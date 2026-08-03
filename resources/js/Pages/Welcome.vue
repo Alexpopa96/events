@@ -1,176 +1,700 @@
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
+import {
+    Bars3Icon,
+    XMarkIcon,
+    CheckIcon,
+    SparklesIcon,
+    ChatBubbleLeftRightIcon,
+    ChartBarIcon,
+    ShieldCheckIcon,
+    CameraIcon,
+    VideoCameraIcon,
+    MusicalNoteIcon,
+    MicrophoneIcon,
+    BuildingStorefrontIcon,
+    PaintBrushIcon,
+    TagIcon,
+    ChevronDownIcon,
+    ArrowUpIcon,
+    ArrowLongRightIcon,
+} from '@heroicons/vue/24/outline';
+import { StarIcon } from '@heroicons/vue/24/solid';
+import { animateCountUp } from '@/Composables/useCountUp';
 
-defineProps({
-    canLogin: {
-        type: Boolean,
+const props = defineProps({
+    categories: {
+        type: Array,
+        default: () => [],
     },
-    canRegister: {
-        type: Boolean,
+    plans: {
+        type: Array,
+        default: () => [],
     },
-    laravelVersion: {
-        type: String,
-        required: true,
-    },
-    phpVersion: {
-        type: String,
-        required: true,
+    stats: {
+        type: Object,
+        default: () => ({ providers: 0, categories: 0 }),
     },
 });
 
-function handleImageError() {
-    document.getElementById('screenshot-container')?.classList.add('!hidden');
-    document.getElementById('docs-card')?.classList.add('!row-span-1');
-    document.getElementById('docs-card-content')?.classList.add('!flex-row');
-    document.getElementById('background')?.classList.add('!hidden');
+const mobileMenuOpen = ref(false);
+
+/* Scroll-triggered reveal — reveals below-the-fold content as it enters the viewport. */
+const vReveal = {
+    mounted(el, binding) {
+        if (typeof IntersectionObserver === 'undefined') {
+            el.classList.add('reveal-visible');
+            return;
+        }
+
+        el.classList.add('reveal');
+        if (binding.value) {
+            el.style.transitionDelay = `${binding.value}ms`;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries, obs) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        el.classList.add('reveal-visible');
+                        obs.unobserve(el);
+                    }
+                });
+            },
+            { threshold: 0.15 },
+        );
+        observer.observe(el);
+    },
+};
+
+/* Header shrink + scroll progress bar */
+const scrollY = ref(0);
+const scrollProgress = ref(0);
+
+function onScroll() {
+    scrollY.value = window.scrollY;
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    scrollProgress.value = max > 0 ? Math.min(100, (scrollY.value / max) * 100) : 0;
 }
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* Hero mouse-follow spotlight */
+const heroRef = ref(null);
+
+function onHeroMouseMove(event) {
+    const rect = heroRef.value.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+    heroRef.value.style.setProperty('--spot-x', `${x}%`);
+    heroRef.value.style.setProperty('--spot-y', `${y}%`);
+}
+
+/* Count-up stats */
+const displayedProviders = ref(0);
+const displayedCategories = ref(0);
+const statsRef = ref(null);
+
+onMounted(() => {
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    if (typeof IntersectionObserver === 'undefined' || !statsRef.value) {
+        displayedProviders.value = props.stats.providers;
+        displayedCategories.value = props.stats.categories;
+        return;
+    }
+
+    const observer = new IntersectionObserver(
+        (entries, obs) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    animateCountUp(props.stats.providers, (v) => (displayedProviders.value = v));
+                    animateCountUp(props.stats.categories, (v) => (displayedCategories.value = v));
+                    obs.disconnect();
+                }
+            });
+        },
+        { threshold: 0.4 },
+    );
+    observer.observe(statsRef.value);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('scroll', onScroll);
+});
+
+/* Color rotation used for category chips and benefit icons — keeps the
+   page from reading as a single flat green wash while staying on-brand. */
+const palette = [
+    { chip: 'bg-brand-500/10 text-brand-600', ring: 'group-hover:ring-brand-400/50', solid: 'bg-brand-500' },
+    { chip: 'bg-gold-500/10 text-gold-500', ring: 'group-hover:ring-gold-400/50', solid: 'bg-gold-500' },
+    { chip: 'bg-sky-500/10 text-sky-600', ring: 'group-hover:ring-sky-400/50', solid: 'bg-sky-500' },
+    { chip: 'bg-rose-500/10 text-rose-600', ring: 'group-hover:ring-rose-400/50', solid: 'bg-rose-500' },
+    { chip: 'bg-violet-500/10 text-violet-600', ring: 'group-hover:ring-violet-400/50', solid: 'bg-violet-500' },
+];
+
+function paletteFor(index) {
+    return palette[index % palette.length];
+}
+
+const categoryIcons = {
+    'fotograf': CameraIcon,
+    'videograf': VideoCameraIcon,
+    'dj': MusicalNoteIcon,
+    'formatie': MusicalNoteIcon,
+    'mc': MicrophoneIcon,
+    'restaurant': BuildingStorefrontIcon,
+    'salon-evenimente': BuildingStorefrontIcon,
+    'decor': PaintBrushIcon,
+};
+
+function iconFor(category) {
+    return categoryIcons[category.slug] ?? TagIcon;
+}
+
+function formatPrice(plan) {
+    if (Number(plan.price) === 0) {
+        return 'Gratuit';
+    }
+
+    return `${Number(plan.price).toLocaleString('ro-RO')} ${plan.currency}`;
+}
+
+const planIcons = {
+    'gratuit': SparklesIcon,
+    'standard': ChartBarIcon,
+    'premium': StarIcon,
+};
+
+function planIcon(plan) {
+    return planIcons[plan.slug] ?? SparklesIcon;
+}
+
+const steps = [
+    {
+        title: 'Creezi profilul companiei',
+        text: 'Adaugi datele companiei, categoriile de servicii și datele de contact. Durează sub 5 minute.',
+    },
+    {
+        title: 'Publici anunțuri cu fotografii',
+        text: 'Încarci fotografii și videoclipuri cu lucrările tale, prețuri orientative și zona în care lucrezi.',
+    },
+    {
+        title: 'Primești cereri de ofertă',
+        text: 'Clienții te găsesc, te contactează direct pe telefon sau WhatsApp și îți trimit cereri de ofertă.',
+    },
+];
+
+const benefits = [
+    {
+        icon: ChatBubbleLeftRightIcon,
+        title: 'Lead-uri directe',
+        text: 'Cereri de ofertă și click-uri pe telefon/WhatsApp trimise direct de clienți interesați din zona ta.',
+    },
+    {
+        icon: ChartBarIcon,
+        title: 'Statistici clare',
+        text: 'Vezi câte persoane ți-au văzut anunțurile și de câte ori au fost contactate, direct din contul tău.',
+    },
+    {
+        icon: ShieldCheckIcon,
+        title: 'Fără comision',
+        text: 'Plătești un abonament lunar fix — nu reținem niciun comision din contractele tale cu clienții.',
+    },
+    {
+        icon: SparklesIcon,
+        title: 'Profil profesionist',
+        text: 'Galerie foto și video, recenzii de la clienți și un profil de companie care inspiră încredere.',
+    },
+];
+
+const paymentMethods = [
+    { name: 'Card bancar', image: '/assets/img/logos/visa.png' },
+    { name: 'Mastercard', image: '/assets/img/logos/mastercard.png' },
+];
 </script>
 
 <template>
-    <Head title="Welcome" />
-    <div class="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
-        <img id="background" class="absolute -left-20 top-0 max-w-[877px]" src="https://laravel.com/assets/img/welcome/background.svg" />
-        <div class="relative min-h-screen flex flex-col items-center justify-center selection:bg-[#FF2D20] selection:text-white">
-            <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl">
-                <header class="grid grid-cols-2 items-center gap-2 py-10 lg:grid-cols-3">
-                    <div class="flex lg:justify-center lg:col-start-2">
-                        <svg class="h-12 w-auto text-white lg:h-16 lg:text-[#FF2D20]" viewBox="0 0 62 65" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M61.8548 14.6253C61.8778 14.7102 61.8895 14.7978 61.8897 14.8858V28.5615C61.8898 28.737 61.8434 28.9095 61.7554 29.0614C61.6675 29.2132 61.5409 29.3392 61.3887 29.4265L49.9104 36.0351V49.1337C49.9104 49.4902 49.7209 49.8192 49.4118 49.9987L25.4519 63.7916C25.3971 63.8227 25.3372 63.8427 25.2774 63.8639C25.255 63.8714 25.2338 63.8851 25.2101 63.8913C25.0426 63.9354 24.8666 63.9354 24.6991 63.8913C24.6716 63.8838 24.6467 63.8689 24.6205 63.8589C24.5657 63.8389 24.5084 63.8215 24.456 63.7916L0.501061 49.9987C0.348882 49.9113 0.222437 49.7853 0.134469 49.6334C0.0465019 49.4816 0.000120578 49.3092 0 49.1337L0 8.10652C0 8.01678 0.0124642 7.92953 0.0348998 7.84477C0.0423783 7.8161 0.0598282 7.78993 0.0697995 7.76126C0.0884958 7.70891 0.105946 7.65531 0.133367 7.6067C0.152063 7.5743 0.179485 7.54812 0.20192 7.51821C0.230588 7.47832 0.256763 7.43719 0.290416 7.40229C0.319084 7.37362 0.356476 7.35243 0.388883 7.32751C0.425029 7.29759 0.457436 7.26518 0.498568 7.2415L12.4779 0.345059C12.6296 0.257786 12.8015 0.211853 12.9765 0.211853C13.1515 0.211853 13.3234 0.257786 13.475 0.345059L25.4531 7.2415H25.4556C25.4955 7.26643 25.5292 7.29759 25.5653 7.32626C25.5977 7.35119 25.6339 7.37362 25.6625 7.40104C25.6974 7.43719 25.7224 7.47832 25.7523 7.51821C25.7735 7.54812 25.8021 7.5743 25.8196 7.6067C25.8483 7.65656 25.8645 7.70891 25.8844 7.76126C25.8944 7.78993 25.9118 7.8161 25.9193 7.84602C25.9423 7.93096 25.954 8.01853 25.9542 8.10652V33.7317L35.9355 27.9844V14.8846C35.9355 14.7973 35.948 14.7088 35.9704 14.6253C35.9792 14.5954 35.9954 14.5692 36.0053 14.5405C36.0253 14.4882 36.0427 14.4346 36.0702 14.386C36.0888 14.3536 36.1163 14.3274 36.1375 14.2975C36.1674 14.2576 36.1923 14.2165 36.2272 14.1816C36.2559 14.1529 36.292 14.1317 36.3244 14.1068C36.3618 14.0769 36.3942 14.0445 36.4341 14.0208L48.4147 7.12434C48.5663 7.03694 48.7383 6.99094 48.9133 6.99094C49.0883 6.99094 49.2602 7.03694 49.4118 7.12434L61.3899 14.0208C61.4323 14.0457 61.4647 14.0769 61.5021 14.1055C61.5333 14.1305 61.5694 14.1529 61.5981 14.1803C61.633 14.2165 61.6579 14.2576 61.6878 14.2975C61.7103 14.3274 61.7377 14.3536 61.7551 14.386C61.7838 14.4346 61.8 14.4882 61.8199 14.5405C61.8312 14.5692 61.8474 14.5954 61.8548 14.6253ZM59.893 27.9844V16.6121L55.7013 19.0252L49.9104 22.3593V33.7317L59.8942 27.9844H59.893ZM47.9149 48.5566V37.1768L42.2187 40.4299L25.953 49.7133V61.2003L47.9149 48.5566ZM1.99677 9.83281V48.5566L23.9562 61.199V49.7145L12.4841 43.2219L12.4804 43.2194L12.4754 43.2169C12.4368 43.1945 12.4044 43.1621 12.3682 43.1347C12.3371 43.1097 12.3009 43.0898 12.2735 43.0624L12.271 43.0586C12.2386 43.0275 12.2162 42.9888 12.1887 42.9539C12.1638 42.9203 12.1339 42.8916 12.114 42.8567L12.1127 42.853C12.0903 42.8156 12.0766 42.7707 12.0604 42.7283C12.0442 42.6909 12.023 42.656 12.013 42.6161C12.0005 42.5688 11.998 42.5177 11.9931 42.4691C11.9881 42.4317 11.9781 42.3943 11.9781 42.3569V15.5801L6.18848 12.2446L1.99677 9.83281ZM12.9777 2.36177L2.99764 8.10652L12.9752 13.8513L22.9541 8.10527L12.9752 2.36177H12.9777ZM18.1678 38.2138L23.9574 34.8809V9.83281L19.7657 12.2459L13.9749 15.5801V40.6281L18.1678 38.2138ZM48.9133 9.14105L38.9344 14.8858L48.9133 20.6305L58.8909 14.8846L48.9133 9.14105ZM47.9149 22.3593L42.124 19.0252L37.9323 16.6121V27.9844L43.7219 31.3174L47.9149 33.7317V22.3593ZM24.9533 47.987L39.59 39.631L46.9065 35.4555L36.9352 29.7145L25.4544 36.3242L14.9907 42.3482L24.9533 47.987Z" fill="currentColor"/></svg>
-                    </div>
-                    <nav v-if="canLogin" class="-mx-3 flex flex-1 justify-end">
-                        <Link
-                            v-if="$page.props.auth.user"
-                            :href="route('dashboard')"
-                            class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                        >
-                            Dashboard
-                        </Link>
+    <Head title="Platforma pentru furnizori de servicii pentru evenimente" />
 
-                        <template v-else>
-                            <Link
-                                :href="route('login')"
-                                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-                            >
-                                Log in
-                            </Link>
+    <div class="bg-paper text-ink antialiased">
+        <!-- Scroll progress bar -->
+        <div class="fixed inset-x-0 top-0 z-[60] h-1 bg-transparent">
+            <div
+                class="h-full bg-gradient-to-r from-brand-500 via-gold-400 to-brand-500 transition-[width] duration-150 ease-out"
+                :style="{ width: scrollProgress + '%' }"
+            ></div>
+        </div>
 
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-50 border-b bg-paper/80 backdrop-blur-md transition-all duration-300"
+            :class="scrollY > 8 ? 'border-line shadow-sm shadow-ink/5' : 'border-transparent'"
+        >
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <div class="flex items-center justify-between transition-all duration-300" :class="scrollY > 8 ? 'h-16' : 'h-20'">
+                    <Link href="/" class="font-serif text-xl text-brand-600 transition-transform duration-200 hover:scale-105">
+                        evenimente<span class="text-gold-500">.</span>
+                    </Link>
+
+                    <nav class="hidden lg:flex items-center gap-8 text-sm font-medium text-ink-soft">
+                        <a href="#cum-functioneaza" class="relative py-1 transition-colors duration-150 hover:text-brand-600 after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-brand-500 after:to-gold-400 after:transition-all after:duration-300 hover:after:w-full">Cum funcționează</a>
+                        <a href="#categorii" class="relative py-1 transition-colors duration-150 hover:text-brand-600 after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-brand-500 after:to-gold-400 after:transition-all after:duration-300 hover:after:w-full">Categorii</a>
+                        <a href="#preturi" class="relative py-1 transition-colors duration-150 hover:text-brand-600 after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-brand-500 after:to-gold-400 after:transition-all after:duration-300 hover:after:w-full">Prețuri</a>
+                        <a href="#despre" class="relative py-1 transition-colors duration-150 hover:text-brand-600 after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-brand-500 after:to-gold-400 after:transition-all after:duration-300 hover:after:w-full">Despre noi</a>
+                    </nav>
+
+                    <div class="hidden lg:flex items-center gap-3">
+                        <template v-if="$page.props.auth.user">
                             <Link
-                                v-if="canRegister"
-                                :href="route('register')"
-                                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
+                                :href="route('dashboard')"
+                                class="rounded-xl px-4 py-2 text-sm font-semibold text-ink transition-colors duration-150 hover:text-brand-600"
                             >
-                                Register
+                                Contul meu
                             </Link>
                         </template>
-                    </nav>
-                </header>
+                        <template v-else>
+                            <Link
+                                href="/login"
+                                class="rounded-xl px-4 py-2 text-sm font-semibold text-ink transition-colors duration-150 hover:text-brand-600"
+                            >
+                                Conectare
+                            </Link>
+                            <Link
+                                href="/register"
+                                class="group relative overflow-hidden rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:-translate-y-0.5 hover:shadow-md hover:shadow-brand-500/30"
+                            >
+                                <span class="relative z-10">Adaugă-ți afacerea</span>
+                                <span class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+                            </Link>
+                        </template>
+                    </div>
 
-                <main class="mt-6">
-                    <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
-                        <a
-                            href="https://laravel.com/docs"
-                            id="docs-card"
-                            class="flex flex-col items-start gap-6 overflow-hidden rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] md:row-span-3 lg:p-10 lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                        >
-                            <div id="screenshot-container" class="relative flex w-full flex-1 items-stretch">
-                                <img
-                                    src="https://laravel.com/assets/img/welcome/docs-light.svg"
-                                    alt="Laravel documentation screenshot"
-                                    class="aspect-video h-full w-full flex-1 rounded-[10px] object-top object-cover drop-shadow-[0px_4px_34px_rgba(0,0,0,0.06)] dark:hidden"
-                                    @error="handleImageError"
-                                />
-                                <img
-                                    src="https://laravel.com/assets/img/welcome/docs-dark.svg"
-                                    alt="Laravel documentation screenshot"
-                                    class="hidden aspect-video h-full w-full flex-1 rounded-[10px] object-top object-cover drop-shadow-[0px_4px_34px_rgba(0,0,0,0.25)] dark:block"
-                                />
-                                <div
-                                    class="absolute -bottom-16 -left-16 h-40 w-[calc(100%+8rem)] bg-gradient-to-b from-transparent via-white to-white dark:via-zinc-900 dark:to-zinc-900"
-                                ></div>
-                            </div>
+                    <button
+                        class="lg:hidden p-2 text-ink-soft transition-transform duration-200 active:scale-90"
+                        @click="mobileMenuOpen = !mobileMenuOpen"
+                    >
+                        <Bars3Icon v-if="!mobileMenuOpen" class="w-6 h-6" />
+                        <XMarkIcon v-else class="w-6 h-6" />
+                    </button>
+                </div>
 
-                            <div class="relative flex items-center gap-6 lg:items-end">
-                                <div id="docs-card-content" class="flex items-start gap-6 lg:flex-col">
-                                    <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                        <svg class="size-5 sm:size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path fill="#FF2D20" d="M23 4a1 1 0 0 0-1.447-.894L12.224 7.77a.5.5 0 0 1-.448 0L2.447 3.106A1 1 0 0 0 1 4v13.382a1.99 1.99 0 0 0 1.105 1.79l9.448 4.728c.14.065.293.1.447.1.154-.005.306-.04.447-.105l9.453-4.724a1.99 1.99 0 0 0 1.1-1.789V4ZM3 6.023a.25.25 0 0 1 .362-.223l7.5 3.75a.251.251 0 0 1 .138.223v11.2a.25.25 0 0 1-.362.224l-7.5-3.75a.25.25 0 0 1-.138-.22V6.023Zm18 11.2a.25.25 0 0 1-.138.224l-7.5 3.75a.249.249 0 0 1-.329-.099.249.249 0 0 1-.033-.12V9.772a.251.251 0 0 1 .138-.224l7.5-3.75a.25.25 0 0 1 .362.224v11.2Z"/><path fill="#FF2D20" d="m3.55 1.893 8 4.048a1.008 1.008 0 0 0 .9 0l8-4.048a1 1 0 0 0-.9-1.785l-7.322 3.706a.506.506 0 0 1-.452 0L4.454.108a1 1 0 0 0-.9 1.785H3.55Z"/></svg>
-                                    </div>
-
-                                    <div class="pt-3 sm:pt-5 lg:pt-0">
-                                        <h2 class="text-xl font-semibold text-black dark:text-white">Documentation</h2>
-
-                                        <p class="mt-4 text-sm/relaxed">
-                                            Laravel has wonderful documentation covering every aspect of the framework. Whether you are a newcomer or have prior experience with Laravel, we recommend reading our documentation from beginning to end.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <svg class="size-6 shrink-0 stroke-[#FF2D20]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/></svg>
-                            </div>
-                        </a>
-
-                        <a
-                            href="https://laracasts.com"
-                            class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                        >
-                            <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                <svg class="size-5 sm:size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g fill="#FF2D20"><path d="M24 8.25a.5.5 0 0 0-.5-.5H.5a.5.5 0 0 0-.5.5v12a2.5 2.5 0 0 0 2.5 2.5h19a2.5 2.5 0 0 0 2.5-2.5v-12Zm-7.765 5.868a1.221 1.221 0 0 1 0 2.264l-6.626 2.776A1.153 1.153 0 0 1 8 18.123v-5.746a1.151 1.151 0 0 1 1.609-1.035l6.626 2.776ZM19.564 1.677a.25.25 0 0 0-.177-.427H15.6a.106.106 0 0 0-.072.03l-4.54 4.543a.25.25 0 0 0 .177.427h3.783c.027 0 .054-.01.073-.03l4.543-4.543ZM22.071 1.318a.047.047 0 0 0-.045.013l-4.492 4.492a.249.249 0 0 0 .038.385.25.25 0 0 0 .14.042h5.784a.5.5 0 0 0 .5-.5v-2a2.5 2.5 0 0 0-1.925-2.432ZM13.014 1.677a.25.25 0 0 0-.178-.427H9.101a.106.106 0 0 0-.073.03l-4.54 4.543a.25.25 0 0 0 .177.427H8.4a.106.106 0 0 0 .073-.03l4.54-4.543ZM6.513 1.677a.25.25 0 0 0-.177-.427H2.5A2.5 2.5 0 0 0 0 3.75v2a.5.5 0 0 0 .5.5h1.4a.106.106 0 0 0 .073-.03l4.54-4.543Z"/></g></svg>
-                            </div>
-
-                            <div class="pt-3 sm:pt-5">
-                                <h2 class="text-xl font-semibold text-black dark:text-white">Laracasts</h2>
-
-                                <p class="mt-4 text-sm/relaxed">
-                                    Laracasts offers thousands of video tutorials on Laravel, PHP, and JavaScript development. Check them out, see for yourself, and massively level up your development skills in the process.
-                                </p>
-                            </div>
-
-                            <svg class="size-6 shrink-0 self-center stroke-[#FF2D20]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/></svg>
-                        </a>
-
-                        <a
-                            href="https://laravel-news.com"
-                            class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] transition duration-300 hover:text-black/70 hover:ring-black/20 focus:outline-none focus-visible:ring-[#FF2D20] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:text-white/70 dark:hover:ring-zinc-700 dark:focus-visible:ring-[#FF2D20]"
-                        >
-                            <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                <svg class="size-5 sm:size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><g fill="#FF2D20"><path d="M8.75 4.5H5.5c-.69 0-1.25.56-1.25 1.25v4.75c0 .69.56 1.25 1.25 1.25h3.25c.69 0 1.25-.56 1.25-1.25V5.75c0-.69-.56-1.25-1.25-1.25Z"/><path d="M24 10a3 3 0 0 0-3-3h-2V2.5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2V20a3.5 3.5 0 0 0 3.5 3.5h17A3.5 3.5 0 0 0 24 20V10ZM3.5 21.5A1.5 1.5 0 0 1 2 20V3a.5.5 0 0 1 .5-.5h14a.5.5 0 0 1 .5.5v17c0 .295.037.588.11.874a.5.5 0 0 1-.484.625L3.5 21.5ZM22 20a1.5 1.5 0 1 1-3 0V9.5a.5.5 0 0 1 .5-.5H21a1 1 0 0 1 1 1v10Z"/><path d="M12.751 6.047h2a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-.75.75h-2A.75.75 0 0 1 12 7.3v-.5a.75.75 0 0 1 .751-.753ZM12.751 10.047h2a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-.75.75h-2A.75.75 0 0 1 12 11.3v-.5a.75.75 0 0 1 .751-.753ZM4.751 14.047h10a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-.75.75h-10A.75.75 0 0 1 4 15.3v-.5a.75.75 0 0 1 .751-.753ZM4.75 18.047h7.5a.75.75 0 0 1 .75.75v.5a.75.75 0 0 1-.75.75h-7.5A.75.75 0 0 1 4 19.3v-.5a.75.75 0 0 1 .75-.753Z"/></g></svg>
-                            </div>
-
-                            <div class="pt-3 sm:pt-5">
-                                <h2 class="text-xl font-semibold text-black dark:text-white">Laravel News</h2>
-
-                                <p class="mt-4 text-sm/relaxed">
-                                    Laravel News is a community driven portal and newsletter aggregating all of the latest and most important news in the Laravel ecosystem, including new package releases and tutorials.
-                                </p>
-                            </div>
-
-                            <svg class="size-6 shrink-0 self-center stroke-[#FF2D20]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/></svg>
-                        </a>
-
-                        <div class="flex items-start gap-4 rounded-lg bg-white p-6 shadow-[0px_14px_34px_0px_rgba(0,0,0,0.08)] ring-1 ring-white/[0.05] lg:pb-10 dark:bg-zinc-900 dark:ring-zinc-800">
-                            <div class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                <svg class="size-5 sm:size-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <g fill="#FF2D20">
-                                        <path
-                                            d="M16.597 12.635a.247.247 0 0 0-.08-.237 2.234 2.234 0 0 1-.769-1.68c.001-.195.03-.39.084-.578a.25.25 0 0 0-.09-.267 8.8 8.8 0 0 0-4.826-1.66.25.25 0 0 0-.268.181 2.5 2.5 0 0 1-2.4 1.824.045.045 0 0 0-.045.037 12.255 12.255 0 0 0-.093 3.86.251.251 0 0 0 .208.214c2.22.366 4.367 1.08 6.362 2.118a.252.252 0 0 0 .32-.079 10.09 10.09 0 0 0 1.597-3.733ZM13.616 17.968a.25.25 0 0 0-.063-.407A19.697 19.697 0 0 0 8.91 15.98a.25.25 0 0 0-.287.325c.151.455.334.898.548 1.328.437.827.981 1.594 1.619 2.28a.249.249 0 0 0 .32.044 29.13 29.13 0 0 0 2.506-1.99ZM6.303 14.105a.25.25 0 0 0 .265-.274 13.048 13.048 0 0 1 .205-4.045.062.062 0 0 0-.022-.07 2.5 2.5 0 0 1-.777-.982.25.25 0 0 0-.271-.149 11 11 0 0 0-5.6 2.815.255.255 0 0 0-.075.163c-.008.135-.02.27-.02.406.002.8.084 1.598.246 2.381a.25.25 0 0 0 .303.193 19.924 19.924 0 0 1 5.746-.438ZM9.228 20.914a.25.25 0 0 0 .1-.393 11.53 11.53 0 0 1-1.5-2.22 12.238 12.238 0 0 1-.91-2.465.248.248 0 0 0-.22-.187 18.876 18.876 0 0 0-5.69.33.249.249 0 0 0-.179.336c.838 2.142 2.272 4 4.132 5.353a.254.254 0 0 0 .15.048c1.41-.01 2.807-.282 4.117-.802ZM18.93 12.957l-.005-.008a.25.25 0 0 0-.268-.082 2.21 2.21 0 0 1-.41.081.25.25 0 0 0-.217.2c-.582 2.66-2.127 5.35-5.75 7.843a.248.248 0 0 0-.09.299.25.25 0 0 0 .065.091 28.703 28.703 0 0 0 2.662 2.12.246.246 0 0 0 .209.037c2.579-.701 4.85-2.242 6.456-4.378a.25.25 0 0 0 .048-.189 13.51 13.51 0 0 0-2.7-6.014ZM5.702 7.058a.254.254 0 0 0 .2-.165A2.488 2.488 0 0 1 7.98 5.245a.093.093 0 0 0 .078-.062 19.734 19.734 0 0 1 3.055-4.74.25.25 0 0 0-.21-.41 12.009 12.009 0 0 0-10.4 8.558.25.25 0 0 0 .373.281 12.912 12.912 0 0 1 4.826-1.814ZM10.773 22.052a.25.25 0 0 0-.28-.046c-.758.356-1.55.635-2.365.833a.25.25 0 0 0-.022.48c1.252.43 2.568.65 3.893.65.1 0 .2 0 .3-.008a.25.25 0 0 0 .147-.444c-.526-.424-1.1-.917-1.673-1.465ZM18.744 8.436a.249.249 0 0 0 .15.228 2.246 2.246 0 0 1 1.352 2.054c0 .337-.08.67-.23.972a.25.25 0 0 0 .042.28l.007.009a15.016 15.016 0 0 1 2.52 4.6.25.25 0 0 0 .37.132.25.25 0 0 0 .096-.114c.623-1.464.944-3.039.945-4.63a12.005 12.005 0 0 0-5.78-10.258.25.25 0 0 0-.373.274c.547 2.109.85 4.274.901 6.453ZM9.61 5.38a.25.25 0 0 0 .08.31c.34.24.616.561.8.935a.25.25 0 0 0 .3.127.631.631 0 0 1 .206-.034c2.054.078 4.036.772 5.69 1.991a.251.251 0 0 0 .267.024c.046-.024.093-.047.141-.067a.25.25 0 0 0 .151-.23A29.98 29.98 0 0 0 15.957.764a.25.25 0 0 0-.16-.164 11.924 11.924 0 0 0-2.21-.518.252.252 0 0 0-.215.076A22.456 22.456 0 0 0 9.61 5.38Z"
-                                        />
-                                    </g>
-                                </svg>
-                            </div>
-
-                            <div class="pt-3 sm:pt-5">
-                                <h2 class="text-xl font-semibold text-black dark:text-white">Vibrant Ecosystem</h2>
-
-                                <p class="mt-4 text-sm/relaxed">
-                                    Laravel's robust library of first-party tools and libraries, such as <a href="https://forge.laravel.com" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white dark:focus-visible:ring-[#FF2D20]">Forge</a>, <a href="https://vapor.laravel.com" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Vapor</a>, <a href="https://nova.laravel.com" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Nova</a>, and <a href="https://envoyer.io" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Envoyer</a> help you take your projects to the next level. Pair them with powerful open source libraries like <a href="https://laravel.com/docs/billing" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Cashier</a>, <a href="https://laravel.com/docs/dusk" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Dusk</a>, <a href="https://laravel.com/docs/broadcasting" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Echo</a>, <a href="https://laravel.com/docs/horizon" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Horizon</a>, <a href="https://laravel.com/docs/sanctum" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Sanctum</a>, <a href="https://laravel.com/docs/telescope" class="rounded-sm underline hover:text-black focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FF2D20] dark:hover:text-white">Telescope</a>, and more.
-                                </p>
-                            </div>
+                <Transition
+                    enter-active-class="transition duration-200 ease-out"
+                    enter-from-class="opacity-0 -translate-y-2"
+                    enter-to-class="opacity-100 translate-y-0"
+                    leave-active-class="transition duration-150 ease-in"
+                    leave-from-class="opacity-100 translate-y-0"
+                    leave-to-class="opacity-0 -translate-y-2"
+                >
+                    <div v-if="mobileMenuOpen" class="lg:hidden pb-6 space-y-4">
+                        <nav class="flex flex-col gap-1 text-sm font-medium text-ink-soft">
+                            <a href="#cum-functioneaza" class="rounded-lg px-3 py-2 transition-colors hover:bg-white hover:text-brand-600" @click="mobileMenuOpen = false">Cum funcționează</a>
+                            <a href="#categorii" class="rounded-lg px-3 py-2 transition-colors hover:bg-white hover:text-brand-600" @click="mobileMenuOpen = false">Categorii</a>
+                            <a href="#preturi" class="rounded-lg px-3 py-2 transition-colors hover:bg-white hover:text-brand-600" @click="mobileMenuOpen = false">Prețuri</a>
+                            <a href="#despre" class="rounded-lg px-3 py-2 transition-colors hover:bg-white hover:text-brand-600" @click="mobileMenuOpen = false">Despre noi</a>
+                        </nav>
+                        <div class="flex flex-col gap-2 px-3">
+                            <template v-if="$page.props.auth.user">
+                                <Link :href="route('dashboard')" class="rounded-xl bg-brand-500 px-4 py-2.5 text-center text-sm font-semibold text-white">
+                                    Contul meu
+                                </Link>
+                            </template>
+                            <template v-else>
+                                <Link href="/login" class="rounded-xl border border-line bg-white px-4 py-2.5 text-center text-sm font-semibold text-ink">
+                                    Conectare
+                                </Link>
+                                <Link href="/register" class="rounded-xl bg-brand-500 px-4 py-2.5 text-center text-sm font-semibold text-white">
+                                    Adaugă-ți afacerea
+                                </Link>
+                            </template>
                         </div>
                     </div>
-                </main>
-
-                <footer class="py-16 text-center text-sm text-black dark:text-white/70">
-                    Laravel v{{ laravelVersion }} (PHP v{{ phpVersion }})
-                </footer>
+                </Transition>
             </div>
-        </div>
+        </header>
+
+        <!-- Hero -->
+        <section ref="heroRef" class="relative overflow-hidden" @mousemove="onHeroMouseMove">
+            <div
+                class="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-500"
+                style="background: radial-gradient(500px circle at var(--spot-x, 50%) var(--spot-y, 20%), rgba(31,92,78,0.08), transparent 70%);"
+            ></div>
+
+            <div class="absolute -top-32 -right-32 w-[32rem] h-[32rem] rounded-full bg-brand-400/20 blur-3xl animate-float-slow"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-gold-400/25 blur-3xl animate-float-slower"></div>
+            <div class="absolute top-1/3 left-1/2 w-72 h-72 rounded-full bg-sky-400/10 blur-3xl animate-float-slow"></div>
+            <div
+                class="absolute inset-0 opacity-[0.05]"
+                style="background-image: radial-gradient(circle, #211C27 1px, transparent 1px); background-size: 24px 24px;"
+            ></div>
+
+            <div class="relative mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+                <div class="mx-auto max-w-3xl text-center">
+                    <p class="inline-flex items-center gap-2 rounded-full bg-brand-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-600 ring-1 ring-brand-500/10">
+                        <span class="relative flex h-1.5 w-1.5">
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75"></span>
+                            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-500"></span>
+                        </span>
+                        Marketplace evenimente
+                    </p>
+                    <h1 class="mt-6 font-serif text-4xl leading-tight text-ink text-balance sm:text-5xl lg:text-6xl">
+                        Fiecare eveniment merită
+                        <span class="animate-gradient-x bg-gradient-to-r from-brand-500 via-gold-500 to-brand-600 bg-clip-text text-transparent">
+                            furnizorul potrivit.
+                        </span>
+                    </h1>
+                    <p class="mt-6 text-lg leading-relaxed text-ink-soft text-balance">
+                        Platforma unde furnizorii de servicii pentru evenimente — fotografi, DJ, formații, locații, decoratori și mulți alții — își construiesc profilul și primesc cereri de ofertă direct de la clienți, fără comisioane.
+                    </p>
+                    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <Link
+                            href="/register"
+                            class="group relative w-full sm:w-auto overflow-hidden rounded-xl bg-brand-500 px-6 py-3.5 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-lg hover:shadow-brand-500/30 hover:-translate-y-0.5"
+                        >
+                            <span class="relative z-10">Adaugă-ți afacerea gratuit</span>
+                            <span class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+                        </Link>
+                        <a
+                            href="#preturi"
+                            class="w-full sm:w-auto rounded-xl border border-line bg-white px-6 py-3.5 text-sm font-semibold text-ink transition-all duration-200 hover:border-brand-400 hover:text-brand-600 hover:-translate-y-0.5"
+                        >
+                            Vezi planurile și prețurile
+                        </a>
+                    </div>
+
+                    <div ref="statsRef" class="mt-14 flex items-center justify-center gap-10 sm:gap-16">
+                        <div class="text-center">
+                            <p class="font-serif text-3xl text-ink">{{ displayedProviders }}+</p>
+                            <p class="mt-1 text-xs font-medium uppercase tracking-wide text-ink-soft">Furnizori activi</p>
+                        </div>
+                        <div class="h-10 w-px bg-line"></div>
+                        <div class="text-center">
+                            <p class="font-serif text-3xl text-ink">{{ displayedCategories }}+</p>
+                            <p class="mt-1 text-xs font-medium uppercase tracking-wide text-ink-soft">Categorii de servicii</p>
+                        </div>
+                        <div class="h-10 w-px bg-line"></div>
+                        <div class="text-center">
+                            <p class="font-serif text-3xl text-ink">0%</p>
+                            <p class="mt-1 text-xs font-medium uppercase tracking-wide text-ink-soft">Comision reținut</p>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="#cum-functioneaza" class="mt-16 hidden sm:flex justify-center text-ink-soft/60 transition-colors hover:text-brand-500">
+                    <ChevronDownIcon class="h-6 w-6 animate-bounce" />
+                </a>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section id="cum-functioneaza" class="py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <div v-reveal class="mx-auto max-w-2xl text-center">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-brand-500">Cum funcționează</p>
+                    <h2 class="mt-3 font-serif text-3xl text-ink sm:text-4xl">De la înregistrare la primul lead, în trei pași</h2>
+                </div>
+
+                <div class="mt-14 grid gap-8 sm:grid-cols-3 sm:gap-6 lg:gap-4 items-start">
+                    <template v-for="(step, index) in steps" :key="step.title">
+                        <div
+                            v-reveal="index * 100"
+                            class="group relative flex-1 rounded-2xl bg-white p-8 shadow-sm shadow-ink/5 ring-1 ring-line transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-ink/10"
+                        >
+                            <span
+                                class="flex h-10 w-10 items-center justify-center rounded-full font-serif text-lg text-white transition-transform duration-300 group-hover:scale-110"
+                                :class="paletteFor(index).solid"
+                            >
+                                {{ index + 1 }}
+                            </span>
+                            <h3 class="mt-5 font-serif text-xl text-ink">{{ step.title }}</h3>
+                            <p class="mt-3 text-sm leading-relaxed text-ink-soft">{{ step.text }}</p>
+                        </div>
+                        <div v-if="index < steps.length - 1" class="hidden lg:flex items-center justify-center text-line">
+                            <ArrowLongRightIcon class="h-6 w-6" />
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories -->
+        <section id="categorii" class="bg-white py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <div v-reveal class="mx-auto max-w-2xl text-center">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-brand-500">Categorii</p>
+                    <h2 class="mt-3 font-serif text-3xl text-ink sm:text-4xl">Ce tipuri de servicii poți promova</h2>
+                    <p class="mt-4 text-ink-soft">De la fotografi și DJ, la locații și decor — platforma acoperă toate categoriile importante pentru un eveniment reușit.</p>
+                </div>
+
+                <div class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                    <div
+                        v-for="(category, index) in categories"
+                        :key="category.id"
+                        v-reveal="(index % 8) * 40"
+                        class="group flex items-center gap-3 rounded-2xl border border-line bg-paper px-5 py-4 ring-1 ring-transparent transition-all duration-300 hover:-translate-y-1 hover:border-transparent hover:shadow-md hover:shadow-ink/5"
+                        :class="paletteFor(index).ring"
+                    >
+                        <span
+                            class="flex h-10 w-10 flex-none items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                            :class="paletteFor(index).chip"
+                        >
+                            <component :is="iconFor(category)" class="h-5 w-5" />
+                        </span>
+                        <span class="text-sm font-medium text-ink">{{ category.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits -->
+        <section class="py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <div v-reveal class="mx-auto max-w-2xl text-center">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-brand-500">De ce evenimente.</p>
+                    <h2 class="mt-3 font-serif text-3xl text-ink sm:text-4xl">Construit pentru furnizori, nu pentru comisioane</h2>
+                </div>
+
+                <div class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    <div
+                        v-for="(benefit, index) in benefits"
+                        :key="benefit.title"
+                        v-reveal="index * 80"
+                        class="group rounded-2xl bg-white p-7 shadow-sm shadow-ink/5 ring-1 ring-line transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg hover:shadow-ink/10"
+                    >
+                        <span
+                            class="flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6"
+                            :class="paletteFor(index).chip"
+                        >
+                            <component :is="benefit.icon" class="h-6 w-6" />
+                        </span>
+                        <h3 class="mt-5 font-serif text-lg text-ink">{{ benefit.title }}</h3>
+                        <p class="mt-2.5 text-sm leading-relaxed text-ink-soft">{{ benefit.text }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing -->
+        <section id="preturi" class="bg-gradient-to-b from-white to-paper py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <div v-reveal class="mx-auto max-w-2xl text-center">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-brand-500">Abonamente</p>
+                    <h2 class="mt-3 font-serif text-3xl text-ink sm:text-4xl">Prețuri simple, fără costuri ascunse</h2>
+                    <p class="mt-4 text-ink-soft">Alege planul potrivit pentru afacerea ta. Poți schimba sau anula abonamentul oricând din contul tău.</p>
+                </div>
+
+                <div class="mt-14 grid gap-8 lg:grid-cols-3 lg:items-start">
+                    <div
+                        v-for="(plan, index) in plans"
+                        :key="plan.slug"
+                        v-reveal="index * 100"
+                        class="relative rounded-2xl bg-white p-8 shadow-sm shadow-ink/5 ring-1 ring-line transition-all duration-300 hover:-translate-y-1.5"
+                        :class="plan.allows_featured_placement ? 'lg:-translate-y-3 lg:hover:-translate-y-4 ring-2 ring-brand-500 shadow-lg shadow-brand-500/10 animate-pulse-glow' : 'hover:shadow-lg hover:shadow-ink/10'"
+                    >
+                        <span
+                            v-if="plan.allows_featured_placement"
+                            class="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gold-500 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-sm shadow-gold-500/40"
+                        >
+                            Cel mai popular
+                        </span>
+
+                        <span
+                            class="flex h-11 w-11 items-center justify-center rounded-xl"
+                            :class="paletteFor(index).chip"
+                        >
+                            <component :is="planIcon(plan)" class="h-5 w-5" />
+                        </span>
+
+                        <h3 class="mt-5 font-serif text-xl text-ink">{{ plan.name }}</h3>
+                        <p class="mt-2 text-sm text-ink-soft">{{ plan.description }}</p>
+
+                        <p class="mt-6 flex items-baseline gap-1.5">
+                            <span class="font-serif text-4xl text-ink">{{ formatPrice(plan) }}</span>
+                            <span v-if="Number(plan.price) > 0" class="text-sm text-ink-soft">/ lună</span>
+                        </p>
+
+                        <Link
+                            href="/register"
+                            class="group relative mt-7 block overflow-hidden rounded-xl px-4 py-3 text-center text-sm font-semibold transition-all duration-200"
+                            :class="plan.allows_featured_placement
+                                ? 'bg-brand-500 text-white shadow-sm shadow-brand-500/25 hover:bg-brand-600 hover:-translate-y-0.5'
+                                : 'border border-line text-ink hover:border-brand-400 hover:text-brand-600'"
+                        >
+                            <span class="relative z-10">Alege {{ plan.name }}</span>
+                            <span
+                                v-if="plan.allows_featured_placement"
+                                class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"
+                            ></span>
+                        </Link>
+
+                        <ul class="mt-7 space-y-3">
+                            <li v-for="feature in plan.features" :key="feature" class="flex items-start gap-2.5 text-sm text-ink-soft">
+                                <CheckIcon class="mt-0.5 h-4 w-4 flex-none text-brand-500" />
+                                <span>{{ feature }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About -->
+        <section id="despre" class="py-20 sm:py-24">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <div class="grid gap-12 lg:grid-cols-2 lg:items-center">
+                    <div v-reveal>
+                        <p class="text-xs font-semibold uppercase tracking-widest text-brand-500">Despre noi</p>
+                        <h2 class="mt-3 font-serif text-3xl text-ink sm:text-4xl">O platformă locală, făcută pentru piața de evenimente din România</h2>
+                        <p class="mt-6 text-ink-soft leading-relaxed">
+                            evenimente. este locul unde furnizorii de servicii pentru nunți, botezuri și evenimente corporate își prezintă portofoliul și sunt găsiți de clienți care caută exact ce oferă ei — fotografi, videografi, DJ, formații, locații, decoratori, floriști și multe altele.
+                        </p>
+                        <p class="mt-4 text-ink-soft leading-relaxed">
+                            Nu suntem o agenție și nu ne implicăm în negocierile dintre furnizor și client. Rolul nostru este să te ajutăm să fii vizibil, să primești cereri de ofertă calificate și să îți administrezi prezența online dintr-un singur loc.
+                        </p>
+                        <ul class="mt-8 space-y-3">
+                            <li class="flex items-start gap-2.5 text-sm text-ink">
+                                <CheckIcon class="mt-0.5 h-4 w-4 flex-none text-brand-500" />
+                                <span>Fără comision din contractele tale cu clienții</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 text-sm text-ink">
+                                <CheckIcon class="mt-0.5 h-4 w-4 flex-none text-brand-500" />
+                                <span>Plan gratuit disponibil, fără card bancar necesar</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 text-sm text-ink">
+                                <CheckIcon class="mt-0.5 h-4 w-4 flex-none text-brand-500" />
+                                <span>Suport dedicat pentru furnizori la configurarea profilului</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div v-reveal="120" class="relative">
+                        <div class="absolute -inset-4 rounded-3xl border border-dashed border-brand-400/20 animate-spin-slow"></div>
+                        <div class="relative rounded-2xl bg-gradient-to-br from-brand-600 to-brand-700 p-10 text-white shadow-xl shadow-brand-500/20">
+                            <p class="font-serif text-2xl leading-snug text-balance">
+                                „Ne dorim ca fiecare furnizor bun să poată fi găsit ușor de clienții potriviți, indiferent de bugetul de marketing.”
+                            </p>
+                            <p class="mt-6 text-sm text-brand-50/80">Echipa evenimente.</p>
+                        </div>
+                        <div class="absolute -bottom-6 -right-6 w-32 h-32 rounded-full bg-gold-400/25 blur-2xl animate-float-slower"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Payment methods -->
+        <section class="border-y border-line bg-white py-14">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <div v-reveal class="flex flex-col items-center justify-between gap-8 sm:flex-row">
+                    <div>
+                        <p class="text-xs font-semibold uppercase tracking-widest text-brand-500">Modalități de plată</p>
+                        <p class="mt-2 text-sm text-ink-soft">Plătești abonamentul lunar simplu și în siguranță.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-6">
+                        <div
+                            v-for="method in paymentMethods"
+                            :key="method.name"
+                            class="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-sm"
+                        >
+                            <img :src="method.image" :alt="method.name" class="h-6 w-auto object-contain grayscale transition-all duration-300 hover:grayscale-0" />
+                        </div>
+                        <div class="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-ink-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-400 hover:text-brand-600">
+                            Transfer bancar
+                        </div>
+                        <div class="flex items-center gap-2 rounded-xl border border-line px-4 py-2.5 text-sm font-medium text-ink-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-400 hover:text-brand-600">
+                            Factură cu TVA
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="relative overflow-hidden py-20 sm:py-24">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-64 rounded-full bg-brand-400/10 blur-3xl"></div>
+            <div v-reveal class="relative mx-auto max-w-4xl px-6 text-center lg:px-8">
+                <h2 class="font-serif text-3xl text-ink sm:text-4xl text-balance">Pregătit să primești primele cereri de ofertă?</h2>
+                <p class="mt-4 text-ink-soft">Creează-ți profilul gratuit în câteva minute — fără card bancar necesar.</p>
+                <Link
+                    href="/register"
+                    class="group relative mt-8 inline-flex overflow-hidden rounded-xl bg-brand-500 px-7 py-3.5 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-lg hover:shadow-brand-500/30 hover:-translate-y-0.5"
+                >
+                    <span class="relative z-10">Adaugă-ți afacerea gratuit</span>
+                    <span class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"></span>
+                </Link>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-line bg-white">
+            <div class="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+                <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+                    <div>
+                        <Link href="/" class="font-serif text-xl text-brand-600">
+                            evenimente<span class="text-gold-500">.</span>
+                        </Link>
+                        <p class="mt-4 text-sm leading-relaxed text-ink-soft">
+                            Platformă pentru furnizori de servicii pentru evenimente din România.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-semibold text-ink">Platformă</h4>
+                        <ul class="mt-4 space-y-2.5 text-sm text-ink-soft">
+                            <li><a href="#cum-functioneaza" class="transition-colors duration-150 hover:text-brand-600">Cum funcționează</a></li>
+                            <li><a href="#categorii" class="transition-colors duration-150 hover:text-brand-600">Categorii</a></li>
+                            <li><a href="#preturi" class="transition-colors duration-150 hover:text-brand-600">Prețuri</a></li>
+                            <li><a href="#despre" class="transition-colors duration-150 hover:text-brand-600">Despre noi</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-semibold text-ink">Cont</h4>
+                        <ul class="mt-4 space-y-2.5 text-sm text-ink-soft">
+                            <li><Link href="/login" class="transition-colors duration-150 hover:text-brand-600">Conectare</Link></li>
+                            <li><Link href="/register" class="transition-colors duration-150 hover:text-brand-600">Creează cont furnizor</Link></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-sm font-semibold text-ink">Legal</h4>
+                        <ul class="mt-4 space-y-2.5 text-sm text-ink-soft">
+                            <li><Link :href="route('terms.show')" class="transition-colors duration-150 hover:text-brand-600">Termeni și condiții</Link></li>
+                            <li><Link :href="route('policy.show')" class="transition-colors duration-150 hover:text-brand-600">Politica de confidențialitate</Link></li>
+                            <li><a href="mailto:contact@evenimente.ro" class="transition-colors duration-150 hover:text-brand-600">contact@evenimente.ro</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-12 flex flex-col-reverse items-center justify-between gap-4 border-t border-line pt-8 sm:flex-row">
+                    <p class="text-xs text-ink-soft">&copy; {{ new Date().getFullYear() }} evenimente. Toate drepturile rezervate.</p>
+                    <p class="text-xs text-ink-soft">Platformă pentru furnizori de servicii pentru evenimente</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Back to top -->
+        <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0 translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 translate-y-2"
+        >
+            <button
+                v-if="scrollY > 500"
+                @click="scrollToTop"
+                class="fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-brand-500 text-white shadow-lg shadow-brand-500/30 transition-all duration-200 hover:bg-brand-600 hover:-translate-y-1"
+                aria-label="Înapoi sus"
+            >
+                <ArrowUpIcon class="h-5 w-5" />
+            </button>
+        </Transition>
     </div>
 </template>

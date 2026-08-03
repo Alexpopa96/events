@@ -1,8 +1,9 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ref, onMounted, onUnmounted } from 'vue';
-import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import InputError from '@/Components/InputError.vue';
+import { EnvelopeIcon, LockClosedIcon } from '@heroicons/vue/24/outline';
+import GuestAuthLayout from '@/Layouts/GuestAuthLayout.vue';
+import IconField from '@/Components/Auth/IconField.vue';
+import GoogleAuthButton from '@/Components/Auth/GoogleAuthButton.vue';
 
 defineProps({
     canResetPassword: Boolean,
@@ -23,97 +24,86 @@ const submit = () => {
         onFinish: () => form.reset('password'),
     });
 };
-
-const parallaxContainer = ref(null);
-
-const handleMouseMove = (event) => {
-    if (parallaxContainer.value) {
-        const { clientX, clientY } = event;
-        const { offsetWidth, offsetHeight } = parallaxContainer.value;
-        const moveX = (clientX / offsetWidth - 0.5) * 50;
-        const moveY = (clientY / offsetHeight - 0.5) * 50;
-
-        parallaxContainer.value.style.transform = `translate(${moveX}px, ${moveY}px)`;
-        parallaxContainer.value.style.filter = `blur(${Math.abs(moveX) * 0.1}px)`;
-    }
-};
-
-onMounted(() => {
-    window.addEventListener('mousemove', handleMouseMove);
-});
-
-onUnmounted(() => {
-    window.removeEventListener('mousemove', handleMouseMove);
-});
 </script>
 
 <template>
-    <Head title="Log in" />
-    <section>
-        <div class="relative flex items-center min-h-screen p-0 overflow-hidden bg-center bg-cover">
-            <div class="container z-1">
-                <div class="flex flex-wrap -mx-3">
-                    <div
-                        class="flex flex-col w-full max-w-full px-3 mx-auto lg:mx-0 shrink-0 md:flex-0 md:w-7/12 lg:w-5/12 xl:w-4/12">
-                        <div
-                            class="relative flex flex-col min-w-0 break-words bg-transparent border-0 shadow-none lg:py4 rounded-2xl bg-clip-border">
-                            <div class="p-6 pb-0 mb-0">
-                                <h4 class="font-bold text-xl">Log in</h4>
-                                <p class="mb-0">Introdu adresa ta de email si parola.</p>
-                            </div>
-                            <div class="flex-auto p-6">
-                                <form @submit.prevent="submit">
-                                    <div class="mb-4">
-                                        <input v-model="form.email" type="email" placeholder="Email"
-                                               :class="{ 'border border-red-500': form.errors.email }"
-                                               class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-300 focus:outline-none" />
-                                        <InputError class="mt-2" :message="form.errors.email" />
-                                    </div>
-                                    <div class="mb-4">
-                                        <input v-model="form.password" type="password" placeholder="Parola"
-                                               :class="{ 'border border-red-500': form.errors.password }"
-                                               class="focus:shadow-primary-outline text-sm leading-5.6 ease block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding p-3 font-normal text-gray-700 outline-none transition-all placeholder:text-gray-500 focus:border-blue-300 focus:outline-none" />
-                                        <InputError class="mt-2" :message="form.errors.password" />
-                                    </div>
-                                    <div class="flex items-center pl-12 mb-0.5 text-left min-h-6">
-                                        <input v-model="form.remember" id="rememberMe"
-                                               class="mt-0.5 rounded-full duration-250 ease-in-out after:rounded-circle after:shadow-2xl after:duration-250 checked:after:translate-x-5.3 h-5 relative float-left -ml-12 w-10 cursor-pointer appearance-none border border-solid border-gray-200 bg-zinc-700/10 bg-none bg-contain bg-left bg-no-repeat align-top transition-all after:absolute after:top-px after:h-4 after:w-4 after:translate-x-px after:bg-white after:content-[''] checked:border-blue-500/95 checked:bg-blue-500/95 checked:bg-none checked:bg-right"
-                                               type="checkbox" />
-                                        <label
-                                            class="ml-2 font-normal cursor-pointer select-none text-sm text-slate-700"
-                                            for="rememberMe">Tine-ma minte</label>
-                                    </div>
-                                    <div class="text-center" :class="{ 'opacity-25': form.processing }"
-                                         :disabled="form.processing">
-                                        <button type="submit"
-                                                class="inline-block w-full px-16 py-3.5 mt-6 mb-0 font-bold leading-normal text-center text-white align-middle transition-all bg-blue-500 border-0 rounded-lg cursor-pointer hover:-translate-y-px active:opacity-85 hover:shadow-xs text-sm ease-in tracking-tight-rem shadow-md bg-150 bg-x-25">
-                                            Conecteaza-ma
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div
-                                class="border-black/12.5 rounded-b-2xl border-t-0 border-solid p-6 text-center pt-0 px-1 sm:px-6">
-                                <p class="mx-auto mb-6 leading-normal text-sm">Nu ai un cont?
-                                    <Link href="/register"
-                                          class="font-semibold text-transparent bg-clip-text bg-gradient-to-tl from-blue-500 to-sky-500">
-                                        &nbsp;Inregistreaza-ma
-                                    </Link>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        class="absolute top-0 right-0 flex-col justify-center hidden w-6/12 h-full max-w-full px-3 pr-0 my-auto text-center flex-0 lg:flex">
-                        <div
-                            ref="parallaxContainer"
-                            class="relative flex flex-col justify-center -mb-20 -mr-20 h-full bg-cover px-24 overflow-hidden bg-[url('https://static.vecteezy.com/system/resources/previews/038/776/964/non_2x/ai-generated-of-marble-roman-greek-statue-against-transparent-background-free-png.png')] transition-all duration-300 ease-out">
-                            <span
-                                class="absolute top-0 left-0 w-full h-full bg-center bg-cover opacity-60"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <Head title="Conectare" />
+
+    <GuestAuthLayout
+        title="Conectare"
+        subtitle="Introdu adresa de email și parola pentru a-ți accesa contul în siguranță."
+    >
+        <div
+            v-if="status"
+            class="mb-6 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
+        >
+            {{ status }}
         </div>
-    </section>
+
+        <form @submit.prevent="submit" class="space-y-4">
+            <IconField
+                id="email"
+                v-model="form.email"
+                type="email"
+                :icon="EnvelopeIcon"
+                autofocus
+                autocomplete="username"
+                placeholder="Adresă de email"
+                :error="form.errors.email"
+            />
+
+            <IconField
+                id="password"
+                v-model="form.password"
+                type="password"
+                :icon="LockClosedIcon"
+                autocomplete="current-password"
+                placeholder="Parolă"
+                :error="form.errors.password"
+            />
+
+            <div class="flex items-center justify-between px-1 text-sm">
+                <label class="flex items-center gap-2 text-ink-soft cursor-pointer select-none">
+                    <input
+                        v-model="form.remember"
+                        type="checkbox"
+                        class="rounded border-line text-brand-500 focus:ring-brand-500/30"
+                        style="accent-color: #1F5C4E;"
+                    />
+                    Ține-mă minte
+                </label>
+                <Link
+                    v-if="canResetPassword"
+                    :href="route('password.request')"
+                    class="font-medium text-brand-500 transition-colors duration-150 hover:text-brand-600"
+                >
+                    Ai uitat parola?
+                </Link>
+            </div>
+
+            <button
+                type="submit"
+                :disabled="form.processing"
+                class="w-full rounded-full bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-md hover:shadow-brand-500/30 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-brand-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            >
+                Conectează-te
+            </button>
+        </form>
+
+        <p class="mt-6 text-center text-sm text-ink-soft">
+            Nu ai un cont?
+            <Link href="/register/client" class="font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600">
+                Înregistrează-te
+            </Link>
+        </p>
+
+        <GoogleAuthButton />
+
+        <p class="mt-6 text-center text-xs text-ink-soft">
+            Ești furnizor de servicii?
+            <Link href="/register" class="font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600">
+                Creează cont firmă
+            </Link>
+        </p>
+    </GuestAuthLayout>
 </template>

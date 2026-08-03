@@ -16,9 +16,11 @@ class RoleSeeder extends Seeder
         collect([
             ['name' => 'admin', 'slug' => 'Admin'],
             ['name' => 'supervisor', 'slug' => 'Supervisor'],
-            ['name' => 'user', 'slug' => 'User']
+            ['name' => 'user', 'slug' => 'User'],
+            ['name' => 'furnizor', 'slug' => 'Furnizor'],
+            ['name' => 'client', 'slug' => 'Client'],
         ])->each(function ($factory) {
-            $role = Role::make([
+            $role = Role::firstOrNew([
                 'name' => $factory['name'],
                 'guard_name' => 'web',
             ]);

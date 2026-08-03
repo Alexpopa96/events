@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -30,6 +32,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'google_id',
         'password',
         'status',
         'phone',
@@ -80,5 +83,30 @@ class User extends Authenticatable
     public function userRole()
     {
         return $this->belongsTo('Spatie\Permission\Models\Role', 'id', 'id');
+    }
+
+    public function providerProfile(): HasOne
+    {
+        return $this->hasOne(ProviderProfile::class);
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function quoteRequests(): HasMany
+    {
+        return $this->hasMany(QuoteRequest::class);
+    }
+
+    public function isProvider(): bool
+    {
+        return $this->hasRole('furnizor');
     }
 }

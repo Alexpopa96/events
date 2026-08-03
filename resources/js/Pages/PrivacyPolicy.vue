@@ -1,6 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
+import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
     policy: String,
@@ -8,17 +7,26 @@ defineProps({
 </script>
 
 <template>
-    <Head title="Privacy Policy" />
+    <Head title="Politica de Confidențialitate" />
 
-    <div class="font-sans text-gray-900 dark:text-gray-100 antialiased">
-        <div class="pt-4 bg-gray-100 dark:bg-gray-900">
-            <div class="min-h-screen flex flex-col items-center pt-6 sm:pt-0">
-                <div>
-                    <AuthenticationCardLogo />
-                </div>
-
-                <div class="w-full sm:max-w-2xl mt-6 p-6 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg prose dark:prose-invert" v-html="policy" />
+    <div class="min-h-screen bg-paper">
+        <header class="border-b border-line bg-white/70 backdrop-blur">
+            <div class="mx-auto max-w-3xl px-6 py-5">
+                <Link href="/" class="font-serif text-xl text-brand-600 w-fit inline-block">
+                    evenimente<span class="text-gold-500">.</span>
+                </Link>
             </div>
-        </div>
+        </header>
+
+        <main class="mx-auto max-w-3xl px-6 py-12">
+            <div
+                class="prose max-w-none prose-headings:font-serif prose-headings:text-ink prose-a:text-brand-500 hover:prose-a:text-brand-600"
+                v-html="policy"
+            />
+
+            <Link href="/" class="mt-12 inline-flex items-center gap-2 text-sm font-semibold text-brand-500 hover:text-brand-600">
+                &larr; Înapoi la pagina principală
+            </Link>
+        </main>
     </div>
 </template>

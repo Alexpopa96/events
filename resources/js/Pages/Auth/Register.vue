@@ -1,14 +1,69 @@
 <script setup>
+import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import axios from 'axios';
+import {
+    BuildingOfficeIcon,
+    EnvelopeIcon,
+    LockClosedIcon,
+    MapPinIcon,
+    UserIcon,
+} from '@heroicons/vue/24/outline';
+import GuestAuthLayout from '@/Layouts/GuestAuthLayout.vue';
+import IconField from '@/Components/Auth/IconField.vue';
 import InputError from '@/Components/InputError.vue';
+import CountyLocalitySelect from '@/Components/CountyLocalitySelect.vue';
+
+defineProps({
+    counties: { type: Array, required: true },
+});
 
 const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
+    cui: '',
+    company_name: '',
+    address: '',
+    county_id: null,
+    locality_id: null,
     terms: false,
 });
+
+const anafStatus = ref('idle'); // idle | loading | success | error
+const anafMessage = ref('');
+const anafCheckedCui = ref(null);
+
+const verifyCui = async () => {
+    const cui = form.cui.trim();
+
+    if (!cui) {
+        return;
+    }
+
+    anafStatus.value = 'loading';
+    anafMessage.value = '';
+
+    try {
+        const { data } = await axios.post(route('register.anaf-lookup'), { cui });
+
+        form.company_name = data.denumire ?? form.company_name;
+        form.address = data.address ?? form.address;
+        form.county_id = data.county?.id ?? null;
+        form.locality_id = data.locality?.id ?? null;
+
+        anafStatus.value = 'success';
+        anafCheckedCui.value = cui;
+        anafMessage.value = data.county && data.locality
+            ? `Firmă găsită: ${data.denumire}.`
+            : `Firmă găsită: ${data.denumire}. Alege manual județul și localitatea.`;
+    } catch (error) {
+        anafStatus.value = 'error';
+        anafCheckedCui.value = null;
+        anafMessage.value = error.response?.data?.message ?? 'Nu am putut valida CUI-ul la ANAF.';
+    }
+};
 
 const submit = () => {
     form.post(route('register'), {
@@ -18,103 +73,155 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Register"/>
-    <section>
-        <div
-            class="bg-top relative flex items-start pt-16 pb-56 m-4 overflow-hidden bg-cover min-h-screen md:min-h-[50vh] rounded-xl bg-[url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signup-cover.jpg')]">
-            <span
-                class="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-zinc-800 to-zinc-700 opacity-60"></span>
-            <div class="container z-10">
-                <div class="flex flex-wrap justify-center -mx-3">
-                    <div class="w-full max-w-full px-3 mx-auto mt-0 text-center lg:flex-0 shrink-0 lg:w-5/12">
-                        <h1 class="mt-12 mb-2 text-white text-4xl font-semibold">Welcome!</h1>
-                        <p class="text-white text-lg font-light">Use these awesome forms to login or create a new
-                            account in your project for free.</p>
-                    </div>
+    <Head title="Creare cont firmă" />
+
+    <GuestAuthLayout
+        back-href="/login"
+        title="Creează cont firmă"
+        subtitle="Publică-ți serviciile și primește cereri de ofertă direct de la clienți."
+        max-width="max-w-xl"
+    >
+        <form @submit.prevent="submit" class="space-y-4">
+            <div>
+                <div class="relative">
+                    <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-ink-soft/70">
+                        <BuildingOfficeIcon class="h-5 w-5" />
+                    </span>
+                    <input
+                        id="cui"
+                        v-model="form.cui"
+                        type="text"
+                        inputmode="numeric"
+                        autofocus
+                        placeholder="CUI firmă (ex: RO12345678)"
+                        class="w-full rounded-full border border-line bg-paper/60 py-3 pl-11 pr-28 text-sm text-ink placeholder:text-ink-soft/60 transition-all duration-150 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                        :class="{ 'border-red-400 focus:border-red-400 focus:ring-red-400/20': form.errors.cui || anafStatus === 'error' }"
+                        @blur="verifyCui"
+                    />
+                    <button
+                        type="button"
+                        :disabled="anafStatus === 'loading' || !form.cui.trim()"
+                        class="absolute inset-y-1.5 right-1.5 flex-none rounded-full bg-ink px-4 text-xs font-semibold text-white transition-all duration-150 hover:bg-ink/80 disabled:cursor-not-allowed disabled:opacity-60"
+                        @click="verifyCui"
+                    >
+                        {{ anafStatus === 'loading' ? 'Se verifică…' : 'Verifică' }}
+                    </button>
                 </div>
+                <p v-if="anafStatus === 'success'" class="mt-1.5 px-4 text-sm text-brand-600">{{ anafMessage }}</p>
+                <p v-else-if="anafStatus === 'error'" class="mt-1.5 px-4 text-sm text-red-600">{{ anafMessage }}</p>
+                <InputError class="mt-1.5 px-4" :message="form.errors.cui" />
             </div>
-        </div>
 
-        <!-- Form Section -->
-        <div class="container">
-            <div class="flex flex-wrap -mx-3 -mt-48 md:-mt-56 lg:-mt-48">
-                <div class="w-full max-w-full px-3 mx-auto mt-0 md:flex-0 shrink-0 md:w-7/12 lg:w-5/12 xl:w-4/12">
-                    <div
-                        class="relative z-0 flex flex-col min-w-0 break-words bg-white border-0 shadow-xl rounded-3xl bg-clip-border">
-                        <div class="flex justify-center items-center">
-                            <img src="/assets/logo.png" class="w-64 mt-10"/>
-                        </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+                <IconField
+                    id="company_name"
+                    v-model="form.company_name"
+                    type="text"
+                    :icon="BuildingOfficeIcon"
+                    placeholder="Denumire firmă (automat)"
+                    :error="form.errors.company_name"
+                    readonly
+                />
 
-                        <div class="px-6 mt-5 mb-0 text-center bg-white border-b-0 rounded-t-3xl">
-                            <h5 class="text-2xl font-bold text-gray-700">Creare cont</h5>
-                        </div>
-
-                        <div class="flex-auto p-6">
-                            <form @submit.prevent="submit" class="space-y-6">
-                                <div>
-                                    <input v-model="form.name" type="text"
-                                           :class="{'border-red-500': form.errors.name}"
-                                           class="w-full p-4 text-lg bg-gray-100 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                                           placeholder="Nume"/>
-                                    <InputError class="mt-2 text-sm text-red-500" :message="form.errors.name"/>
-                                </div>
-
-                                <div>
-                                    <input v-model="form.email" type="email"
-                                           :class="{'border-red-500': form.errors.email}"
-                                           class="w-full p-4 text-lg bg-gray-100 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                                           placeholder="Email"/>
-                                    <InputError class="mt-2 text-sm text-red-500" :message="form.errors.email"/>
-                                </div>
-
-                                <div>
-                                    <input v-model="form.password" type="password"
-                                           :class="{'border-red-500': form.errors.password}"
-                                           class="w-full p-4 text-lg bg-gray-100 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                                           placeholder="Parola"/>
-                                    <InputError class="mt-2 text-sm text-red-500" :message="form.errors.password"/>
-                                </div>
-
-                                <div>
-                                    <input v-model="form.password_confirmation" type="password"
-                                           :class="{'border-red-500': form.errors.password_confirmation}"
-                                           class="w-full p-4 text-lg bg-gray-100 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-                                           placeholder="Confirmare parola"/>
-                                    <InputError class="mt-2 text-sm text-red-500"
-                                                :message="form.errors.password_confirmation"/>
-                                </div>
-
-                                <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature"
-                                     class="flex items-center space-x-2">
-                                    <input type="checkbox" id="terms"
-                                           class="w-6 h-6 text-blue-600 rounded-md focus:ring-0 transition-all"
-                                           checked/>
-                                    <label for="terms" class="text-sm text-gray-600">
-                                        Sunt de acord cu <a href="javascript:;" class="text-blue-500 font-bold">Termenii
-                                        și Condițiile</a>
-                                    </label>
-                                    <InputError class="mt-2 text-sm text-red-500" :message="form.errors.terms"/>
-                                </div>
-
-                                <div class="text-center">
-                                    <button type="submit"
-                                            class="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 transition-all ease-in-out">
-                                        Inregistreaza-ma
-                                    </button>
-                                </div>
-
-                                <p class="text-center text-sm text-gray-600 mt-4">Ai deja un cont?
-                                    <Link href="/login"
-                                          class="font-semibold text-transparent bg-clip-text bg-gradient-to-tl from-blue-500 to-sky-500">
-                                        Conecteaza-ma
-                                    </Link>
-                                </p>
-                            </form>
-                        </div>
-
-                    </div>
-                </div>
+                <IconField
+                    id="address"
+                    v-model="form.address"
+                    type="text"
+                    :icon="MapPinIcon"
+                    placeholder="Adresă (automat)"
+                    :error="form.errors.address"
+                    readonly
+                />
             </div>
-        </div>
-    </section>
+
+            <CountyLocalitySelect
+                v-model:county-id="form.county_id"
+                v-model:locality-id="form.locality_id"
+                :counties="counties"
+                :county-error="form.errors.county_id"
+                :locality-error="form.errors.locality_id"
+            />
+
+            <IconField
+                id="name"
+                v-model="form.name"
+                type="text"
+                :icon="UserIcon"
+                autocomplete="name"
+                placeholder="Persoană de contact"
+                :error="form.errors.name"
+            />
+
+            <IconField
+                id="email"
+                v-model="form.email"
+                type="email"
+                :icon="EnvelopeIcon"
+                autocomplete="username"
+                placeholder="Adresă de email"
+                :error="form.errors.email"
+            />
+
+            <IconField
+                id="password"
+                v-model="form.password"
+                type="password"
+                :icon="LockClosedIcon"
+                autocomplete="new-password"
+                placeholder="Parolă"
+                :error="form.errors.password"
+            />
+
+            <IconField
+                id="password_confirmation"
+                v-model="form.password_confirmation"
+                type="password"
+                :icon="LockClosedIcon"
+                autocomplete="new-password"
+                placeholder="Confirmă parola"
+                :error="form.errors.password_confirmation"
+            />
+
+            <div v-if="$page.props.jetstream?.hasTermsAndPrivacyPolicyFeature">
+                <label class="flex items-start gap-2.5 px-1 text-sm text-ink-soft cursor-pointer select-none">
+                    <input
+                        v-model="form.terms"
+                        type="checkbox"
+                        class="mt-0.5 rounded border-line text-brand-500 focus:ring-brand-500/30"
+                        style="accent-color: #1F5C4E;"
+                    />
+                    <span>
+                        Sunt de acord cu <span class="font-semibold text-ink">Termenii și Condițiile</span>
+                        și <span class="font-semibold text-ink">Politica de Confidențialitate</span>
+                    </span>
+                </label>
+                <InputError class="mt-1.5 px-4" :message="form.errors.terms" />
+            </div>
+
+            <button
+                type="submit"
+                :disabled="form.processing || anafCheckedCui !== form.cui.trim()"
+                class="w-full rounded-full bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-md hover:shadow-brand-500/30 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-brand-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            >
+                Creează cont firmă
+            </button>
+            <p v-if="anafCheckedCui !== form.cui.trim()" class="text-center text-xs text-ink-soft">
+                Verifică CUI-ul firmei pentru a continua.
+            </p>
+        </form>
+
+        <p class="mt-6 text-center text-sm text-ink-soft">
+            Ai deja un cont?
+            <Link href="/login" class="font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600">
+                Conectează-te
+            </Link>
+        </p>
+
+        <p class="mt-4 text-center text-xs text-ink-soft">
+            Cauți furnizori pentru evenimentul tău?
+            <Link href="/register/client" class="font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600">
+                Creează cont client
+            </Link>
+        </p>
+    </GuestAuthLayout>
 </template>

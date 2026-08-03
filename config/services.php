@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'anaf' => [
+        'tva_url' => env('ANAF_TVA_URL', 'https://webservicesp.anaf.ro/api/PlatitorTvaRest/v9/tva'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
 ];
