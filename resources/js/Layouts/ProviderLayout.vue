@@ -4,6 +4,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline';
 import SidebarNav from '@/Components/Provider/SidebarNav.vue';
 import AccountMenu from '@/Components/Provider/AccountMenu.vue';
+import Logo from '@/Components/Logo.vue';
 
 defineProps({
     title: {
@@ -31,7 +32,7 @@ const sidebarOpen = ref(false);
 
         <!-- Mobile topbar -->
         <div class="relative lg:hidden flex items-center justify-between px-4 h-16 bg-white/90 backdrop-blur border-b border-line">
-            <Link href="/" class="font-serif text-lg text-brand-600">evenimente<span class="text-gold-500">.</span></Link>
+            <Link href="/"><Logo size="sm" /></Link>
             <button @click="sidebarOpen = true" class="p-2 rounded-lg text-ink-soft transition-colors duration-150 hover:bg-paper hover:text-brand-600">
                 <Bars3Icon class="w-6 h-6" />
             </button>
@@ -39,15 +40,35 @@ const sidebarOpen = ref(false);
 
         <!-- Mobile sidebar overlay -->
         <div v-if="sidebarOpen" class="fixed inset-0 z-40 lg:hidden">
-            <div class="absolute inset-0 bg-ink/40" @click="sidebarOpen = false"></div>
-            <aside class="absolute inset-y-0 left-0 w-72 bg-white p-5 flex flex-col">
-                <div class="flex items-center justify-between mb-8">
-                    <span class="font-serif text-lg text-brand-600">evenimente<span class="text-gold-500">.</span></span>
-                    <button @click="sidebarOpen = false" class="p-1 text-ink-soft"><XMarkIcon class="w-5 h-5" /></button>
-                </div>
-                <SidebarNav @navigate="sidebarOpen = false" />
-                <AccountMenu />
-            </aside>
+            <transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+                appear
+            >
+                <div class="absolute inset-0 bg-ink/40" @click="sidebarOpen = false"></div>
+            </transition>
+            <transition
+                enter-active-class="transition ease-out duration-200"
+                enter-from-class="-translate-x-full"
+                enter-to-class="translate-x-0"
+                leave-active-class="transition ease-in duration-150"
+                leave-from-class="translate-x-0"
+                leave-to-class="-translate-x-full"
+                appear
+            >
+                <aside class="absolute inset-y-0 left-0 w-72 bg-white p-5 flex flex-col">
+                    <div class="flex items-center justify-between mb-8">
+                        <Logo />
+                        <button @click="sidebarOpen = false" class="p-1 text-ink-soft"><XMarkIcon class="w-5 h-5" /></button>
+                    </div>
+                    <SidebarNav @navigate="sidebarOpen = false" />
+                    <AccountMenu />
+                </aside>
+            </transition>
         </div>
 
         <div class="relative lg:flex">
@@ -55,9 +76,7 @@ const sidebarOpen = ref(false);
             <aside class="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 border-r border-line bg-white/95 backdrop-blur px-5 py-6 shadow-[1px_0_12px_rgba(33,28,39,0.03)] z-10">
                 <Link href="/" class="relative block mb-10 px-1">
                     <span class="absolute -left-3 -top-3 w-16 h-16 rounded-full bg-gold-400/20 blur-2xl" aria-hidden="true"></span>
-                    <span class="relative font-serif text-2xl tracking-tight text-brand-600">
-                        evenimente<span class="text-gold-500">.</span>
-                    </span>
+                    <Logo size="lg" class="relative" />
                 </Link>
 
                 <SidebarNav />

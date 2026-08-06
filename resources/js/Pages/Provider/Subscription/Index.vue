@@ -1,7 +1,12 @@
 <script setup>
+import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { useToast } from 'vue-toastification';
 import ProviderLayout from '@/Layouts/ProviderLayout.vue';
-import { CheckIcon } from '@heroicons/vue/24/outline';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+import { CheckIcon, DocumentTextIcon } from '@heroicons/vue/24/outline';
+
+const toast = useToast();
 
 const props = defineProps({
     currentPlanId: Number,
@@ -11,11 +16,19 @@ const props = defineProps({
 });
 
 const form = useForm({ subscription_plan_id: null });
+const planToConfirm = ref(null);
 
 const choose = (plan) => {
     if (plan.id === props.currentPlanId) return;
-    if (!confirm(`Treci pe planul ${plan.name}?`)) return;
-    form.transform(() => ({ subscription_plan_id: plan.id })).put(route('provider.subscription.update'));
+    planToConfirm.value = plan;
+};
+
+const confirmChoose = () => {
+    const plan = planToConfirm.value;
+    form.transform(() => ({ subscription_plan_id: plan.id })).put(route('provider.subscription.update'), {
+        onSuccess: () => toast.success(`Ai trecut pe planul ${plan.name}.`),
+        onFinish: () => { planToConfirm.value = null; },
+    });
 };
 
 const invoiceStatusMeta = {
@@ -67,11 +80,15 @@ const invoiceStatusMeta = {
                 <button
                     :disabled="plan.id === currentPlanId || form.processing"
                     @click="choose(plan)"
-                    class="rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200"
                     :class="plan.id === currentPlanId
                         ? 'bg-paper text-ink-soft cursor-not-allowed'
-                        : 'bg-brand-500 text-white hover:bg-brand-600 shadow-sm shadow-brand-500/25 hover:shadow-md hover:shadow-brand-500/30 active:translate-y-0'"
+                        : 'bg-brand-500 text-white hover:bg-brand-600 shadow-sm shadow-brand-500/25 hover:shadow-md hover:shadow-brand-500/30 active:translate-y-0 disabled:opacity-60'"
                 >
+                    <svg v-if="form.processing && planToConfirm?.id === plan.id" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
                     {{ plan.id === currentPlanId ? 'Plan activ' : 'Alege acest plan' }}
                 </button>
             </div>
@@ -81,9 +98,14 @@ const invoiceStatusMeta = {
             <h3 class="font-serif text-lg text-ink mb-4">Facturi</h3>
             <div v-if="invoices.length" class="divide-y divide-line">
                 <div v-for="invoice in invoices" :key="invoice.id" class="py-3 flex items-center justify-between text-sm px-2 -mx-2 rounded-lg transition-colors duration-150 hover:bg-paper/60">
-                    <div>
-                        <p class="font-medium text-ink">{{ invoice.number }}</p>
-                        <p class="text-xs text-ink-soft">{{ invoice.issued_at }}</p>
+                    <div class="flex items-center gap-3">
+                        <span class="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                            <DocumentTextIcon class="w-4 h-4" />
+                        </span>
+                        <div>
+                            <p class="font-medium text-ink">{{ invoice.number }}</p>
+                            <p class="text-xs text-ink-soft">{{ invoice.issued_at }}</p>
+                        </div>
                     </div>
                     <div class="flex items-center gap-4">
                         <span class="tabular-nums text-ink">{{ invoice.amount }} {{ invoice.currency }}</span>
@@ -99,5 +121,16 @@ const invoiceStatusMeta = {
         <p class="text-xs text-ink-soft mt-4">
             Schimbarea planului este instantă în această versiune de testare — procesarea reală a plăților (card bancar) va fi adăugată separat.
         </p>
+
+        <ConfirmDialog
+            :show="!!planToConfirm"
+            @update:show="(v) => !v && (planToConfirm = null)"
+            title="Schimbi planul de abonament?"
+            :message="planToConfirm ? `Treci pe planul ${planToConfirm.name}?` : ''"
+            confirm-label="Confirmă"
+            variant="default"
+            :processing="form.processing"
+            @confirm="confirmChoose"
+        />
     </ProviderLayout>
 </template>

@@ -1,7 +1,7 @@
 @php
     $tonePalette = [
-        'success' => ['bg' => '#EDF5F2', 'fg' => '#1F5C4E'],
-        'info' => ['bg' => '#FBF3E6', 'fg' => '#A9782E'],
+        'success' => ['bg' => '#F5F3FF', 'fg' => '#6D28D9'],
+        'info' => ['bg' => '#FFFBEB', 'fg' => '#B45309'],
         'danger' => ['bg' => '#FBEAE8', 'fg' => '#B3413A'],
     ][$tone ?? 'success'];
 @endphp
@@ -21,7 +21,7 @@
                 <tr>
                     <td align="center" style="padding-bottom:28px;">
                         <span style="font-family:Georgia,'Iowan Old Style','Times New Roman',serif; font-size:22px; color:#211C27;">
-                            evenimente<span style="color:#A9782E;">.</span>
+                            Event<span style="color:#7C3AED;">Hub</span>
                         </span>
                     </td>
                 </tr>
@@ -55,7 +55,7 @@
                                     @isset($actionUrl)
                                         <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 8px 0;">
                                             <tr>
-                                                <td style="border-radius:999px; background-color:#1F5C4E;">
+                                                <td style="border-radius:999px; background-color:#7C3AED;">
                                                     <a href="{{ $actionUrl }}" target="_blank" style="display:inline-block; padding:13px 28px; font-size:14px; font-weight:600; color:#FFFFFF; text-decoration:none; border-radius:999px;">
                                                         {{ $actionText }}
                                                     </a>
@@ -73,7 +73,7 @@
                 <tr>
                     <td align="center" style="padding-top:28px;">
                         <p style="margin:0; font-size:12px; line-height:1.6; color:#6B6373;">
-                            &copy; {{ date('Y') }} evenimente. &mdash; platformă pentru furnizori de servicii pentru evenimente
+                            &copy; {{ date('Y') }} EventHub &mdash; platforma pentru servicii de evenimente
                         </p>
                     </td>
                 </tr>

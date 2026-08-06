@@ -35,7 +35,7 @@ class Edit extends Controller
             'listing' => [
                 ...$listing->only([
                     'id', 'title', 'category_id', 'description', 'price_type',
-                    'price_from', 'price_to', 'county_id', 'locality_id',
+                    'price_from', 'price_to', 'benefits', 'county_id', 'locality_id',
                     'status', 'rejection_reason', 'views_count',
                 ]),
                 'county' => $listing->county?->only(['id', 'name']),

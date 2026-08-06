@@ -2,7 +2,7 @@
 import { useForm } from '@inertiajs/vue3';
 import ProviderLayout from '@/Layouts/ProviderLayout.vue';
 import CountyLocalitySelect from '@/Components/CountyLocalitySelect.vue';
-import { CameraIcon } from '@heroicons/vue/24/outline';
+import { CameraIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     profile: Object,
@@ -32,7 +32,7 @@ const onFile = (field, event) => {
     form[field] = event.target.files[0] ?? null;
 };
 
-const inputClass = 'w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 shadow-sm shadow-ink/5 transition-all duration-150 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:shadow-md focus:shadow-brand-500/10';
+const inputClass = 'w-full rounded-2xl border border-line bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 shadow-sm shadow-ink/5 transition-all duration-150 hover:border-brand-300/70 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:shadow-md focus:shadow-brand-500/10';
 </script>
 
 <template>
@@ -46,7 +46,7 @@ const inputClass = 'w-full rounded-xl border border-line bg-white px-4 py-2.5 te
                         <input type="file" accept="image/*" class="hidden" @change="onFile('logo', $event)" />
                     </label>
                     <div>
-                        <label class="inline-block text-sm font-semibold text-brand-500 hover:text-brand-600 cursor-pointer">
+                        <label class="inline-block text-sm font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600 cursor-pointer">
                             Schimbă logo
                             <input type="file" accept="image/*" class="hidden" @change="onFile('logo', $event)" />
                         </label>
@@ -119,7 +119,9 @@ const inputClass = 'w-full rounded-xl border border-line bg-white px-4 py-2.5 te
                         >
                             Salvează profilul
                         </button>
-                        <span v-if="form.recentlySuccessful" class="text-sm text-emerald-600">Salvat.</span>
+                        <span v-if="form.recentlySuccessful" class="inline-flex items-center gap-1.5 text-sm text-emerald-600">
+                            <CheckCircleIcon class="h-4 w-4" /> Salvat.
+                        </span>
                     </div>
                 </form>
             </div>

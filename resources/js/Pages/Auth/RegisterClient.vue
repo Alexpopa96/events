@@ -72,24 +72,24 @@ const submit = () => {
             <button
                 type="submit"
                 :disabled="form.processing"
-                class="w-full rounded-full bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-md hover:shadow-brand-500/30 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-brand-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                class="w-full rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(124,46,59,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ivt-wine/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
                 Creează cont
             </button>
         </form>
 
-        <p class="mt-6 text-center text-sm text-ink-soft">
+        <p class="mt-6 text-center text-sm text-ivt-ink-soft">
             Ai deja un cont?
-            <Link href="/login" class="font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600">
+            <Link href="/login" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
                 Conectează-te
             </Link>
         </p>
 
         <GoogleAuthButton />
 
-        <p class="mt-6 text-center text-xs text-ink-soft">
+        <p class="mt-6 text-center text-xs text-ivt-ink-faint">
             Ești furnizor de servicii?
-            <Link href="/register" class="font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600">
+            <Link href="/register" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
                 Creează cont firmă
             </Link>
         </p>

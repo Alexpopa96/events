@@ -30,9 +30,17 @@ class Store extends Controller
             'price_type' => ['required', Rule::in(['fixed', 'starting_from', 'per_hour', 'on_request'])],
             'price_from' => ['nullable', 'numeric', 'min:0'],
             'price_to' => ['nullable', 'numeric', 'min:0', 'gte:price_from'],
+            'benefits' => ['nullable', 'array'],
+            'benefits.*' => ['string', 'max:120'],
             'county_id' => ['nullable', 'integer', 'exists:counties,id'],
             'locality_id' => ['nullable', 'integer', 'exists:localities,id'],
         ]);
+
+        $data['benefits'] = collect($data['benefits'] ?? [])
+            ->map(fn ($benefit) => trim($benefit))
+            ->filter()
+            ->values()
+            ->all();
 
         $slug = Str::slug($data['title']).'-'.Str::lower(Str::random(5));
 

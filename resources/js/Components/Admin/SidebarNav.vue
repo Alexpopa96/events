@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutDashboard, Users, KeyRound, ShieldCheck, Store } from '@lucide/vue';
+import { LayoutDashboard, Users, KeyRound, ShieldCheck, Store, MessageSquareText } from '@lucide/vue';
 
 defineEmits(['navigate']);
 
@@ -14,6 +14,7 @@ const isUrl = (path) => {
 
 const can = computed(() => page.props.auth.can);
 const pendingProviders = computed(() => page.props.adminBadges?.pendingProviders ?? 0);
+const pendingQuoteRequests = computed(() => page.props.adminBadges?.pendingQuoteRequests ?? 0);
 
 const dashboardItem = computed(() => ({
     label: 'Dashboard',
@@ -33,6 +34,14 @@ const adminItems = computed(() => [
         show: can.value.moderateProviders,
         active: isUrl('administration/providers'),
         badge: pendingProviders.value || null,
+    },
+    {
+        label: 'Cereri de ofertă',
+        icon: MessageSquareText,
+        href: '/administration/quote-requests',
+        show: can.value.moderateQuoteRequests,
+        active: isUrl('administration/quote-requests'),
+        badge: pendingQuoteRequests.value || null,
     },
 ].filter((item) => item.show));
 </script>

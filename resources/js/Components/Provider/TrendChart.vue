@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
+import { ChartBarIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     data: {
@@ -9,9 +10,9 @@ const props = defineProps({
 });
 
 const series = [
-    { key: 'views', label: 'Vizualizări', color: '#1F5C4E' },
-    { key: 'phone_clicks', label: 'Click-uri telefon', color: '#A9782E' },
-    { key: 'whatsapp_clicks', label: 'Click-uri WhatsApp', color: '#2E7D6B' },
+    { key: 'views', label: 'Vizualizări', color: '#047857' },
+    { key: 'phone_clicks', label: 'Click-uri telefon', color: '#F59E0B' },
+    { key: 'whatsapp_clicks', label: 'Click-uri WhatsApp', color: '#10B981' },
 ];
 
 const width = 720;
@@ -44,6 +45,8 @@ const areaPath = (key) => {
 };
 
 const gradientId = `trend-${Math.random().toString(36).slice(2, 9)}`;
+
+const hasData = computed(() => props.data.length > 0 && props.data.some((d) => series.some((s) => d[s.key] > 0)));
 
 const xLabelIndexes = computed(() => {
     const n = props.data.length;
@@ -84,7 +87,15 @@ const tooltipStyle = computed(() => {
 </script>
 
 <template>
-    <div class="relative select-none">
+    <div v-if="!hasData" class="flex h-56 flex-col items-center justify-center text-center">
+        <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-500">
+            <ChartBarIcon class="h-5 w-5" />
+        </span>
+        <p class="mt-3 text-sm font-medium text-ink">Încă nu sunt date suficiente</p>
+        <p class="mt-1 text-xs text-ink-soft">Graficul va apărea imediat ce anunțurile tale primesc vizualizări.</p>
+    </div>
+
+    <div v-else class="relative select-none">
         <svg
             ref="svgEl"
             :viewBox="`0 0 ${width} ${height}`"

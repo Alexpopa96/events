@@ -19,6 +19,7 @@ const form = useForm({
     price_type: 'on_request',
     price_from: '',
     price_to: '',
+    benefits: [],
     county_id: null,
     locality_id: null,
 });
@@ -72,8 +73,12 @@ const previewListing = computed(() => ({
                         <button
                             type="submit"
                             :disabled="form.processing || quotaReached"
-                            class="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-md hover:shadow-brand-500/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:pointer-events-none"
+                            class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-md hover:shadow-brand-500/30 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:pointer-events-none"
                         >
+                            <svg v-if="form.processing" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                            </svg>
                             Salvează ca ciornă
                         </button>
                         <Link :href="route('provider.listings.index')" class="text-sm font-medium text-ink-soft transition-colors duration-150 hover:text-ink">

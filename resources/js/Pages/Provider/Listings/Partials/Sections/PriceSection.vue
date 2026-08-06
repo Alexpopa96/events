@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { CurrencyDollarIcon, InformationCircleIcon } from '@heroicons/vue/24/outline';
+import { CurrencyDollarIcon, InformationCircleIcon, PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
     form: Object,
@@ -18,6 +18,9 @@ const priceTypes = [
 const showPriceFrom = computed(() => props.form.price_type !== 'on_request');
 const showPriceTo = computed(() => props.form.price_type === 'fixed' || props.form.price_type === 'starting_from');
 const priceFromLabel = computed(() => (props.form.price_type === 'starting_from' ? 'Preț de la' : 'Preț'));
+
+const addBenefit = () => props.form.benefits.push('');
+const removeBenefit = (index) => props.form.benefits.splice(index, 1);
 
 const inputClass = 'w-full rounded-2xl border border-line bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 shadow-sm shadow-ink/5 transition-all duration-150 hover:border-brand-300/70 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:shadow-md focus:shadow-brand-500/10';
 const errorClass = 'border-red-400';
@@ -75,6 +78,39 @@ const iconWrapClass = 'w-7 h-7 rounded-lg bg-brand-50 text-brand-500 flex items-
                 <p class="text-sm text-brand-700">
                     Anunțul va afișa „Preț la cerere”, iar clienții te vor putea contacta direct pentru a primi o ofertă personalizată.
                 </p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-ink mb-1.5">Ce include prețul</label>
+                <p class="text-xs text-ink-soft/80 mb-3">Listează beneficiile incluse — ex. „Album foto printat”, „2 fotografi”, „Editare inclusă”.</p>
+
+                <div v-if="form.benefits.length" class="space-y-2">
+                    <div v-for="(benefit, index) in form.benefits" :key="index" class="flex items-center gap-2">
+                        <input
+                            v-model="form.benefits[index]"
+                            type="text"
+                            maxlength="120"
+                            placeholder="Ex: Album foto printat"
+                            :class="inputClass"
+                        />
+                        <button
+                            type="button"
+                            @click="removeBenefit(index)"
+                            class="w-9 h-9 rounded-xl flex-none flex items-center justify-center text-ink-soft/60 transition-colors duration-150 hover:text-rose-500 hover:bg-rose-50"
+                            aria-label="Elimină beneficiul"
+                        >
+                            <XMarkIcon class="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    @click="addBenefit"
+                    class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 transition-colors duration-150 hover:text-brand-700"
+                >
+                    <PlusIcon class="w-4 h-4" /> Adaugă beneficiu
+                </button>
             </div>
         </div>
     </section>

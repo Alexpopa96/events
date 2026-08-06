@@ -31,7 +31,7 @@ const resolvedType = computed(() => {
 <template>
     <div>
         <div class="relative">
-            <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-ink-soft/70">
+            <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-ivt-ink-faint">
                 <component :is="icon" class="h-5 w-5" />
             </span>
 
@@ -45,18 +45,18 @@ const resolvedType = computed(() => {
                 :inputmode="inputmode"
                 :readonly="readonly"
                 :tabindex="readonly ? -1 : undefined"
-                class="w-full rounded-full border border-line bg-paper/60 py-3 pl-11 pr-4 text-sm text-ink placeholder:text-ink-soft/60 transition-all duration-150 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                class="w-full rounded-full border border-ivt-line bg-white py-3 pl-11 pr-4 text-sm text-ivt-ink placeholder:text-ivt-ink-faint transition-all duration-150 focus:border-ivt-gold focus:outline-none focus:ring-2 focus:ring-ivt-gold/20"
                 :class="[
                     type === 'password' ? 'pr-11' : 'pr-4',
                     { 'border-red-400 focus:border-red-400 focus:ring-red-400/20': error },
-                    { 'cursor-default bg-paper text-ink-soft focus:bg-paper focus:ring-0': readonly },
+                    { 'cursor-default bg-ivt-paper-2 text-ivt-ink-soft focus:bg-ivt-paper-2 focus:ring-0': readonly },
                 ]"
             />
 
             <button
                 v-if="type === 'password'"
                 type="button"
-                class="absolute inset-y-0 right-4 flex items-center text-ink-soft/70 transition-colors duration-150 hover:text-ink"
+                class="absolute inset-y-0 right-4 flex items-center text-ivt-ink-faint transition-colors duration-150 hover:text-ivt-ink"
                 tabindex="-1"
                 @click="showPassword = !showPassword"
             >

@@ -12,7 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("ALTER TABLE provider_profiles MODIFY status ENUM('pending', 'active', 'rejected', 'suspended') NOT NULL DEFAULT 'pending'");
+        if (DB::getDriverName() === 'sqlite') {
+            // SQLite has no ALTER ... MODIFY; widening the enum's CHECK
+            // constraint means rebuilding the column via a native change().
+            Schema::table('provider_profiles', function (Blueprint $table) {
+                $table->string('status')->default('pending')->change();
+            });
+        } else {
+            DB::statement("ALTER TABLE provider_profiles MODIFY status ENUM('pending', 'active', 'rejected', 'suspended') NOT NULL DEFAULT 'pending'");
+        }
 
         Schema::table('provider_profiles', function (Blueprint $table) {
             $table->text('rejection_reason')->nullable()->after('approved_at');
@@ -31,6 +39,12 @@ return new class extends Migration
             $table->dropColumn(['rejection_reason', 'suspension_reason', 'rejected_at', 'suspended_at']);
         });
 
-        DB::statement("ALTER TABLE provider_profiles MODIFY status ENUM('pending', 'active', 'suspended') NOT NULL DEFAULT 'pending'");
+        if (DB::getDriverName() === 'sqlite') {
+            Schema::table('provider_profiles', function (Blueprint $table) {
+                $table->string('status')->default('pending')->change();
+            });
+        } else {
+            DB::statement("ALTER TABLE provider_profiles MODIFY status ENUM('pending', 'active', 'suspended') NOT NULL DEFAULT 'pending'");
+        }
     }
 };

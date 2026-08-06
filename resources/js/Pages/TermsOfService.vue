@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import Logo from '@/Components/Logo.vue';
 
 defineProps({
     terms: String,
@@ -12,9 +13,7 @@ defineProps({
     <div class="min-h-screen bg-paper">
         <header class="border-b border-line bg-white/70 backdrop-blur">
             <div class="mx-auto max-w-3xl px-6 py-5">
-                <Link href="/" class="font-serif text-xl text-brand-600 w-fit inline-block">
-                    evenimente<span class="text-gold-500">.</span>
-                </Link>
+                <Link href="/" class="inline-block w-fit"><Logo /></Link>
             </div>
         </header>
 

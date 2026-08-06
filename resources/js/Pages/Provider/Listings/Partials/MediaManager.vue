@@ -1,8 +1,12 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
+import { useToast } from 'vue-toastification';
 import { CloudArrowUpIcon, PhotoIcon, StarIcon, TrashIcon, VideoCameraIcon } from '@heroicons/vue/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/vue/24/solid';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+
+const toast = useToast();
 
 const props = defineProps({
     listingId: { type: [Number, String], required: true },
@@ -20,6 +24,9 @@ const uploadForm = useForm({ photos: [], videos: [] });
 const dragOver = ref(false);
 const draggingId = ref(null);
 const fileInput = ref(null);
+const pendingCount = ref(0);
+const mediaToDelete = ref(null);
+const deleting = ref(false);
 
 const reload = { preserveScroll: true, preserveState: true, only: ['listing', 'mediaLimits'] };
 
@@ -50,11 +57,15 @@ function upload(files) {
 
     if (!photos.length && !videos.length) return;
 
+    pendingCount.value = photos.length + videos.length;
+
     uploadForm.transform(() => ({ photos, videos }))
         .post(route('provider.listings.media.store', props.listingId), {
             ...reload,
             forceFormData: true,
             onSuccess: () => uploadForm.reset(),
+            onError: () => toast.error('Încărcarea a eșuat. Încearcă din nou.'),
+            onFinish: () => { pendingCount.value = 0; },
         });
 }
 
@@ -74,8 +85,18 @@ function setCover(media) {
 }
 
 function destroy(media) {
-    if (!confirm('Ștergi acest fișier?')) return;
-    router.delete(route('provider.listings.media.destroy', [props.listingId, media.id]), reload);
+    mediaToDelete.value = media;
+}
+
+function confirmDestroy() {
+    deleting.value = true;
+    router.delete(route('provider.listings.media.destroy', [props.listingId, mediaToDelete.value.id]), {
+        ...reload,
+        onFinish: () => {
+            deleting.value = false;
+            mediaToDelete.value = null;
+        },
+    });
 }
 
 function onDragStart(media) {
@@ -178,10 +199,38 @@ function onDragEnd() {
                     </button>
                 </div>
             </div>
+
+            <div
+                v-for="n in pendingCount"
+                :key="`pending-${n}`"
+                class="relative aspect-square rounded-xl overflow-hidden border border-line bg-line/50 animate-pulse flex items-center justify-center"
+            >
+                <PhotoIcon class="w-6 h-6 text-ink-soft/30" />
+            </div>
+        </div>
+
+        <div v-else-if="pendingCount" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-5">
+            <div
+                v-for="n in pendingCount"
+                :key="`pending-${n}`"
+                class="relative aspect-square rounded-xl overflow-hidden border border-line bg-line/50 animate-pulse flex items-center justify-center"
+            >
+                <PhotoIcon class="w-6 h-6 text-ink-soft/30" />
+            </div>
         </div>
 
         <div v-else class="flex items-center gap-2 mt-4 text-xs text-ink-soft">
             <PhotoIcon class="w-4 h-4" /> Fără fotografii încă — anunțurile cu fotografii primesc mai multe cereri de ofertă.
         </div>
+
+        <ConfirmDialog
+            :show="!!mediaToDelete"
+            @update:show="(v) => !v && (mediaToDelete = null)"
+            title="Ștergi acest fișier?"
+            message="Fișierul va fi eliminat definitiv din anunț."
+            confirm-label="Șterge"
+            :processing="deleting"
+            @confirm="confirmDestroy"
+        />
     </div>
 </template>

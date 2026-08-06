@@ -17,6 +17,7 @@ class Listing extends Model
         'price_type',
         'price_from',
         'price_to',
+        'benefits',
         'currency',
         'county_id',
         'locality_id',
@@ -32,6 +33,7 @@ class Listing extends Model
         return [
             'price_from' => 'decimal:2',
             'price_to' => 'decimal:2',
+            'benefits' => 'array',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
         ];

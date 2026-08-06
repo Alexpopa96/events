@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\ProviderProfile;
+use App\Models\QuoteRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -51,6 +52,9 @@ class HandleInertiaRequests extends Middleware
                     'viewRoles' => Auth::user() ? Auth::user()->can('view roles') : false,
                     'viewPermissions' => Auth::user() ? Auth::user()->can('view permissions') : false,
                     'moderateProviders' => Auth::user() ? Auth::user()->can('moderate providers') : false,
+                    'moderateQuoteRequests' => Auth::user() ? Auth::user()->can('moderate quote requests') : false,
+                    'submitQuoteRequest' => Auth::user() ? Auth::user()->can('submit quote request') : false,
+                    'manageOwnFavorites' => Auth::user() ? Auth::user()->can('manage own favorites') : false,
                 ],
             ],
             'toast' => function () {
@@ -62,13 +66,21 @@ class HandleInertiaRequests extends Middleware
             'impersonate' => Session::get('impersonate'),
             'role_id' => Auth::user() ? Auth::user()->roles()->first()->id : null,
             'adminBadges' => function () use ($user) {
-                if (! $user || ! $user->can('moderate providers')) {
+                if (! $user) {
                     return null;
                 }
 
-                return [
-                    'pendingProviders' => ProviderProfile::where('status', 'pending')->count(),
-                ];
+                $badges = [];
+
+                if ($user->can('moderate providers')) {
+                    $badges['pendingProviders'] = ProviderProfile::where('status', 'pending')->count();
+                }
+
+                if ($user->can('moderate quote requests')) {
+                    $badges['pendingQuoteRequests'] = QuoteRequest::where('status', 'pending_review')->count();
+                }
+
+                return $badges ?: null;
             },
         ];
     }

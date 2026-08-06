@@ -21,6 +21,8 @@ class Update extends Controller
             'price_type' => ['required', Rule::in(['fixed', 'starting_from', 'per_hour', 'on_request'])],
             'price_from' => ['nullable', 'numeric', 'min:0'],
             'price_to' => ['nullable', 'numeric', 'min:0', 'gte:price_from'],
+            'benefits' => ['nullable', 'array'],
+            'benefits.*' => ['string', 'max:120'],
             'county_id' => ['nullable', 'integer', 'exists:counties,id'],
             'locality_id' => ['nullable', 'integer', 'exists:localities,id'],
             'action' => ['required', Rule::in(['save', 'submit', 'unpublish'])],
@@ -28,6 +30,12 @@ class Update extends Controller
 
         $action = $data['action'];
         unset($data['action']);
+
+        $data['benefits'] = collect($data['benefits'] ?? [])
+            ->map(fn ($benefit) => trim($benefit))
+            ->filter()
+            ->values()
+            ->all();
 
         if (! empty($data['description'])) {
             $data['description'] = clean($data['description'], 'listing_description');

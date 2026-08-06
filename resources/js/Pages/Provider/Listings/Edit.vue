@@ -8,10 +8,11 @@ import LocationSection from './Partials/Sections/LocationSection.vue';
 import MediaManager from './Partials/MediaManager.vue';
 import ListingCard from '@/Components/Provider/ListingCard.vue';
 import TrendChart from '@/Components/Provider/TrendChart.vue';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import {
     CalendarIcon, EyeIcon, ExclamationTriangleIcon, PhotoIcon, SparklesIcon,
     PhoneIcon, ChatBubbleLeftRightIcon, ChartBarIcon, TagIcon, CurrencyDollarIcon,
-    MapPinIcon, ArrowLeftIcon,
+    MapPinIcon, ArrowLeftIcon, CheckCircleIcon,
 } from '@heroicons/vue/24/outline';
 
 const props = defineProps({
@@ -30,6 +31,7 @@ const form = useForm({
     price_type: props.listing.price_type,
     price_from: props.listing.price_from ?? '',
     price_to: props.listing.price_to ?? '',
+    benefits: props.listing.benefits ?? [],
     county_id: props.listing.county_id,
     locality_id: props.listing.locality_id,
     action: 'save',
@@ -37,6 +39,12 @@ const form = useForm({
 
 const submitWithAction = (action) => {
     form.transform((data) => ({ ...data, action })).put(route('provider.listings.update', props.listing.id));
+};
+
+const confirmUnpublishOpen = ref(false);
+const confirmUnpublish = () => {
+    confirmUnpublishOpen.value = false;
+    submitWithAction('unpublish');
 };
 
 const statusMeta = {
@@ -74,7 +82,7 @@ const statCards = computed(() => [
 const activeTab = ref('details');
 const tabs = computed(() => [
     { key: 'details', label: 'Detalii', icon: TagIcon, hasError: !!(form.errors.title || form.errors.category_id) },
-    { key: 'price', label: 'Preț', icon: CurrencyDollarIcon, hasError: !!(form.errors.price_from || form.errors.price_to) },
+    { key: 'price', label: 'Preț', icon: CurrencyDollarIcon, hasError: !!(form.errors.price_from || form.errors.price_to || Object.keys(form.errors).some((key) => key.startsWith('benefits'))) },
     { key: 'location', label: 'Locație', icon: MapPinIcon, hasError: !!(form.errors.county_id || form.errors.locality_id) },
     { key: 'media', label: 'Media', icon: PhotoIcon, hasError: false },
 ]);
@@ -186,8 +194,12 @@ watch(() => form.errors, (errors) => {
                             <button
                                 type="submit"
                                 :disabled="form.processing"
-                                class="rounded-xl bg-white border border-line px-5 py-2.5 text-sm font-semibold text-ink shadow-sm shadow-ink/5 transition-all duration-200 hover:bg-paper hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:pointer-events-none"
+                                class="inline-flex items-center gap-2 rounded-xl bg-white border border-line px-5 py-2.5 text-sm font-semibold text-ink shadow-sm shadow-ink/5 transition-all duration-200 hover:bg-paper hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:pointer-events-none"
                             >
+                                <svg v-if="form.processing" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                                </svg>
                                 Salvează modificările
                             </button>
 
@@ -196,8 +208,12 @@ watch(() => form.errors, (errors) => {
                                 type="button"
                                 :disabled="form.processing"
                                 @click="submitWithAction('submit')"
-                                class="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-glow-brand hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:pointer-events-none"
+                                class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-glow-brand hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-60 disabled:pointer-events-none"
                             >
+                                <svg v-if="form.processing" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                                </svg>
                                 Trimite spre verificare
                             </button>
 
@@ -205,13 +221,15 @@ watch(() => form.errors, (errors) => {
                                 v-if="['published', 'pending_review'].includes(listing.status)"
                                 type="button"
                                 :disabled="form.processing"
-                                @click="submitWithAction('unpublish')"
+                                @click="confirmUnpublishOpen = true"
                                 class="rounded-xl px-5 py-2.5 text-sm font-semibold text-ink-soft transition-colors duration-150 hover:text-ink"
                             >
                                 Retrage la ciornă
                             </button>
 
-                            <span v-if="form.recentlySuccessful" class="text-sm text-emerald-600">Salvat.</span>
+                            <span v-if="form.recentlySuccessful" class="inline-flex items-center gap-1.5 text-sm text-emerald-600">
+                                <CheckCircleIcon class="h-4 w-4" /> Salvat.
+                            </span>
                         </div>
                     </form>
                 </div>
@@ -224,5 +242,15 @@ watch(() => form.errors, (errors) => {
                 <ListingCard :listing="previewListing" :preview="true" />
             </div>
         </div>
+
+        <ConfirmDialog
+            v-model:show="confirmUnpublishOpen"
+            title="Retragi anunțul la ciornă?"
+            message="Anunțul nu va mai fi vizibil publicului până când îl trimiți din nou spre verificare."
+            confirm-label="Retrage"
+            variant="default"
+            :processing="form.processing"
+            @confirm="confirmUnpublish"
+        />
     </ProviderLayout>
 </template>

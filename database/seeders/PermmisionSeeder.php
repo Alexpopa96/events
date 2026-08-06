@@ -42,6 +42,7 @@ class PermmisionSeeder extends Seeder
             ['name' => 'moderate listings', 'group' => 'moderation', 'parent' => 'administration'],
             ['name' => 'moderate reviews', 'group' => 'moderation', 'parent' => 'administration'],
             ['name' => 'moderate providers', 'group' => 'moderation', 'parent' => 'administration'],
+            ['name' => 'moderate quote requests', 'group' => 'moderation', 'parent' => 'administration'],
 
             // Marketplace: leads
             ['name' => 'view quote requests', 'group' => 'leads', 'parent' => 'administration'],

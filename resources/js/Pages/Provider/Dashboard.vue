@@ -11,6 +11,8 @@ import {
     ClipboardDocumentListIcon,
     CheckCircleIcon,
     DocumentTextIcon,
+    BuildingStorefrontIcon,
+    UserCircleIcon,
 } from '@heroicons/vue/24/outline';
 import { StarIcon } from '@heroicons/vue/24/solid';
 
@@ -72,7 +74,10 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
 <template>
     <ProviderLayout title="Dashboard">
         <div v-if="!profile" class="max-w-lg mx-auto text-center py-20">
-            <h2 class="font-serif text-2xl text-ink mb-2">Profilul tău e aproape gata</h2>
+            <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                <BuildingStorefrontIcon class="h-6 w-6" />
+            </span>
+            <h2 class="font-serif text-2xl text-ink mt-4 mb-2">Profilul tău e aproape gata</h2>
             <p class="text-sm text-ink-soft">Nu am găsit încă un profil de companie asociat contului tău. Contactează-ne dacă vezi acest mesaj — ar trebui să fie creat automat la înregistrare.</p>
         </div>
 
@@ -167,7 +172,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-line">
-                                <tr v-for="listing in listings" :key="listing.id">
+                                <tr v-for="listing in listings" :key="listing.id" class="transition-colors duration-150 hover:bg-paper">
                                     <td class="px-2 py-3 max-w-[12rem]">
                                         <p class="font-medium text-ink truncate">{{ listing.title }}</p>
                                         <p class="text-xs text-ink-soft">{{ listing.category }}</p>
@@ -195,7 +200,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                     <div class="flex items-center gap-5">
                         <div
                             class="relative w-20 h-20 rounded-full flex-none"
-                            :style="`background: conic-gradient(from -90deg, #1F5C4E, #A9782E ${completionDeg}deg, #E6DFE7 0)`"
+                            :style="`background: conic-gradient(from -90deg, #047857, #F59E0B ${completionDeg}deg, #E6DFE7 0)`"
                         >
                             <div class="absolute inset-1.5 rounded-full bg-white flex items-center justify-center">
                                 <span class="text-lg font-semibold text-ink tabular-nums">{{ profile.completion_score }}%</span>
@@ -227,7 +232,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                     </div>
 
                     <div v-if="leads.length" class="space-y-3">
-                        <div v-for="lead in leads" :key="lead.id" class="border border-line rounded-xl p-3">
+                        <div v-for="lead in leads" :key="lead.id" class="border border-line rounded-xl p-3 transition-all duration-200 hover:shadow-glow-brand">
                             <div class="flex items-center justify-between gap-2">
                                 <div class="flex items-center gap-2 min-w-0">
                                     <p class="text-sm font-medium text-ink truncate">{{ lead.name }}</p>
@@ -262,7 +267,10 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                     <div v-if="reviews.recent.length" class="space-y-4 divide-y divide-line">
                         <div v-for="review in reviews.recent" :key="review.id" class="pt-4 first:pt-0">
                             <div class="flex items-center justify-between gap-2">
-                                <p class="text-sm font-medium text-ink">{{ review.author }}</p>
+                                <p class="flex items-center gap-1.5 text-sm font-medium text-ink">
+                                    <UserCircleIcon class="h-5 w-5 flex-none text-ink-soft/40" />
+                                    {{ review.author }}
+                                </p>
                                 <span class="flex items-center gap-0.5">
                                     <StarIcon
                                         v-for="n in 5"

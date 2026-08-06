@@ -10,6 +10,9 @@ const config = {
     active: { label: 'Activ', classes: 'bg-emerald-50 text-emerald-600' },
     rejected: { label: 'Respins', classes: 'bg-rose-50 text-rose-600' },
     suspended: { label: 'Suspendat', classes: 'bg-slate-100 text-slate-600' },
+    pending_review: { label: 'În așteptare', classes: 'bg-amber-50 text-amber-600' },
+    open: { label: 'Aprobată', classes: 'bg-emerald-50 text-emerald-600' },
+    closed: { label: 'Închisă', classes: 'bg-slate-100 text-slate-600' },
 };
 
 const current = computed(() => config[props.status] ?? { label: props.status, classes: 'bg-slate-100 text-slate-600' });

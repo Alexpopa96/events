@@ -27,6 +27,7 @@ const icons = {
     'Furnizori în așteptare': Clock,
     'Anunțuri publicate': FileText,
     'Cereri de ofertă deschise': MessageSquare,
+    'Cereri în așteptare': Clock,
 };
 const iconFor = (label) => icons[label] ?? Users;
 
@@ -36,6 +37,7 @@ const accents = {
     'Furnizori în așteptare': 'text-gold-500 bg-gold-400/10',
     'Anunțuri publicate': 'text-sky-600 bg-sky-50',
     'Cereri de ofertă deschise': 'text-violet-600 bg-violet-50',
+    'Cereri în așteptare': 'text-gold-500 bg-gold-400/10',
 };
 const accentFor = (label) => accents[label] ?? 'text-brand-600 bg-brand-50';
 

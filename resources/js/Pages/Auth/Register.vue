@@ -84,7 +84,7 @@ const submit = () => {
         <form @submit.prevent="submit" class="space-y-4">
             <div>
                 <div class="relative">
-                    <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-ink-soft/70">
+                    <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-ivt-ink-faint">
                         <BuildingOfficeIcon class="h-5 w-5" />
                     </span>
                     <input
@@ -94,20 +94,20 @@ const submit = () => {
                         inputmode="numeric"
                         autofocus
                         placeholder="CUI firmă (ex: RO12345678)"
-                        class="w-full rounded-full border border-line bg-paper/60 py-3 pl-11 pr-28 text-sm text-ink placeholder:text-ink-soft/60 transition-all duration-150 focus:border-brand-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                        class="w-full rounded-full border border-ivt-line bg-white py-3 pl-11 pr-28 text-sm text-ivt-ink placeholder:text-ivt-ink-faint transition-all duration-150 focus:border-ivt-gold focus:outline-none focus:ring-2 focus:ring-ivt-gold/20"
                         :class="{ 'border-red-400 focus:border-red-400 focus:ring-red-400/20': form.errors.cui || anafStatus === 'error' }"
                         @blur="verifyCui"
                     />
                     <button
                         type="button"
                         :disabled="anafStatus === 'loading' || !form.cui.trim()"
-                        class="absolute inset-y-1.5 right-1.5 flex-none rounded-full bg-ink px-4 text-xs font-semibold text-white transition-all duration-150 hover:bg-ink/80 disabled:cursor-not-allowed disabled:opacity-60"
+                        class="absolute inset-y-1.5 right-1.5 flex-none rounded-full bg-ivt-ink px-4 text-xs font-semibold text-ivt-paper transition-all duration-150 hover:bg-ivt-ink-2 disabled:cursor-not-allowed disabled:opacity-60"
                         @click="verifyCui"
                     >
                         {{ anafStatus === 'loading' ? 'Se verifică…' : 'Verifică' }}
                     </button>
                 </div>
-                <p v-if="anafStatus === 'success'" class="mt-1.5 px-4 text-sm text-brand-600">{{ anafMessage }}</p>
+                <p v-if="anafStatus === 'success'" class="mt-1.5 px-4 text-sm text-ivt-sage">{{ anafMessage }}</p>
                 <p v-else-if="anafStatus === 'error'" class="mt-1.5 px-4 text-sm text-red-600">{{ anafMessage }}</p>
                 <InputError class="mt-1.5 px-4" :message="form.errors.cui" />
             </div>
@@ -183,16 +183,16 @@ const submit = () => {
             />
 
             <div v-if="$page.props.jetstream?.hasTermsAndPrivacyPolicyFeature">
-                <label class="flex items-start gap-2.5 px-1 text-sm text-ink-soft cursor-pointer select-none">
+                <label class="flex items-start gap-2.5 px-1 text-sm text-ivt-ink-soft cursor-pointer select-none">
                     <input
                         v-model="form.terms"
                         type="checkbox"
-                        class="mt-0.5 rounded border-line text-brand-500 focus:ring-brand-500/30"
-                        style="accent-color: #1F5C4E;"
+                        class="mt-0.5 rounded border-ivt-line text-ivt-wine focus:ring-ivt-wine/30"
+                        style="accent-color: #7C2E3B;"
                     />
                     <span>
-                        Sunt de acord cu <span class="font-semibold text-ink">Termenii și Condițiile</span>
-                        și <span class="font-semibold text-ink">Politica de Confidențialitate</span>
+                        Sunt de acord cu <span class="font-semibold text-ivt-ink">Termenii și Condițiile</span>
+                        și <span class="font-semibold text-ivt-ink">Politica de Confidențialitate</span>
                     </span>
                 </label>
                 <InputError class="mt-1.5 px-4" :message="form.errors.terms" />
@@ -201,25 +201,25 @@ const submit = () => {
             <button
                 type="submit"
                 :disabled="form.processing || anafCheckedCui !== form.cui.trim()"
-                class="w-full rounded-full bg-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition-all duration-200 hover:bg-brand-600 hover:shadow-md hover:shadow-brand-500/30 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-brand-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                class="w-full rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(124,46,59,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ivt-wine/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
                 Creează cont firmă
             </button>
-            <p v-if="anafCheckedCui !== form.cui.trim()" class="text-center text-xs text-ink-soft">
+            <p v-if="anafCheckedCui !== form.cui.trim()" class="text-center text-xs text-ivt-ink-faint">
                 Verifică CUI-ul firmei pentru a continua.
             </p>
         </form>
 
-        <p class="mt-6 text-center text-sm text-ink-soft">
+        <p class="mt-6 text-center text-sm text-ivt-ink-soft">
             Ai deja un cont?
-            <Link href="/login" class="font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600">
+            <Link href="/login" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
                 Conectează-te
             </Link>
         </p>
 
-        <p class="mt-4 text-center text-xs text-ink-soft">
+        <p class="mt-4 text-center text-xs text-ivt-ink-faint">
             Cauți furnizori pentru evenimentul tău?
-            <Link href="/register/client" class="font-semibold text-brand-500 transition-colors duration-150 hover:text-brand-600">
+            <Link href="/register/client" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
                 Creează cont client
             </Link>
         </p>

@@ -10,14 +10,14 @@ defineProps({
 <template>
     <div>
         <div class="my-6 flex items-center gap-3">
-            <span class="h-px flex-1 bg-line"></span>
-            <span class="text-xs font-medium uppercase tracking-wide text-ink-soft/70">sau</span>
-            <span class="h-px flex-1 bg-line"></span>
+            <span class="h-px flex-1 bg-ivt-line"></span>
+            <span class="text-xs font-medium uppercase tracking-wide text-ivt-ink-faint">sau</span>
+            <span class="h-px flex-1 bg-ivt-line"></span>
         </div>
 
         <a
             :href="route('auth.google.redirect')"
-            class="flex w-full items-center justify-center gap-3 rounded-full border border-line bg-white px-4 py-3 text-sm font-semibold text-ink shadow-sm shadow-ink/5 transition-all duration-150 hover:bg-paper"
+            class="flex w-full items-center justify-center gap-3 rounded-full border border-ivt-line bg-white px-4 py-3 text-sm font-semibold text-ivt-ink transition-all duration-150 hover:border-ivt-gold hover:bg-ivt-paper-2"
         >
             <svg class="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
                 <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>

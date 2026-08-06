@@ -1,15 +1,23 @@
 <script setup>
+import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import ProviderLayout from '@/Layouts/ProviderLayout.vue';
-import { PhoneIcon, EnvelopeIcon, MapPinIcon, CalendarIcon, CheckCircleIcon } from '@heroicons/vue/24/outline';
+import { PhoneIcon, EnvelopeIcon, MapPinIcon, CalendarIcon, CheckCircleIcon, InboxIcon, BuildingStorefrontIcon } from '@heroicons/vue/24/outline';
 
 defineProps({
     leads: Array,
     hasCategories: Boolean,
 });
 
+const markingContacted = ref(null);
+
 const markContacted = (lead) => {
-    router.post(route('provider.leads.contacted', lead.id), {}, { preserveScroll: true });
+    if (markingContacted.value) return;
+    markingContacted.value = lead.id;
+    router.post(route('provider.leads.contacted', lead.id), {}, {
+        preserveScroll: true,
+        onFinish: () => { markingContacted.value = null; },
+    });
 };
 </script>
 
@@ -19,12 +27,20 @@ const markContacted = (lead) => {
             Cereri publicate de clienți în categoriile în care ai anunțuri active. Contactează-i direct — platforma nu intermediază rezervarea.
         </p>
 
-        <div v-if="!hasCategories" class="bg-white border border-line rounded-2xl p-8 text-center text-sm text-ink-soft shadow-sm shadow-ink/5">
-            Publică cel puțin un anunț ca să vezi cererile de ofertă din categoria ta.
+        <div v-if="!hasCategories" class="bg-white border border-line rounded-2xl p-10 text-center shadow-sm shadow-ink/5">
+            <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                <BuildingStorefrontIcon class="h-6 w-6" />
+            </span>
+            <p class="mt-3 text-sm font-medium text-ink">Publică un anunț mai întâi</p>
+            <p class="mt-1 text-sm text-ink-soft">Publică cel puțin un anunț ca să vezi cererile de ofertă din categoria ta.</p>
         </div>
 
-        <div v-else-if="!leads.length" class="bg-white border border-line rounded-2xl p-8 text-center text-sm text-ink-soft shadow-sm shadow-ink/5">
-            Nicio cerere deschisă momentan în categoriile tale.
+        <div v-else-if="!leads.length" class="bg-white border border-line rounded-2xl p-10 text-center shadow-sm shadow-ink/5">
+            <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+                <InboxIcon class="h-6 w-6" />
+            </span>
+            <p class="mt-3 text-sm font-medium text-ink">Nicio cerere deschisă momentan</p>
+            <p class="mt-1 text-sm text-ink-soft">Te anunțăm imediat ce apare o cerere nouă în categoriile tale.</p>
         </div>
 
         <div v-else class="space-y-4">
@@ -72,9 +88,14 @@ const markContacted = (lead) => {
                     </a>
                     <button
                         v-if="!lead.contacted"
+                        :disabled="markingContacted === lead.id"
                         @click="markContacted(lead)"
-                        class="ml-auto text-sm font-medium text-ink-soft transition-colors duration-150 hover:text-brand-600"
+                        class="ml-auto inline-flex items-center gap-1.5 text-sm font-medium text-ink-soft transition-colors duration-150 hover:text-brand-600 disabled:pointer-events-none disabled:opacity-50"
                     >
+                        <svg v-if="markingContacted === lead.id" class="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                        </svg>
                         Marchează ca și contactat
                     </button>
                 </div>

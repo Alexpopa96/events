@@ -1,10 +1,24 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { router, Link } from '@inertiajs/vue3';
+import { useToast } from 'vue-toastification';
 import ProviderLayout from '@/Layouts/ProviderLayout.vue';
 import ListingCard from '@/Components/Provider/ListingCard.vue';
 import TrendChart from '@/Components/Provider/TrendChart.vue';
-import { PlusIcon, Squares2X2Icon, ChartBarIcon, ChevronDownIcon } from '@heroicons/vue/24/outline';
+import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+import {
+    PlusIcon,
+    Squares2X2Icon,
+    ChartBarIcon,
+    ChevronDownIcon,
+    PencilSquareIcon,
+    ClockIcon,
+    CheckCircleIcon,
+    XCircleIcon,
+    ArchiveBoxIcon,
+} from '@heroicons/vue/24/outline';
+
+const toast = useToast();
 
 const props = defineProps({
     listings: Array,
@@ -14,12 +28,12 @@ const props = defineProps({
 });
 
 const filters = [
-    { value: 'all', label: 'Toate' },
-    { value: 'draft', label: 'Ciornă' },
-    { value: 'pending_review', label: 'În verificare' },
-    { value: 'published', label: 'Publicate' },
-    { value: 'rejected', label: 'Respinse' },
-    { value: 'archived', label: 'Arhivate' },
+    { value: 'all', label: 'Toate', icon: Squares2X2Icon },
+    { value: 'draft', label: 'Ciornă', icon: PencilSquareIcon },
+    { value: 'pending_review', label: 'În verificare', icon: ClockIcon },
+    { value: 'published', label: 'Publicate', icon: CheckCircleIcon },
+    { value: 'rejected', label: 'Respinse', icon: XCircleIcon },
+    { value: 'archived', label: 'Arhivate', icon: ArchiveBoxIcon },
 ];
 
 const activeFilter = ref('all');
@@ -50,10 +64,22 @@ const filteredListings = computed(() => {
 
 const quotaReached = computed(() => props.quota.max !== null && props.quota.used >= props.quota.max);
 
+const listingToDelete = ref(null);
+const deleting = ref(false);
+
 const destroy = (listing) => {
-    if (confirm(`Ștergi anunțul „${listing.title}”? Nu poate fi anulat.`)) {
-        router.delete(route('provider.listings.destroy', listing.id));
-    }
+    listingToDelete.value = listing;
+};
+
+const confirmDestroy = () => {
+    deleting.value = true;
+    router.delete(route('provider.listings.destroy', listingToDelete.value.id), {
+        onSuccess: () => toast.success('Anunțul a fost șters.'),
+        onFinish: () => {
+            deleting.value = false;
+            listingToDelete.value = null;
+        },
+    });
 };
 </script>
 
@@ -147,6 +173,7 @@ const destroy = (listing) => {
                 class="flex-none inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-150"
                 :class="activeFilter === filter.value ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-sm shadow-brand-500/25' : 'bg-white border border-line text-ink-soft hover:text-ink hover:border-gold-400/60'"
             >
+                <component :is="filter.icon" class="h-3.5 w-3.5" />
                 {{ filter.label }}
                 <span
                     class="rounded-full px-1.5 text-[11px] tabular-nums"
@@ -181,5 +208,15 @@ const destroy = (listing) => {
                 @delete="destroy"
             />
         </div>
+
+        <ConfirmDialog
+            :show="!!listingToDelete"
+            @update:show="(v) => !v && (listingToDelete = null)"
+            title="Ștergi acest anunț?"
+            :message="listingToDelete ? `Ștergi anunțul „${listingToDelete.title}”? Nu poate fi anulat.` : ''"
+            confirm-label="Șterge"
+            :processing="deleting"
+            @confirm="confirmDestroy"
+        />
     </ProviderLayout>
 </template>
