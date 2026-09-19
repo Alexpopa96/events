@@ -1,13 +1,25 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { MapPinIcon, PhoneIcon, EnvelopeIcon, ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/24/outline';
-import { StarIcon } from '@heroicons/vue/24/solid';
+import { MapPinIcon, PhoneIcon, EnvelopeIcon, ChatBubbleLeftEllipsisIcon, HeartIcon } from '@heroicons/vue/24/outline';
+import { HeartIcon as HeartIconSolid, StarIcon } from '@heroicons/vue/24/solid';
 import { categoryIcon } from '@/Composables/useCategoryIcon';
 import { formatListingPrice } from '@/Composables/useListingPrice';
+import { useProviderFavoriteToggle } from '@/Composables/useProviderFavoriteToggle';
 
 const props = defineProps({
     provider: { type: Object, required: true },
+    favorited: { type: Boolean, default: false },
+    showFavorite: { type: Boolean, default: true },
 });
+
+const emit = defineEmits(['favorite-toggled']);
+
+const { isFavorited, toggle: toggleFavorite } = useProviderFavoriteToggle(
+    props.provider.slug,
+    props.favorited,
+    (favorited) => emit('favorite-toggled', { id: props.provider.id, favorited }),
+    props.provider.logo_url ?? props.provider.cover_url,
+);
 
 const location = (provider) => [provider.locality, provider.county].filter(Boolean).join(', ');
 </script>
@@ -32,6 +44,17 @@ const location = (provider) => [provider.locality, provider.county].filter(Boole
                 Premium
             </span>
         </Link>
+
+        <button
+            v-if="showFavorite"
+            type="button"
+            @click="toggleFavorite"
+            class="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-ivt-wine shadow-sm backdrop-blur transition-colors duration-150 hover:text-ivt-wine-bright"
+            :aria-label="isFavorited ? 'Elimină de la favorite' : 'Adaugă la favorite'"
+        >
+            <HeartIconSolid v-if="isFavorited" class="h-3.5 w-3.5 text-ivt-wine" />
+            <HeartIcon v-else class="h-3.5 w-3.5" />
+        </button>
 
         <div class="flex flex-1 flex-col p-[18px]">
             <Link :href="route('providers.show', provider.slug)" class="font-serif text-lg font-medium leading-snug text-ivt-ink transition-colors hover:text-ivt-wine">

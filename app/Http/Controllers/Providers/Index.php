@@ -7,13 +7,20 @@ use App\Models\Listing;
 use App\Models\ProviderProfile;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class Index extends Controller
 {
+    private Collection $favoriteProviderIds;
+
     public function __invoke(Request $request): Response
     {
+        $this->favoriteProviderIds = $request->user()
+            ? $request->user()->providerFavorites()->pluck('provider_profile_id')
+            : collect();
+
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
             'category_ids' => ['nullable', 'array'],
@@ -156,6 +163,7 @@ class Index extends Controller
             ],
             'providers' => $providers,
             'recommended' => $recommended,
+            'favoriteProviderIds' => $this->favoriteProviderIds,
             'categories' => $categories,
             'counties' => $counties,
             'facets' => [

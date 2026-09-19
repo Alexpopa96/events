@@ -14,11 +14,14 @@ const props = defineProps({
     stats: { type: Object, required: true },
     providers: { type: Object, required: true },
     recommended: { type: Array, default: () => [] },
+    favoriteProviderIds: { type: Array, default: () => [] },
     categories: { type: Array, default: () => [] },
     counties: { type: Array, default: () => [] },
     facets: { type: Object, default: () => ({ rating: {}, featured: 0, price: { min: null, max: null } }) },
     filters: { type: Object, required: true },
 });
+
+const favoritedProviderIds = computed(() => new Set(props.favoriteProviderIds));
 
 const search = ref(props.filters.q);
 const selectedCategories = ref(props.filters.category_ids.map(Number));
@@ -62,7 +65,7 @@ const applyFilters = (overrides = {}) => {
         featured: featuredOnly.value || undefined,
         sort: sort.value !== 'recommended' ? sort.value : undefined,
         ...overrides,
-    }, { preserveState: true, preserveScroll: true, replace: true, only: ['providers', 'filters', 'stats', 'categories', 'counties', 'facets'] });
+    }, { preserveState: true, preserveScroll: true, replace: true, only: ['providers', 'filters', 'stats', 'categories', 'counties', 'facets', 'favoriteProviderIds'] });
 };
 
 watch(search, debounce(() => applyFilters({ q: search.value || undefined }), 350));
@@ -276,6 +279,7 @@ const location = (item) => [item.locality, item.county].filter(Boolean).join(', 
                                 v-for="item in providers.data"
                                 :key="item.id"
                                 :provider="item"
+                                :favorited="favoritedProviderIds.has(item.id)"
                             />
                         </div>
 

@@ -11,18 +11,27 @@ import {
     CheckBadgeIcon,
     EyeIcon,
     FaceFrownIcon,
+    HeartIcon,
 } from '@heroicons/vue/24/outline';
-import { StarIcon } from '@heroicons/vue/24/solid';
+import { HeartIcon as HeartIconSolid, StarIcon } from '@heroicons/vue/24/solid';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
 import { categoryIcon } from '@/Composables/useCategoryIcon';
 import { formatListingPrice } from '@/Composables/useListingPrice';
+import { useProviderFavoriteToggle } from '@/Composables/useProviderFavoriteToggle';
 
 const props = defineProps({
     provider: { type: Object, required: true },
     listings: { type: Array, default: () => [] },
     reviews: { type: Array, default: () => [] },
 });
+
+const { isFavorited, toggle: toggleFavorite } = useProviderFavoriteToggle(
+    props.provider.slug,
+    props.provider.is_favorited,
+    null,
+    props.provider.logo_url ?? props.provider.cover_url,
+);
 
 const location = computed(() => [props.provider.locality, props.provider.county].filter(Boolean).join(', '));
 const categoryNames = computed(() => props.provider.categories.slice(0, 3).map((c) => c.name).join(', '));
@@ -164,9 +173,20 @@ const socialLinks = computed(() => Object.entries(props.provider.social_links ??
                                 </div>
                             </div>
                         </div>
-                        <a href="#contact" class="rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-5 py-2.5 text-sm font-semibold text-white transition-transform duration-150 hover:-translate-y-0.5">
-                            Trimite mesaj
-                        </a>
+                        <div class="flex gap-2.5">
+                            <button
+                                type="button"
+                                @click="toggleFavorite"
+                                class="inline-flex items-center gap-1.5 rounded-full border border-ivt-line px-5 py-2.5 text-sm font-semibold text-ivt-ink transition-colors duration-150 hover:border-ivt-gold hover:text-ivt-wine"
+                            >
+                                <HeartIconSolid v-if="isFavorited" class="h-4 w-4 text-ivt-wine" />
+                                <HeartIcon v-else class="h-4 w-4" />
+                                {{ isFavorited ? 'Salvat' : 'Salvează' }}
+                            </button>
+                            <a href="#contact" class="rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-5 py-2.5 text-sm font-semibold text-white transition-transform duration-150 hover:-translate-y-0.5">
+                                Trimite mesaj
+                            </a>
+                        </div>
                     </div>
 
                     <div class="mt-5 flex flex-wrap overflow-hidden rounded-2xl border border-ivt-line">

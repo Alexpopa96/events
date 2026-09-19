@@ -16,6 +16,7 @@ use App\Http\Controllers\QuoteRequests\Success as QuoteRequestsSuccess;
 use App\Http\Controllers\QuoteRequests\Update as QuoteRequestsUpdate;
 use App\Http\Controllers\Providers\Index as ProvidersIndex;
 use App\Http\Controllers\Providers\Show as ProvidersShow;
+use App\Http\Controllers\Providers\ToggleFavorite as ProvidersToggleFavorite;
 use Illuminate\Support\Facades\Route;
 
 Route::get('categorii', CategoriesIndex::class)->name('categories.index');
@@ -23,6 +24,10 @@ Route::get('categorii/{category:slug}', CategoriesShow::class)->name('categories
 
 Route::get('furnizori', ProvidersIndex::class)->name('providers.index');
 Route::get('furnizori/{providerProfile:slug}', ProvidersShow::class)->name('providers.show');
+
+Route::middleware(['auth', 'can:manage own favorites'])->group(function () {
+    Route::post('furnizori/{providerProfile:slug}/favorite', ProvidersToggleFavorite::class)->name('providers.favorite');
+});
 
 Route::prefix('anunturi')->as('listings.')->group(function () {
     Route::get('', ListingsIndex::class)->name('index');

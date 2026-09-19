@@ -66,6 +66,9 @@ class Show extends Controller
                 'listings_count' => $providerProfile->listings->count(),
                 'member_since' => $providerProfile->approved_at?->format('Y'),
                 'is_featured' => $providerProfile->listings->contains('is_featured', true),
+                'is_favorited' => $request->user()
+                    ? $request->user()->providerFavorites()->where('provider_profile_id', $providerProfile->id)->exists()
+                    : false,
             ],
             'listings' => $providerProfile->listings->map(fn ($listing) => [
                 'id' => $listing->id,
