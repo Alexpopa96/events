@@ -1,15 +1,12 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import axios from 'axios';
-import { DatePicker } from 'v-calendar';
-import 'v-calendar/style.css';
 import { useToast } from 'vue-toastification';
 import {
     ChevronRightIcon,
     ChevronLeftIcon,
     MagnifyingGlassIcon,
-    CalendarDaysIcon,
     UserGroupIcon,
     HeartIcon,
     SparklesIcon,
@@ -25,6 +22,8 @@ import { CheckIcon } from '@heroicons/vue/24/solid';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
 import CountyLocalitySelect from '@/Components/CountyLocalitySelect.vue';
+import ModalSelect from '@/Components/ModalSelect.vue';
+import DatePickerModal from '@/Components/DatePickerModal.vue';
 import { categoryIcon } from '@/Composables/useCategoryIcon';
 
 const toast = useToast();
@@ -36,13 +35,14 @@ const props = defineProps({
 });
 
 const steps = [
-    { title: 'Detalii despre căutare', subtitle: 'Ce serviciu cauți' },
+    { title: 'Detalii despre căutare', subtitle: 'Ce servicii cauți' },
     { title: 'Despre eveniment', subtitle: 'Tip, locație și dată' },
     { title: 'Buget & preferințe', subtitle: 'Buget și alte preferințe' },
     { title: 'Informații de contact', subtitle: 'Cum te pot contacta' },
     { title: 'Verificare & publicare', subtitle: 'Ultimul pas' },
 ];
 const currentStep = ref(0);
+const wizardSection = ref(null);
 const furthestStep = ref(0);
 
 const eventTypes = [
@@ -79,8 +79,10 @@ const contactMethods = [
 
 const DRAFT_KEY = 'quote-request-draft';
 
+const MAX_CATEGORIES = 5;
+
 const form = useForm({
-    category_id: '',
+    category_ids: [],
     title: '',
     message: '',
     event_type: '',
@@ -159,12 +161,19 @@ const togglePreference = (pref) => {
 };
 
 const stepValid = computed(() => [
-    !!form.category_id && !!form.title && !!form.message,
+    form.category_ids.length > 0 && !!form.title && !!form.message,
     !!form.event_type && (flexibleDate.value || !!form.event_date) && !!form.county_id && !!form.locality_id,
     true,
     !!form.name && !!form.email && !!form.phone,
     true,
 ]);
+
+// Bring the wizard back into view whenever the step changes, so the new
+// step always starts at its top instead of wherever the previous one ended.
+watch(currentStep, async () => {
+    await nextTick();
+    wizardSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
 const goToStep = (index) => {
     if (index <= furthestStep.value) currentStep.value = index;
@@ -193,7 +202,20 @@ const prevStep = () => {
     if (currentStep.value > 0) currentStep.value -= 1;
 };
 
-const categoryName = computed(() => props.categories.find((c) => c.id === form.category_id)?.name ?? '–');
+const selectedCategoryNames = computed(() => props.categories
+    .filter((c) => form.category_ids.includes(c.id))
+    .map((c) => c.name));
+const isPackage = computed(() => form.category_ids.length > 1);
+
+const toggleCategory = (categoryId) => {
+    const index = form.category_ids.indexOf(categoryId);
+    if (index !== -1) {
+        form.category_ids.splice(index, 1);
+        return;
+    }
+    if (form.category_ids.length >= MAX_CATEGORIES) return;
+    form.category_ids.push(categoryId);
+};
 const eventTypeLabel = computed(() => eventTypes.find((t) => t.value === form.event_type)?.label ?? '–');
 const eventDateLabel = computed(() => {
     if (flexibleDate.value) return 'Flexibilă';
@@ -217,7 +239,7 @@ const localityName = computed(() => localityOptions.value.find((l) => l.id === f
 const locationLabel = computed(() => (localityName.value && countyName.value ? `${localityName.value}, ${countyName.value}` : '–'));
 
 watch(
-    () => [form.category_id, form.title, form.message, form.event_type, form.event_date, form.county_id, form.locality_id, form.guest_count, form.budget_range, form.preferences, form.notes, form.phone, form.contact_method, form.platform_only],
+    () => [form.category_ids, form.title, form.message, form.event_type, form.event_date, form.county_id, form.locality_id, form.guest_count, form.budget_range, form.preferences, form.notes, form.phone, form.contact_method, form.platform_only],
     saveDraft,
     { deep: true },
 );
@@ -272,7 +294,7 @@ const minDate = new Date(Date.now() + 86400000);
             </section>
 
             <!-- WIZARD -->
-            <section class="py-14 pb-28">
+            <section ref="wizardSection" class="scroll-mt-16 py-14 pb-28">
                 <div class="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 lg:grid-cols-[250px_1fr] lg:px-8">
 
                     <!-- STEPPER -->
@@ -313,31 +335,54 @@ const minDate = new Date(Date.now() + 86400000);
                             <!-- STEP 1 -->
                             <template v-if="currentStep === 0">
                                 <p class="text-xs font-bold uppercase tracking-[0.08em] text-ivt-sage">Pasul 1 din 5</p>
-                                <h2 class="mt-2 font-serif text-2xl font-medium text-ivt-ink">Ce serviciu cauți?</h2>
-                                <p class="mt-2 max-w-lg text-[14.5px] text-ivt-ink-soft">Alege categoria principală pentru care vrei oferte. Poți publica o cerere separată pentru fiecare serviciu.</p>
+                                <h2 class="mt-2 font-serif text-2xl font-medium text-ivt-ink">Ce servicii cauți?</h2>
+                                <p class="mt-2 max-w-lg text-[14.5px] text-ivt-ink-soft">Alege una sau mai multe categorii pentru același eveniment — ex. fotograf, DJ și locație pentru aceeași nuntă — și publicăm câte o cerere pentru fiecare, către furnizorii potriviți.</p>
 
                                 <div class="mt-7 space-y-6">
                                     <div>
-                                        <label class="mb-2.5 block text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-ink-soft">Categorie</label>
+                                        <div class="mb-2.5 flex items-baseline justify-between">
+                                            <label class="block text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-ink-soft">Categorii</label>
+                                            <span class="text-xs text-ivt-ink-faint">{{ form.category_ids.length }} / {{ MAX_CATEGORIES }} selectate</span>
+                                        </div>
                                         <div class="relative mb-4">
                                             <MagnifyingGlassIcon class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ivt-ink-faint" />
                                             <input v-model="categorySearch" type="text" placeholder="Caută o categorie…" :class="[fieldClasses, 'pl-11']" />
                                         </div>
                                         <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
-                                            <label v-for="category in filteredCategories" :key="category.id" class="relative cursor-pointer">
-                                                <input v-model="form.category_id" type="radio" name="category" :value="category.id" class="peer sr-only" />
+                                            <label
+                                                v-for="category in filteredCategories"
+                                                :key="category.id"
+                                                class="relative"
+                                                :class="form.category_ids.includes(category.id) || form.category_ids.length < MAX_CATEGORIES ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'"
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    :checked="form.category_ids.includes(category.id)"
+                                                    :disabled="!form.category_ids.includes(category.id) && form.category_ids.length >= MAX_CATEGORIES"
+                                                    class="peer sr-only"
+                                                    @change="toggleCategory(category.id)"
+                                                />
                                                 <span class="flex flex-col items-center gap-2 rounded-xl border border-ivt-line px-2.5 py-4 text-center transition-all duration-150 peer-checked:-translate-y-0.5 peer-checked:border-ivt-gold peer-checked:bg-ivt-paper-2 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-ivt-gold">
                                                     <component :is="categoryIcon(category.slug)" class="h-[22px] w-[22px] text-ivt-wine" stroke-width="1.4" />
                                                     <span class="text-[12.5px] font-semibold text-ivt-ink">{{ category.name }}</span>
                                                 </span>
                                             </label>
                                         </div>
+                                        <p v-if="form.category_ids.length >= MAX_CATEGORIES" class="mt-2.5 text-xs text-ivt-ink-faint">Ai atins limita de {{ MAX_CATEGORIES }} categorii pentru o singură cerere.</p>
                                     </div>
 
                                     <div>
-                                        <label class="mb-2.5 block text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-ink-soft">Titlul cererii</label>
-                                        <input v-model="form.title" type="text" maxlength="150" placeholder="Ex. Caut fotograf pentru nuntă în Cluj" :class="fieldClasses" />
-                                        <p class="mt-1.5 text-xs text-ivt-ink-faint">Un titlu scurt și clar — apare primul în lista văzută de furnizori.</p>
+                                        <label class="mb-2.5 block text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-ink-soft">{{ isPackage ? 'Titlul evenimentului' : 'Titlul cererii' }}</label>
+                                        <input
+                                            v-model="form.title"
+                                            type="text"
+                                            maxlength="150"
+                                            :placeholder="isPackage ? 'Ex. Nuntă Ana & Vlad, 15 iunie' : 'Ex. Caut fotograf pentru nuntă în Cluj'"
+                                            :class="fieldClasses"
+                                        />
+                                        <p class="mt-1.5 text-xs text-ivt-ink-faint">
+                                            {{ isPackage ? 'Un titlu care descrie evenimentul — va apărea pe fiecare din cele ' + form.category_ids.length + ' cereri.' : 'Un titlu scurt și clar — apare primul în lista văzută de furnizori.' }}
+                                        </p>
                                     </div>
 
                                     <div>
@@ -375,23 +420,16 @@ const minDate = new Date(Date.now() + 86400000);
                                     </div>
 
                                     <div class="grid gap-6 sm:grid-cols-2">
-                                        <div class="brand-datepicker">
+                                        <div>
                                             <label class="mb-2.5 block text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-ink-soft">Data evenimentului</label>
-                                            <DatePicker v-model="form.event_date" mode="date" :model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" :min-date="minDate" :first-day-of-week="2" locale="ro" :disabled="flexibleDate">
-                                                <template #default="{ inputValue, inputEvents }">
-                                                    <div class="relative">
-                                                        <CalendarDaysIcon class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ivt-wine" />
-                                                        <input
-                                                            readonly
-                                                            :value="flexibleDate ? '' : inputValue"
-                                                            v-on="flexibleDate ? {} : inputEvents"
-                                                            :disabled="flexibleDate"
-                                                            placeholder="Selectează data evenimentului"
-                                                            :class="[fieldClasses, 'cursor-pointer pl-11 disabled:cursor-not-allowed disabled:opacity-50']"
-                                                        />
-                                                    </div>
-                                                </template>
-                                            </DatePicker>
+                                            <DatePickerModal
+                                                v-model="form.event_date"
+                                                title="Data evenimentului"
+                                                placeholder="Selectează data evenimentului"
+                                                :min-date="minDate"
+                                                :disabled="flexibleDate"
+                                                :button-class="fieldClasses"
+                                            />
                                             <label class="mt-3 flex items-center gap-2.5 text-[13.5px] text-ivt-ink-soft">
                                                 <input v-model="flexibleDate" type="checkbox" class="h-[15px] w-[15px] rounded border-ivt-line text-ivt-wine focus:ring-ivt-wine/30" />
                                                 Data este flexibilă / încă nu am stabilit-o
@@ -400,10 +438,14 @@ const minDate = new Date(Date.now() + 86400000);
 
                                         <div>
                                             <label class="mb-2.5 block text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-ink-soft">Număr aproximativ de invitați</label>
-                                            <select v-model="form.guest_count" :class="fieldClasses">
-                                                <option value="">Selectează numărul invitaților</option>
-                                                <option v-for="option in guestCountOptions" :key="option" :value="option">{{ option }}</option>
-                                            </select>
+                                            <ModalSelect
+                                                v-model="form.guest_count"
+                                                :options="guestCountOptions"
+                                                title="Număr aproximativ de invitați"
+                                                placeholder="Selectează numărul invitaților"
+                                                clear-label="Nespecificat"
+                                                :button-class="fieldClasses"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -521,8 +563,14 @@ const minDate = new Date(Date.now() + 86400000);
                                             <h4 class="text-[13px] font-bold uppercase tracking-[0.05em] text-ivt-ink-soft">Căutare</h4>
                                             <button type="button" @click="goToStep(0)" class="text-[12.5px] font-semibold text-ivt-wine hover:underline">Editează</button>
                                         </div>
-                                        <div class="flex justify-between gap-4 border-b border-ivt-line py-2 text-sm"><span class="text-ivt-ink-faint">Categorie</span><span class="text-right font-semibold text-ivt-ink">{{ categoryName }}</span></div>
+                                        <div class="flex items-start justify-between gap-4 border-b border-ivt-line py-2 text-sm">
+                                            <span class="flex-none pt-0.5 text-ivt-ink-faint">{{ isPackage ? 'Categorii' : 'Categorie' }}</span>
+                                            <span class="flex flex-wrap justify-end gap-1.5">
+                                                <span v-for="name in selectedCategoryNames" :key="name" class="rounded-full bg-ivt-paper-2 px-2.5 py-1 text-xs font-semibold text-ivt-ink">{{ name }}</span>
+                                            </span>
+                                        </div>
                                         <div class="flex justify-between gap-4 py-2 text-sm"><span class="text-ivt-ink-faint">Titlu</span><span class="text-right font-semibold text-ivt-ink">{{ form.title || '–' }}</span></div>
+                                        <p v-if="isPackage" class="mt-2 text-xs text-ivt-ink-faint">Se vor publica {{ form.category_ids.length }} cereri separate, una pentru fiecare categorie — vizibile fiecare doar furnizorilor din categoria ei.</p>
                                     </div>
 
                                     <div class="rounded-2xl border border-ivt-line p-5">
@@ -565,7 +613,7 @@ const minDate = new Date(Date.now() + 86400000);
                                 <div class="mt-6 flex items-start gap-3.5 rounded-2xl bg-ivt-paper-2 p-5">
                                     <span class="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-ivt-ink text-ivt-gold-bright"><CheckIcon class="h-4 w-4" /></span>
                                     <p class="text-[13.5px] leading-relaxed text-ivt-ink-soft">
-                                        <b class="text-ivt-ink">Ce urmează:</b> cererea ta devine vizibilă imediat furnizorilor din categoria și zona aleasă. Vei primi oferte direct pe metoda de contact preferată, de obicei în câteva ore.
+                                        <b class="text-ivt-ink">Ce urmează:</b> {{ isPackage ? `cererile tale devin vizibile imediat furnizorilor din fiecare categorie și zona aleasă` : 'cererea ta devine vizibilă imediat furnizorilor din categoria și zona aleasă' }}. Vei primi oferte direct pe metoda de contact preferată, de obicei în câteva ore.
                                     </p>
                                 </div>
                             </template>
@@ -603,7 +651,7 @@ const minDate = new Date(Date.now() + 86400000);
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                                     </svg>
-                                    {{ currentStep === steps.length - 1 ? 'Publică cererea' : 'Continuă' }}
+                                    {{ currentStep === steps.length - 1 ? (isPackage ? 'Publică cererile' : 'Publică cererea') : 'Continuă' }}
                                     <ChevronRightIcon v-if="!form.processing && currentStep < steps.length - 1" class="h-4 w-4" />
                                 </button>
                             </div>
@@ -616,22 +664,3 @@ const minDate = new Date(Date.now() + 86400000);
         <SiteFooter />
     </div>
 </template>
-
-<style scoped>
-.brand-datepicker :deep(.vc-container) {
-    --vc-accent-50: #F6F3EB;
-    --vc-accent-100: #EFEADB;
-    --vc-accent-200: #E4D6B8;
-    --vc-accent-300: #D9C08C;
-    --vc-accent-400: #C9A24F;
-    --vc-accent-500: #A87F2E;
-    --vc-accent-600: #8C6825;
-    --vc-accent-700: #6F511D;
-    --vc-accent-800: #523C16;
-    --vc-accent-900: #38290F;
-    --vc-font-family: inherit;
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 20px 50px -12px rgba(22, 40, 31, 0.25);
-}
-</style>

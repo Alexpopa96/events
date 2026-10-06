@@ -1,5 +1,13 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
 
+// Single source of truth for the app's primary (action) colour. Use the
+// `primary` / `primary-bright` utilities for buttons, active states, links and
+// focus rings; `ivt-wine` is kept as an alias of the same values.
+const primary = {
+    DEFAULT: '#7C2E3B',
+    bright: '#96323F',
+}
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -17,6 +25,7 @@ export default {
         },
         extend: {
             colors: {
+                primary,
                 // "Invita" mockup palette — scoped to the public homepage
                 // (SiteHeader/SiteFooter/Home) via the `ivt-*` namespace so it
                 // never touches the existing brand/ink/paper tokens elsewhere.
@@ -30,8 +39,8 @@ export default {
                     'ink-faint': '#8A9186',
                     gold: '#A87F2E',
                     'gold-bright': '#C9A24F',
-                    wine: '#7C2E3B',
-                    'wine-bright': '#96323F',
+                    wine: primary.DEFAULT,
+                    'wine-bright': primary.bright,
                     sage: '#6F8465',
                     line: 'rgba(22,40,31,0.1)',
                     'on-dark': '#F3EEDD',
@@ -66,6 +75,7 @@ export default {
                 },
             },
             boxShadow: {
+                'glow-primary': '0 8px 24px -8px rgba(124,46,59,0.45)',
                 'glow-brand': '0 8px 30px -8px rgba(16,185,129,0.35)',
                 'glow-gold': '0 8px 30px -8px rgba(245,158,11,0.35)',
                 'ivt-soft': '0 24px 48px -30px rgba(22,40,31,0.28)',

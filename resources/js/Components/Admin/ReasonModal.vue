@@ -33,20 +33,20 @@ const submit = () => {
 <template>
     <Modal :show="show" max-width="lg" @close="$emit('close')">
         <div class="p-6">
-            <h3 class="font-serif text-lg text-ink">{{ title }}</h3>
-            <p v-if="description" class="mt-1.5 text-sm text-ink-soft">{{ description }}</p>
+            <h3 class="font-serif text-lg text-ivt-ink">{{ title }}</h3>
+            <p v-if="description" class="mt-1.5 text-sm text-ivt-ink-soft">{{ description }}</p>
 
             <textarea
                 v-model="reason"
                 rows="4"
                 placeholder="Scrie motivul aici..."
-                class="mt-4 w-full rounded-2xl border-line text-sm text-ink placeholder:text-ink-soft/50 focus:border-brand-400 focus:ring-brand-400"
+                class="mt-4 w-full rounded-2xl border-ivt-line text-sm text-ivt-ink placeholder:text-ivt-ink-soft/50 focus:border-primary focus:ring-primary"
             ></textarea>
 
             <div class="mt-5 flex items-center justify-end gap-3">
                 <button
                     type="button"
-                    class="px-4 py-2 rounded-xl text-sm font-medium text-ink-soft hover:bg-paper transition-colors"
+                    class="px-4 py-2 rounded-xl text-sm font-medium text-ivt-ink-soft hover:bg-ivt-paper transition-colors"
                     @click="$emit('close')"
                 >
                     Anulează

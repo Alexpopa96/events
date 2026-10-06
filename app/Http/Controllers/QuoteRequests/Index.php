@@ -14,8 +14,13 @@ class Index extends Controller
         $quoteRequests = $request->user()
             ->quoteRequests()
             ->with('category:id,name,slug')
+            ->withCount('offers')
             ->latest()
             ->get();
+
+        // How many requests share each group token, so a package member can show
+        // "part of a package of 3" without a query per row.
+        $packageSizes = $quoteRequests->whereNotNull('group_token')->countBy('group_token');
 
         return Inertia::render('QuoteRequests/Index', [
             'quoteRequests' => $quoteRequests->map(fn ($quoteRequest) => [
@@ -31,9 +36,8 @@ class Index extends Controller
                 'message' => $quoteRequest->message,
                 'notes' => $quoteRequest->notes,
                 'status' => $quoteRequest->status,
-                // No offers/messaging system exists yet — providers can't respond
-                // to a request in-app, so this is always 0 until that's built.
-                'offers_count' => 0,
+                'offers_count' => $quoteRequest->offers_count,
+                'package_size' => $quoteRequest->group_token ? $packageSizes->get($quoteRequest->group_token, 1) : 1,
                 'created_at' => $quoteRequest->created_at->format('d.m.Y, H:i'),
                 'created_at_human' => $quoteRequest->created_at->diffForHumans(),
             ])->values(),
@@ -41,7 +45,7 @@ class Index extends Controller
                 'total' => $quoteRequests->count(),
                 'pending' => $quoteRequests->where('status', 'pending_review')->count(),
                 'active' => $quoteRequests->where('status', 'open')->count(),
-                'withOffers' => 0,
+                'withOffers' => (int) $quoteRequests->sum('offers_count'),
                 'closed' => $quoteRequests->whereIn('status', ['closed', 'rejected'])->count(),
             ],
         ]);

@@ -1,6 +1,8 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { EnvelopeIcon, LockClosedIcon } from '@heroicons/vue/24/outline';
+import { nextTick, ref } from 'vue';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import axios from 'axios';
+import { ArrowLeftIcon, LockClosedIcon, UserIcon } from '@heroicons/vue/24/outline';
 import GuestAuthLayout from '@/Layouts/GuestAuthLayout.vue';
 import IconField from '@/Components/Auth/IconField.vue';
 import GoogleAuthButton from '@/Components/Auth/GoogleAuthButton.vue';
@@ -10,11 +12,51 @@ defineProps({
     status: String,
 });
 
+const step = ref(1);
+const identifier = ref('');
+const identifierError = ref('');
+const checking = ref(false);
+
 const form = useForm({
     email: '',
     password: '',
     remember: false,
 });
+
+const identify = async () => {
+    identifierError.value = '';
+    checking.value = true;
+
+    try {
+        const { data } = await axios.post(route('login.identify'), { identifier: identifier.value });
+
+        if (data.exists) {
+            form.email = data.identifier;
+            identifier.value = data.identifier;
+            step.value = 2;
+            await nextTick();
+            document.getElementById('password')?.focus();
+        } else {
+            router.get(route('register.client'), {
+                [data.type]: data.identifier,
+            });
+        }
+    } catch (error) {
+        identifierError.value = error.response?.data?.errors?.identifier?.[0]
+            ?? (error.response?.status === 429
+                ? 'Prea multe încercări. Încearcă din nou peste un minut.'
+                : 'A apărut o eroare. Încearcă din nou.');
+    } finally {
+        checking.value = false;
+    }
+};
+
+const back = () => {
+    form.reset('password');
+    form.clearErrors();
+    step.value = 1;
+    nextTick(() => document.getElementById('identifier')?.focus());
+};
 
 const submit = () => {
     form.transform(data => ({
@@ -31,7 +73,9 @@ const submit = () => {
 
     <GuestAuthLayout
         title="Conectare"
-        subtitle="Introdu adresa de email și parola pentru a-ți accesa contul în siguranță."
+        :subtitle="step === 1
+            ? 'Introdu adresa de email sau numărul de telefon pentru a continua.'
+            : 'Introdu parola pentru a-ți accesa contul în siguranță.'"
     >
         <div
             v-if="status"
@@ -40,17 +84,37 @@ const submit = () => {
             {{ status }}
         </div>
 
-        <form @submit.prevent="submit" class="space-y-4">
+        <form v-if="step === 1" @submit.prevent="identify" class="space-y-4">
             <IconField
-                id="email"
-                v-model="form.email"
-                type="email"
-                :icon="EnvelopeIcon"
+                id="identifier"
+                v-model="identifier"
+                type="text"
+                :icon="UserIcon"
                 autofocus
                 autocomplete="username"
-                placeholder="Adresă de email"
-                :error="form.errors.email"
+                placeholder="Email sau număr de telefon"
+                :error="identifierError"
             />
+
+            <button
+                type="submit"
+                :disabled="checking || !identifier.trim()"
+                class="w-full rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(124,46,59,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ivt-wine/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            >
+                Continuă
+            </button>
+        </form>
+
+        <form v-else @submit.prevent="submit" class="space-y-4">
+            <button
+                type="button"
+                class="flex w-full items-center gap-2 rounded-full border border-ivt-line bg-ivt-paper-2 px-4 py-3 text-left text-sm text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-gold"
+                @click="back"
+            >
+                <ArrowLeftIcon class="h-4 w-4 shrink-0 text-ivt-ink-faint" />
+                <span class="truncate">{{ form.email }}</span>
+                <span class="ml-auto shrink-0 font-medium text-ivt-wine">Schimbă</span>
+            </button>
 
             <IconField
                 id="password"
@@ -59,7 +123,7 @@ const submit = () => {
                 :icon="LockClosedIcon"
                 autocomplete="current-password"
                 placeholder="Parolă"
-                :error="form.errors.password"
+                :error="form.errors.password || form.errors.email"
             />
 
             <div class="flex items-center justify-between px-1 text-sm">
@@ -74,7 +138,7 @@ const submit = () => {
                 </label>
                 <Link
                     v-if="canResetPassword"
-                    :href="route('password.request')"
+                    :href="route('password.request', { identifier: form.email })"
                     class="font-medium text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright"
                 >
                     Ai uitat parola?
@@ -90,14 +154,14 @@ const submit = () => {
             </button>
         </form>
 
-        <p class="mt-6 text-center text-sm text-ivt-ink-soft">
+        <p v-if="step === 1" class="mt-6 text-center text-sm text-ivt-ink-soft">
             Nu ai un cont?
             <Link href="/register/client" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
                 Înregistrează-te
             </Link>
         </p>
 
-        <GoogleAuthButton />
+        <GoogleAuthButton v-if="step === 1" />
 
         <p class="mt-6 text-center text-xs text-ivt-ink-faint">
             Ești furnizor de servicii?

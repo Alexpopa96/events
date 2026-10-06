@@ -9,13 +9,18 @@ import {
     LockClosedIcon,
     InformationCircleIcon,
     ChevronRightIcon,
+    SparklesIcon,
 } from '@heroicons/vue/24/outline';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
 
 const props = defineProps({
     quoteRequest: Object,
+    package: { type: Array, default: () => [] },
 });
+
+// `package` is a reserved word, so it's aliased for use in the template.
+const pkg = computed(() => props.package);
 
 const eventTypeLabels = {
     nunta: 'Nuntă',
@@ -151,6 +156,19 @@ const activeStepIndex = computed(() => (props.quoteRequest.status === 'open' ? 3
                             <span class="text-[12.5px] text-ivt-ink-faint">Cod cerere <b class="font-bold text-ivt-ink">#CR{{ String(quoteRequest.id).padStart(5, '0') }}</b></span>
                         </div>
                         <p class="mb-7 text-[15px] text-ivt-ink-soft">{{ quoteRequest.title }}</p>
+
+                        <div v-if="pkg.length" class="mb-4 rounded-2xl border border-ivt-gold/40 bg-ivt-gold/5 p-5">
+                            <h4 class="mb-1 flex items-center gap-1.5 text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-gold">
+                                <SparklesIcon class="h-3.5 w-3.5" /> Cerere de tip pachet
+                            </h4>
+                            <p class="mb-3.5 text-[13.5px] text-ivt-ink-soft">
+                                Ai publicat câte o cerere separată pentru fiecare serviciu, ca fiecare furnizor s-o vadă în categoria lui. Toate au aceleași detalii de eveniment și contact.
+                            </p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="rounded-full bg-ivt-ink px-3 py-1.5 text-xs font-semibold text-ivt-gold-bright">{{ quoteRequest.category }} (aceasta)</span>
+                                <span v-for="item in pkg" :key="item.id" class="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-ivt-ink ring-1 ring-ivt-line">{{ item.category }}</span>
+                            </div>
+                        </div>
 
                         <div class="mb-4 rounded-2xl border border-ivt-line p-5">
                             <h4 class="mb-3.5 text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-ink-soft">Căutare</h4>

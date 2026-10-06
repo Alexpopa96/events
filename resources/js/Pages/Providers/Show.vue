@@ -12,6 +12,10 @@ import {
     EyeIcon,
     FaceFrownIcon,
     HeartIcon,
+    CalendarIcon,
+    CheckIcon,
+    XMarkIcon,
+    ClockIcon,
 } from '@heroicons/vue/24/outline';
 import { HeartIcon as HeartIconSolid, StarIcon } from '@heroicons/vue/24/solid';
 import SiteHeader from '@/Components/SiteHeader.vue';
@@ -24,7 +28,12 @@ const props = defineProps({
     provider: { type: Object, required: true },
     listings: { type: Array, default: () => [] },
     reviews: { type: Array, default: () => [] },
+    unavailableDates: { type: Array, default: () => [] },
 });
+
+/* ---------- availability check ---------- */
+const checkDate = ref('');
+const dateIsAvailable = computed(() => !props.unavailableDates.includes(checkDate.value));
 
 const { isFavorited, toggle: toggleFavorite } = useProviderFavoriteToggle(
     props.provider.slug,
@@ -157,8 +166,8 @@ const socialLinks = computed(() => Object.entries(props.provider.social_links ??
                                     <span v-if="provider.is_featured" class="inline-flex items-center gap-1 rounded-full border border-white/15 bg-ivt-ink px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-ivt-gold-bright">
                                         Premium
                                     </span>
-                                    <span class="inline-flex items-center gap-1 rounded-full border border-ivt-sage px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.05em] text-ivt-sage">
-                                        <CheckBadgeIcon class="h-3.5 w-3.5" /> Verificat
+                                    <span v-if="provider.is_verified" class="inline-flex items-center gap-1 rounded-full border border-ivt-sage px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.05em] text-ivt-sage" title="CUI confirmat la ANAF">
+                                        <CheckBadgeIcon class="h-3.5 w-3.5" /> Verificat ANAF
                                     </span>
                                 </div>
                                 <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-ivt-ink-soft">
@@ -169,6 +178,9 @@ const socialLinks = computed(() => Object.entries(props.provider.social_links ??
                                     <span v-if="provider.rating" class="inline-flex items-center gap-1 font-medium text-ivt-ink">
                                         <StarIcon class="h-4 w-4 text-ivt-gold" /> {{ provider.rating }}
                                         <span class="font-normal text-ivt-ink-faint">· {{ provider.reviews_count }} recenzii</span>
+                                    </span>
+                                    <span v-if="provider.response_time_label" class="inline-flex items-center gap-1">
+                                        <ClockIcon class="h-4 w-4" /> {{ provider.response_time_label }}
                                     </span>
                                 </div>
                             </div>
@@ -354,6 +366,13 @@ const socialLinks = computed(() => Object.entries(props.provider.social_links ??
                                             </span>
                                         </div>
                                         <p v-if="review.comment" class="text-sm leading-relaxed text-ivt-ink-soft">{{ review.comment }}</p>
+                                        <div v-if="review.provider_reply" class="mt-3 rounded-xl bg-ivt-paper p-4">
+                                            <p class="text-xs font-semibold text-ivt-ink">
+                                                Răspuns de la {{ provider.company_name }}
+                                                <span class="font-normal text-ivt-ink-faint">· {{ review.provider_replied_at }}</span>
+                                            </p>
+                                            <p class="mt-1 whitespace-pre-line text-sm leading-relaxed text-ivt-ink-soft">{{ review.provider_reply }}</p>
+                                        </div>
                                     </li>
                                 </ul>
 
@@ -424,6 +443,26 @@ const socialLinks = computed(() => Object.entries(props.provider.social_links ??
                                         <GlobeAltIcon class="h-4 w-4" />
                                     </a>
                                 </div>
+                            </div>
+
+                            <!-- Availability check -->
+                            <div class="rounded-[18px] border border-ivt-line bg-white p-6 shadow-ivt-soft">
+                                <p class="flex items-center gap-1.5 text-sm font-semibold text-ivt-ink"><CalendarIcon class="h-4 w-4 text-ivt-wine" /> Verifică disponibilitatea</p>
+                                <input
+                                    v-model="checkDate"
+                                    type="date"
+                                    :min="new Date().toISOString().slice(0, 10)"
+                                    class="mt-3 w-full rounded-xl border-ivt-line text-sm text-ivt-ink focus:border-primary focus:ring-primary"
+                                />
+                                <p
+                                    v-if="checkDate"
+                                    class="mt-2.5 flex items-center gap-1.5 text-sm font-medium"
+                                    :class="dateIsAvailable ? 'text-emerald-600' : 'text-rose-600'"
+                                >
+                                    <CheckIcon v-if="dateIsAvailable" class="h-4 w-4" />
+                                    <XMarkIcon v-else class="h-4 w-4" />
+                                    {{ dateIsAvailable ? 'Disponibil în această dată' : 'Ocupat în această dată' }}
+                                </p>
                             </div>
 
                             <div class="rounded-[18px] bg-ivt-paper-2 p-[22px]">

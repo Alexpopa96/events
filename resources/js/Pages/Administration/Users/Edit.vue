@@ -21,8 +21,7 @@
                         </select-input>
                     </div>
                     <div class="col-span-1">
-                        <label class="block text-sm font-medium dark:text-textInputDark text-gray-800"
-                               for="switcher">Activ</label>
+                        <label class="block text-sm font-medium text-ivt-ink mb-2" for="switcher">Activ</label>
                         <Switcher id="switcher" v-model="form.status" />
                     </div>
                     <div class="md:col-span-1 lg:col-span-12">

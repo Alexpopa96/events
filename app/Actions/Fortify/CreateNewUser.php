@@ -9,8 +9,8 @@ use App\Notifications\ProviderRegistrationReceived;
 use App\Services\AnafLookupService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
 
@@ -65,6 +65,9 @@ class CreateNewUser implements CreatesNewUsers
             'county_id' => $input['county_id'],
             'locality_id' => $input['locality_id'],
             'status' => 'pending',
+            // The lookup above just succeeded, so this CUI is a real, live-checked company.
+            'anaf_verified_at' => now(),
+            'anaf_status' => $company['stare_inregistrare'],
         ]);
 
         $user->notify(new ProviderRegistrationReceived($profile));

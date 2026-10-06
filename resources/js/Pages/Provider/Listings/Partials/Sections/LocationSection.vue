@@ -9,12 +9,12 @@ defineProps({
     bordered: { type: Boolean, default: false },
 });
 
-const sectionHeadingClass = 'flex items-center gap-2 text-sm font-semibold text-ink mb-4';
-const iconWrapClass = 'w-7 h-7 rounded-lg bg-brand-50 text-brand-500 flex items-center justify-center flex-none';
+const sectionHeadingClass = 'flex items-center gap-2 text-sm font-semibold text-ivt-ink mb-5';
+const iconWrapClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex items-center justify-center flex-none';
 </script>
 
 <template>
-    <section :class="bordered && 'pt-6 border-t border-line'">
+    <section :class="bordered && 'pt-6 border-t border-ivt-line'">
         <h3 v-if="heading" :class="sectionHeadingClass">
             <span :class="iconWrapClass"><MapPinIcon class="w-4 h-4" /></span>
             Locație
@@ -24,6 +24,7 @@ const iconWrapClass = 'w-7 h-7 rounded-lg bg-brand-50 text-brand-500 flex items-
             v-model:county-id="form.county_id"
             v-model:locality-id="form.locality_id"
             :counties="counties"
+            theme="brand"
             :county-error="form.errors.county_id"
             :locality-error="form.errors.locality_id"
         />

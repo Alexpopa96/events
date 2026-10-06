@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\QuoteRequests;
 
+use App\Rules\RomanianPhone;
 use App\Http\Controllers\Controller;
 use App\Models\County;
 use App\Models\Locality;
@@ -31,7 +32,7 @@ class Update extends Controller
             'notes' => ['nullable', 'string', 'max:1000'],
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'email', 'max:150'],
-            'phone' => ['required', 'string', 'max:30'],
+            'phone' => ['required', 'string', 'max:30', new RomanianPhone],
             'contact_method' => ['nullable', 'string', 'max:30'],
             'platform_only' => ['nullable', 'boolean'],
         ]);

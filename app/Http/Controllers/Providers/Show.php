@@ -66,10 +66,18 @@ class Show extends Controller
                 'listings_count' => $providerProfile->listings->count(),
                 'member_since' => $providerProfile->approved_at?->format('Y'),
                 'is_featured' => $providerProfile->listings->contains('is_featured', true),
+                'is_verified' => $providerProfile->isAnafVerified(),
+                'response_time_label' => $providerProfile->responseTimeLabel(),
                 'is_favorited' => $request->user()
                     ? $request->user()->providerFavorites()->where('provider_profile_id', $providerProfile->id)->exists()
                     : false,
             ],
+            'unavailableDates' => $providerProfile->availabilityBlocks()
+                ->whereBetween('date', [now()->toDateString(), now()->addMonths(6)->toDateString()])
+                ->orderBy('date')
+                ->pluck('date')
+                ->map(fn ($date) => $date->toDateString())
+                ->all(),
             'listings' => $providerProfile->listings->map(fn ($listing) => [
                 'id' => $listing->id,
                 'slug' => $listing->slug,
@@ -92,6 +100,8 @@ class Show extends Controller
                 'comment' => $review->comment,
                 'author' => $review->user->name,
                 'listing_title' => $review->listing?->title,
+                'provider_reply' => $review->provider_reply,
+                'provider_replied_at' => $review->provider_replied_at?->diffForHumans(),
                 'created_at' => $review->created_at->diffForHumans(),
             ]),
         ]);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Listing;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Support\EventTypes;
 use Illuminate\Validation\Rule;
 
 class Update extends Controller
@@ -23,6 +24,8 @@ class Update extends Controller
             'price_to' => ['nullable', 'numeric', 'min:0', 'gte:price_from'],
             'benefits' => ['nullable', 'array'],
             'benefits.*' => ['string', 'max:120'],
+            'event_types' => ['nullable', 'array'],
+            'event_types.*' => ['string', Rule::in(EventTypes::values())],
             'county_id' => ['nullable', 'integer', 'exists:counties,id'],
             'locality_id' => ['nullable', 'integer', 'exists:localities,id'],
             'action' => ['required', Rule::in(['save', 'submit', 'unpublish'])],

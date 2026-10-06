@@ -1,6 +1,8 @@
 <script setup>
-import { ref } from 'vue';
-import { Link, router, useForm } from '@inertiajs/vue3';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import axios from 'axios';
+import { useForm } from '@inertiajs/vue3';
+import { EnvelopeIcon } from '@heroicons/vue/24/outline';
 import ActionMessage from '@/Components/ActionMessage.vue';
 import FormSection from '@/Components/FormSection.vue';
 import InputError from '@/Components/InputError.vue';
@@ -17,125 +19,98 @@ const form = useForm({
     _method: 'PUT',
     name: props.user.name,
     email: props.user.email,
-    photo: null,
+    email_change_code: '',
 });
 
-const verificationLinkSent = ref(null);
-const photoPreview = ref(null);
-const photoInput = ref(null);
+/* ---------- changing the email needs a code sent to the current address ---------- */
+const emailChanged = computed(() => form.email.trim().toLowerCase() !== props.user.email.toLowerCase());
+
+const codeSent = ref(false);
+const sending = ref(false);
+const sendError = ref('');
+const cooldown = ref(0);
+let timer = null;
+
+const startCooldown = (seconds) => {
+    cooldown.value = seconds;
+    clearInterval(timer);
+    if (seconds <= 0) return;
+    timer = setInterval(() => {
+        cooldown.value -= 1;
+        if (cooldown.value <= 0) clearInterval(timer);
+    }, 1000);
+};
+
+onBeforeUnmount(() => clearInterval(timer));
+
+const resetChange = () => {
+    codeSent.value = false;
+    sendError.value = '';
+    form.email_change_code = '';
+    form.clearErrors('email_change_code');
+    clearInterval(timer);
+    cooldown.value = 0;
+};
+
+// The code is bound to the address it was requested for, so editing the address starts over.
+watch(() => form.email, resetChange);
+
+const sendCode = async () => {
+    sending.value = true;
+    sendError.value = '';
+
+    try {
+        const { data } = await axios.post(route('email-change.send'), { email: form.email });
+        codeSent.value = true;
+        startCooldown(data.retry_in);
+    } catch (error) {
+        sendError.value = error.response?.status === 422
+            ? Object.values(error.response.data.errors)[0][0]
+            : error.response?.status === 429
+                ? 'Prea multe încercări. Așteaptă un minut și încearcă din nou.'
+                : 'Ceva n-a mers. Încearcă din nou.';
+    } finally {
+        sending.value = false;
+    }
+};
+
+const onCodeInput = (event) => {
+    form.email_change_code = event.target.value.replace(/\D/g, '').slice(0, 6);
+};
+
+const canSave = computed(() => !form.processing && (!emailChanged.value || form.email_change_code.length === 6));
 
 const updateProfileInformation = () => {
-    if (photoInput.value) {
-        form.photo = photoInput.value.files[0];
-    }
-
-    form.post(route('user-profile-information.update'), {
+    form.transform((data) => (emailChanged.value ? data : { ...data, email_change_code: undefined })).post(route('user-profile-information.update'), {
         errorBag: 'updateProfileInformation',
         preserveScroll: true,
-        onSuccess: () => clearPhotoFileInput(),
-    });
-};
-
-const sendEmailVerification = () => {
-    verificationLinkSent.value = true;
-};
-
-const selectNewPhoto = () => {
-    photoInput.value.click();
-};
-
-const updatePhotoPreview = () => {
-    const photo = photoInput.value.files[0];
-
-    if (! photo) return;
-
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-        photoPreview.value = e.target.result;
-    };
-
-    reader.readAsDataURL(photo);
-};
-
-const deletePhoto = () => {
-    router.delete(route('current-user-photo.destroy'), {
-        preserveScroll: true,
         onSuccess: () => {
-            photoPreview.value = null;
-            clearPhotoFileInput();
+            resetChange();
+            form.email = props.user.email;
         },
     });
-};
-
-const clearPhotoFileInput = () => {
-    if (photoInput.value?.value) {
-        photoInput.value.value = null;
-    }
 };
 </script>
 
 <template>
     <FormSection @submitted="updateProfileInformation">
         <template #title>
-            Profile Information
+            Informații profil
         </template>
 
         <template #description>
-            Update your account's profile information and email address.
+            Actualizează numele și adresa de email a contului tău.
         </template>
 
         <template #form>
-            <!-- Profile Photo -->
-            <div v-if="$page.props.jetstream.managesProfilePhotos" class="col-span-6 sm:col-span-4">
-                <!-- Profile Photo File Input -->
-                <input
-                    id="photo"
-                    ref="photoInput"
-                    type="file"
-                    class="hidden"
-                    @change="updatePhotoPreview"
-                >
-
-                <InputLabel for="photo" value="Photo" />
-
-                <!-- Current Profile Photo -->
-                <div v-show="!photoPreview" class="mt-2">
-                    <img :src="user.profile_photo_url" :alt="user.name" class="rounded-full size-20 object-cover">
-                </div>
-
-                <!-- New Profile Photo Preview -->
-                <div v-show="photoPreview" class="mt-2">
-                    <span
-                        class="block rounded-full size-20 bg-cover bg-no-repeat bg-center"
-                        :style="'background-image: url(\'' + photoPreview + '\');'"
-                    />
-                </div>
-
-                <SecondaryButton class="mt-2 me-2" type="button" @click.prevent="selectNewPhoto">
-                    Select A New Photo
-                </SecondaryButton>
-
-                <SecondaryButton
-                    v-if="user.profile_photo_path"
-                    type="button"
-                    class="mt-2"
-                    @click.prevent="deletePhoto"
-                >
-                    Remove Photo
-                </SecondaryButton>
-
-                <InputError :message="form.errors.photo" class="mt-2" />
-            </div>
-
             <!-- Name -->
             <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="name" value="Name" />
+                <InputLabel for="name" value="Nume" />
                 <TextInput
                     id="name"
                     v-model="form.name"
                     type="text"
-                    class="mt-1 block w-full"
+                    class="block w-full"
                     required
                     autocomplete="name"
                 />
@@ -149,29 +124,61 @@ const clearPhotoFileInput = () => {
                     id="email"
                     v-model="form.email"
                     type="email"
-                    class="mt-1 block w-full"
+                    class="block w-full"
                     required
                     autocomplete="username"
                 />
                 <InputError :message="form.errors.email" class="mt-2" />
+                <p v-if="!emailChanged" class="mt-1.5 text-xs leading-relaxed text-ivt-ink-soft/80">
+                    Ca să schimbi adresa, îți trimitem un cod de verificare pe adresa curentă.
+                </p>
+            </div>
 
-                <div v-if="$page.props.jetstream.hasEmailVerification && user.email_verified_at === null">
-                    <p class="text-sm mt-2 dark:text-white">
-                        Your email address is unverified.
+            <!-- Verification for a changed email -->
+            <div v-if="emailChanged" class="col-span-6">
+                <div class="rounded-2xl bg-ivt-paper-2 px-4 py-4">
+                    <div class="flex items-start gap-3">
+                        <span class="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-white text-primary shadow-sm"><EnvelopeIcon class="h-5 w-5" /></span>
+                        <p class="text-sm text-ivt-ink-soft">
+                            <template v-if="!codeSent">
+                                Pentru a schimba adresa în <strong class="break-all text-ivt-ink">{{ form.email }}</strong>, confirmă cu un cod trimis pe adresa curentă,
+                                <strong class="break-all text-ivt-ink">{{ user.email }}</strong>.
+                            </template>
+                            <template v-else>
+                                Am trimis un cod de 6 cifre pe <strong class="break-all text-ivt-ink">{{ user.email }}</strong>. Este valabil 10 minute.
+                            </template>
+                        </p>
+                    </div>
 
-                        <Link
-                            :href="route('verification.send')"
-                            method="post"
-                            as="button"
-                            class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                            @click.prevent="sendEmailVerification"
-                        >
-                            Click here to re-send the verification email.
-                        </Link>
-                    </p>
+                    <div v-if="codeSent" class="mt-4">
+                        <input
+                            :value="form.email_change_code"
+                            @input="onCodeInput"
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            maxlength="6"
+                            placeholder="••••••"
+                            aria-label="Cod de verificare"
+                            class="w-full rounded-2xl border-2 border-transparent bg-white py-3.5 text-center font-mono text-2xl font-semibold tracking-[0.5em] text-primary placeholder:text-ivt-ink-soft/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
+                            :class="{ '!border-red-400 !bg-red-50/60': form.errors.email_change_code }"
+                        />
+                        <InputError class="mt-2" :message="form.errors.email_change_code" />
+                        <p class="mt-2 text-xs text-ivt-ink-soft">Apoi apasă „Salvează” ca să schimbi adresa.</p>
+                    </div>
 
-                    <div v-show="verificationLinkSent" class="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
-                        A new verification link has been sent to your email address.
+                    <InputError v-if="sendError" class="mt-3" :message="sendError" />
+
+                    <div class="mt-4 flex flex-wrap items-center gap-3">
+                        <SecondaryButton v-if="!codeSent" :disabled="sending" @click="sendCode">
+                            {{ sending ? 'Se trimite…' : 'Trimite codul' }}
+                        </SecondaryButton>
+                        <SecondaryButton v-else :disabled="cooldown > 0 || sending" @click="sendCode">
+                            {{ cooldown > 0 ? `Retrimite în ${cooldown}s` : 'Trimite un cod nou' }}
+                        </SecondaryButton>
+                        <button type="button" class="text-sm font-medium text-ivt-ink-soft transition-colors hover:text-ivt-ink" @click="form.email = user.email">
+                            Renunță la schimbare
+                        </button>
                     </div>
                 </div>
             </div>
@@ -179,11 +186,11 @@ const clearPhotoFileInput = () => {
 
         <template #actions>
             <ActionMessage :on="form.recentlySuccessful" class="me-3">
-                Saved.
+                Salvat.
             </ActionMessage>
 
-            <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                Save
+            <PrimaryButton :disabled="!canSave">
+                Salvează
             </PrimaryButton>
         </template>
     </FormSection>

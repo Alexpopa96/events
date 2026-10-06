@@ -28,23 +28,25 @@ const imageLoaded = ref(false);
 </script>
 
 <template>
-    <div class="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-lg shadow-ink/10 transition-all duration-200 hover:-translate-y-1 hover:shadow-glow-brand">
-        <Link :href="route('listings.show', listing.slug)" class="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-brand-50 to-paper">
+    <div class="group relative flex flex-col overflow-hidden rounded-3xl bg-white p-2 shadow-lg shadow-ink/5 ring-1 ring-line transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-primary/15 hover:ring-primary/20">
+        <Link :href="route('listings.show', listing.slug)" class="relative block aspect-[4/3] overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 to-paper">
             <div v-if="listing.cover_url && !imageLoaded" class="absolute inset-0 animate-pulse bg-line/60" />
             <img
                 v-if="listing.cover_url"
                 :src="listing.cover_url"
                 :alt="listing.title"
-                class="h-full w-full object-cover transition-all duration-300 group-hover:scale-105"
+                class="h-full w-full object-cover transition-all duration-300 duration-500 group-hover:scale-105"
                 :class="{ 'opacity-0': !imageLoaded }"
                 @load="imageLoaded = true"
                 @error="imageLoaded = true"
             />
             <div v-else class="flex h-full w-full items-center justify-center">
-                <component :is="categoryIcon(listing.category_slug)" class="h-10 w-10 text-brand-500/30" />
+                <component :is="categoryIcon(listing.category_slug)" class="h-10 w-10 text-primary/30" />
             </div>
 
-            <span v-if="listing.is_featured" class="absolute left-3 top-3 rounded-full bg-gold-400 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+            <span v-if="listing.is_featured" class="absolute left-3 top-3 rounded-full bg-primary/95 px-3 py-1 text-xs font-semibold text-white shadow-md backdrop-blur">
                 Recomandat
             </span>
         </Link>
@@ -53,20 +55,20 @@ const imageLoaded = ref(false);
             v-if="showFavorite"
             type="button"
             @click="toggleFavorite"
-            class="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-ink-soft shadow-sm backdrop-blur transition-colors duration-150 hover:text-rose-500"
+            class="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink-soft shadow-md backdrop-blur transition-all duration-150 hover:scale-110 hover:text-primary"
             :aria-label="isFavorited ? 'Elimină de la favorite' : 'Adaugă la favorite'"
         >
-            <HeartIconSolid v-if="isFavorited" class="h-4 w-4 text-rose-500" />
+            <HeartIconSolid v-if="isFavorited" class="h-4 w-4 text-primary" />
             <HeartIcon v-else class="h-4 w-4" />
         </button>
 
-        <div class="flex flex-1 flex-col p-4">
-            <div class="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-brand-500">
+        <div class="flex flex-1 flex-col px-3 pb-3 pt-4">
+            <div class="mb-2 inline-flex w-fit items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
                 <component :is="categoryIcon(listing.category_slug)" class="h-3.5 w-3.5" />
                 {{ listing.category }}
             </div>
 
-            <Link :href="route('listings.show', listing.slug)" class="text-sm font-semibold leading-snug text-ink line-clamp-2 transition-colors duration-150 hover:text-brand-600">
+            <Link :href="route('listings.show', listing.slug)" class="text-[15px] font-semibold leading-snug text-ink line-clamp-2 transition-colors duration-150 hover:text-primary-bright">
                 {{ listing.title }}
             </Link>
 
@@ -74,14 +76,14 @@ const imageLoaded = ref(false);
                 <MapPinIcon class="h-3.5 w-3.5 flex-none" /> {{ location(listing) }}
             </p>
 
-            <p v-if="listing.provider?.company_name" class="mt-1 truncate text-xs text-ink-soft/80">
+            <p v-if="listing.provider?.company_name" class="mb-4 mt-1 truncate text-xs text-ink-soft/80">
                 {{ listing.provider.company_name }}
             </p>
 
-            <div class="mt-auto flex items-center justify-between pt-3">
-                <span class="text-sm font-semibold text-ink">{{ formatListingPrice(listing) }}</span>
-                <span v-if="listing.rating" class="inline-flex items-center gap-1 text-xs font-medium text-ink-soft">
-                    <StarIcon class="h-3.5 w-3.5 text-gold-400" /> {{ listing.rating }}
+            <div class="mt-auto flex items-center justify-between border-t border-line/70 pt-3">
+                <span class="text-[15px] font-bold text-primary">{{ formatListingPrice(listing) }}</span>
+                <span v-if="listing.rating" class="inline-flex items-center gap-1 rounded-full bg-primary/5 px-2 py-1 text-xs font-semibold text-ink">
+                    <StarIcon class="h-3.5 w-3.5 text-primary" /> {{ listing.rating }}
                     <span v-if="listing.reviews_count" class="text-ink-soft/60">({{ listing.reviews_count }})</span>
                 </span>
             </div>

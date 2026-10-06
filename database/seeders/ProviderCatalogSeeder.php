@@ -10,6 +10,7 @@ use App\Models\Locality;
 use App\Models\ProviderProfile;
 use App\Models\ProviderSubscription;
 use App\Models\QuoteRequest;
+use Database\Seeders\Concerns\SeedsLeadClients;
 use App\Models\Review;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
@@ -19,6 +20,8 @@ use Illuminate\Support\Str;
 
 class ProviderCatalogSeeder extends Seeder
 {
+    use SeedsLeadClients;
+
     /**
      * Major cities the demo catalog is spread across. Keys are matched
      * against county/locality names imported by LocalitySeeder.
@@ -234,9 +237,12 @@ class ProviderCatalogSeeder extends Seeder
     {
         $location = $this->resolveLocation($lead['city_key']);
 
-        QuoteRequest::firstOrCreate(
+        $client = $this->leadClient($lead);
+
+        $quote = QuoteRequest::firstOrCreate(
             ['email' => $lead['email']],
             [
+                'user_id' => $client->id,
                 'category_id' => $category->id,
                 'title' => $lead['title'],
                 'name' => $lead['name'],
@@ -253,6 +259,11 @@ class ProviderCatalogSeeder extends Seeder
                 'status' => 'open',
             ]
         );
+
+        // Requests seeded before accounts were attached get linked on re-run.
+        if (! $quote->user_id) {
+            $quote->update(['user_id' => $client->id]);
+        }
     }
 
     private function resolveLocation(string $key): array

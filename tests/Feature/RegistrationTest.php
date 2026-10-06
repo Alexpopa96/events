@@ -6,7 +6,9 @@ use App\Models\County;
 use App\Models\Locality;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Notifications\VerifyEmailCode;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
 use Tests\TestCase;
@@ -98,6 +100,7 @@ class RegistrationTest extends TestCase
     public function test_new_clients_can_register(): void
     {
         $this->seed(RoleSeeder::class);
+        Notification::fake();
 
         $response = $this->post('/register/client', [
             'name' => 'Test Client',
@@ -107,7 +110,9 @@ class RegistrationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('verification.notice'));
         $this->assertTrue(auth()->user()->hasRole('client'));
+        $this->assertNull(auth()->user()->email_verified_at);
+        Notification::assertSentTo(auth()->user(), VerifyEmailCode::class);
     }
 }

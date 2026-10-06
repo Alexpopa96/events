@@ -113,4 +113,16 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Support Address
+    |--------------------------------------------------------------------------
+    |
+    | Internal address that receives moderation alerts, such as new quote
+    | requests waiting for approval.
+    |
+    */
+
+    'support_address' => env('MAIL_SUPPORT_ADDRESS', 'suport@eventhub.ro'),
+
 ];

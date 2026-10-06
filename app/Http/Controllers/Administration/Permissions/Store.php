@@ -27,7 +27,7 @@ class Store extends Controller
             'guard_name' => Request::get('guard_name'),
         ]);
 
-        return Redirect::to('/administration/permissions/')->with(['success'=> ['message'=> 'Permisia a fost creata cu succes!']]);
+        return Redirect::to('/administration/permissions/')->with(['success'=> ['message'=> 'Permisiunea a fost creată cu succes!']]);
     }
 }
 

@@ -1,34 +1,30 @@
 <template>
-    <th class="px-4 py-1 bg-cool-gray-50" :class="$attrs.class">
-        <div class="flex items-center">
-           <span v-if="sortable" class="text-left text-sm leading-4 dark:text-textTableDark text-gray-700 font-bold tracking-wider">
-               <slot></slot>
-           </span>
-            <button @click="$emit('sort')" v-else class="flex items-center space-x-1 text-left text-sm leading-4 dark:text-textTableDark text-gray-700 font-bold tracking-wider group focus:outline-none">
+    <th class="px-4 py-3 text-left" :class="$attrs.class">
+        <div class="flex items-center gap-1">
+            <span v-if="sortable" class="text-xs font-semibold uppercase tracking-wider text-ivt-ink-soft/70">
+                <slot></slot>
+            </span>
+            <button v-else type="button" @click="$emit('sort')"
+                    class="group inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider transition-colors focus:outline-none"
+                    :class="selected ? 'text-primary' : 'text-ivt-ink-soft/70 hover:text-ivt-ink'">
                 <span><slot></slot></span>
-                <span v-if="multiColumn" class="relative flex items-center">
-                   <i v-if="selected && direction === 'asc'" class="fas fa-sort-up text-gray-400 hover:text-gray-700"></i>
-                   <i v-else-if="selected && direction === 'desc'" class="fas fa-sort-down text-gray-400 hover:text-gray-700"></i>
-                   <i v-else class="fas fa-sort text-gray-400 hover:text-gray-700"></i>
-               </span>
-                <span v-else>
-                   <i v-if="selected && direction === 'asc'" class="fas fa-sort-up text-gray-400 hover:text-gray-700"></i>
-                   <i v-else-if="selected && direction === 'desc'" class="fas fa-sort-down text-gray-400 hover:text-gray-700"></i>
-                   <i v-else class="fas fa-sort text-gray-400 hover:text-gray-700"></i>
-               </span>
+                <ArrowUp v-if="selected && direction === 'asc'" class="h-3.5 w-3.5" />
+                <ArrowDown v-else-if="selected && direction === 'desc'" class="h-3.5 w-3.5" />
+                <ArrowUpDown v-else class="h-3.5 w-3.5 opacity-50 group-hover:opacity-100" />
             </button>
-            <span v-if="selected">
-               <button class="flex items-center space-x-1 text-left text-sm leading-4 text-gray-700 font-bold tracking-wider group focus:outline-none"
-                       @click="$emit('removeSort')">
-                   <i class="ml-1s fas fa-times-circle text-red-400 hover:text-red-700"></i>
-               </button>
-           </span>
+            <button v-if="selected" type="button" @click="$emit('removeSort')"
+                    class="text-ivt-ink-soft/50 transition-colors hover:text-rose-600" title="Elimină sortarea">
+                <X class="h-3.5 w-3.5" />
+            </button>
         </div>
     </th>
 </template>
 
 <script>
+import { ArrowUp, ArrowDown, ArrowUpDown, X } from '@lucide/vue';
+
 export default {
+    components: { ArrowUp, ArrowDown, ArrowUpDown, X },
     props: {
         sortable: null,
         direction: null,

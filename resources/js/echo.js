@@ -12,3 +12,11 @@ window.Echo = new Echo({
     forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
 });
+
+// So broadcast(...)->toOthers() on the backend can skip echoing an event back
+// to the very tab that triggered it (axios carries this on every request,
+// including Inertia visits, since Inertia's HTTP client is this same axios).
+// Re-bound on every (re)connect, since the socket id changes each time.
+window.Echo.connector.pusher.connection.bind('connected', () => {
+    window.axios.defaults.headers.common['X-Socket-ID'] = window.Echo.socketId();
+});

@@ -27,7 +27,7 @@ const editor = useEditor({
     ],
     editorProps: {
         attributes: {
-            class: 'prose prose-sm max-w-none focus:outline-none min-h-[8rem] text-ink',
+            class: 'prose prose-sm max-w-none focus:outline-none min-h-[8rem] text-ivt-ink',
         },
     },
     onUpdate: ({ editor }) => {
@@ -61,8 +61,8 @@ const buttons = [
 </script>
 
 <template>
-    <div class="rounded-2xl border border-line bg-white shadow-sm shadow-ink/5 transition-all duration-150 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 focus-within:shadow-md focus-within:shadow-brand-500/10">
-        <div v-if="editor" class="flex flex-wrap items-center gap-0.5 px-2 py-1.5 border-b border-line">
+    <div class="overflow-hidden rounded-xl border-2 border-transparent bg-ivt-paper-2 transition-[background-color,border-color,box-shadow] duration-150 hover:bg-ivt-paper-3/70 focus-within:border-primary focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/10">
+        <div v-if="editor" class="flex flex-wrap items-center gap-0.5 border-b border-ivt-ink/5 px-2 py-1.5">
             <button
                 v-for="button in buttons"
                 :key="button.key"
@@ -70,7 +70,7 @@ const buttons = [
                 :title="button.title"
                 @mousedown.prevent="button.run(editor)"
                 class="flex items-center justify-center w-8 h-8 rounded-lg transition-colors duration-150"
-                :class="button.active(editor) ? 'bg-brand-50 text-brand-600' : 'text-ink-soft hover:bg-paper hover:text-ink'"
+                :class="button.active(editor) ? 'bg-ivt-paper-2 text-primary' : 'text-ivt-ink-soft hover:bg-ivt-paper hover:text-ivt-ink'"
             >
                 <component :is="button.icon" class="w-4 h-4" />
             </button>

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import {
@@ -12,12 +12,21 @@ import {
     LockClosedIcon,
     Bars3Icon,
     XMarkIcon,
+    BookmarkIcon,
+    MagnifyingGlassIcon,
 } from '@heroicons/vue/24/outline';
 import Logo from '@/Components/Logo.vue';
+import PushNotificationToggle from '@/Components/PushNotificationToggle.vue';
+import GlobalSearch from '@/Components/GlobalSearch.vue';
+import { useLiveUnreadBadge } from '@/Composables/useLiveUnreadBadge';
+
+useLiveUnreadBadge();
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 const can = computed(() => page.props.auth.can);
+const unreadMessages = computed(() => page.props.unreadMessages ?? 0);
+const unreadNotifications = computed(() => page.props.unreadNotifications ?? 0);
 
 const accountMenuOpen = ref(false);
 const mobileMenuOpen = ref(false);
@@ -29,9 +38,13 @@ const closeAccountMenu = () => {
 const navLinks = [
     { label: 'Categorii', href: () => route('categories.index'), current: () => route().current('categories.*') },
     { label: 'Furnizori', href: () => route('providers.index'), current: () => route().current('providers.*') },
+    { label: 'Hartă', href: () => route('listings.map'), current: () => route().current('listings.map') },
     { label: 'Cereri de ofertă', href: () => '/#cereri' },
-    { label: 'Abonamente', href: () => '/#abonamente' },
+    { label: 'Abonamente', href: () => '/#abonamente', hideForClient: true },
 ];
+
+const isClient = computed(() => !!user.value && !page.props.auth.isProvider);
+const visibleNavLinks = computed(() => navLinks.filter((item) => !(item.hideForClient && isClient.value)));
 
 const postAdHref = computed(() => (can.value.submitQuoteRequest ? route('quote-requests.create') : '/register/client'));
 
@@ -43,6 +56,18 @@ const initials = (name) => (name || '')
     .toUpperCase();
 
 const logout = () => router.post(route('logout'));
+
+const searchOpen = ref(false);
+const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
+
+const onKeydown = (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        searchOpen.value = true;
+    }
+};
+onMounted(() => window.addEventListener('keydown', onKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onKeydown));
 </script>
 
 <template>
@@ -54,7 +79,7 @@ const logout = () => router.post(route('logout'));
                 </Link>
 
                 <nav class="hidden lg:flex items-center gap-8 text-[14.5px] font-medium text-ivt-ink-soft">
-                    <template v-for="item in navLinks" :key="item.label">
+                    <template v-for="item in visibleNavLinks" :key="item.label">
                         <Link
                             v-if="item.current"
                             :href="item.href()"
@@ -67,6 +92,23 @@ const logout = () => router.post(route('logout'));
                 </nav>
 
                 <div class="flex items-center gap-1 lg:gap-3">
+                    <button
+                        type="button"
+                        title="Caută"
+                        @click="searchOpen = true"
+                        class="hidden h-10 items-center gap-2 rounded-xl px-3 text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine sm:flex"
+                    >
+                        <MagnifyingGlassIcon class="h-5 w-5" />
+                        <span class="hidden text-xs text-ivt-ink-soft/70 lg:inline">{{ isMac ? '⌘K' : 'Ctrl+K' }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        title="Caută"
+                        @click="searchOpen = true"
+                        class="flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine sm:hidden"
+                    >
+                        <MagnifyingGlassIcon class="h-5 w-5" />
+                    </button>
                     <div v-if="user" class="flex items-center gap-1">
                         <Link
                             :href="route('favorites.index')"
@@ -75,20 +117,37 @@ const logout = () => router.post(route('logout'));
                         >
                             <HeartIcon class="h-6 w-6" />
                         </Link>
+                        <Link
+                            v-if="can.submitQuoteRequest"
+                            :href="route('messages.index')"
+                            title="Mesaje"
+                            class="relative flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine"
+                        >
+                            <ChatBubbleLeftRightIcon class="h-6 w-6" />
+                            <span
+                                v-if="unreadMessages"
+                                class="absolute right-0.5 top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-ivt-wine px-1 text-[10px] font-semibold text-white ring-2 ring-white"
+                            >{{ unreadMessages > 99 ? '99+' : unreadMessages }}</span>
+                        </Link>
                         <span
+                            v-else
                             title="În curând"
                             class="relative flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl text-ivt-ink-soft/40"
                         >
                             <ChatBubbleLeftRightIcon class="h-6 w-6" />
                             <LockClosedIcon class="absolute right-1.5 top-1.5 h-3 w-3 text-ivt-ink-soft/50" />
                         </span>
-                        <span
-                            title="În curând"
-                            class="relative flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl text-ivt-ink-soft/40"
+                        <Link
+                            :href="route('notifications.index')"
+                            title="Notificări"
+                            class="relative flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine"
                         >
                             <BellIcon class="h-6 w-6" />
-                            <LockClosedIcon class="absolute right-1.5 top-1.5 h-3 w-3 text-ivt-ink-soft/50" />
-                        </span>
+                            <span
+                                v-if="unreadNotifications"
+                                class="absolute right-0.5 top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-ivt-wine px-1 text-[10px] font-semibold text-white ring-2 ring-white"
+                            >{{ unreadNotifications > 99 ? '99+' : unreadNotifications }}</span>
+                        </Link>
                         <div class="relative hidden lg:block">
                             <button
                                 type="button"
@@ -140,6 +199,13 @@ const logout = () => router.post(route('logout'));
                                             </span>
                                             Cererile mele
                                         </Link>
+                                        <Link v-if="can.saveSearch" :href="route('saved-searches.index')" class="group flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-ink" @click="accountMenuOpen = false">
+                                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-ivt-paper-2 text-ivt-ink-soft transition-colors duration-150 group-hover:bg-white group-hover:text-ivt-wine">
+                                                <BookmarkIcon class="h-5 w-5" />
+                                            </span>
+                                            Căutări salvate
+                                        </Link>
+                                        <PushNotificationToggle v-if="user" />
                                     </nav>
 
                                     <div class="my-1 h-px bg-ivt-line" />
@@ -210,7 +276,7 @@ const logout = () => router.post(route('logout'));
                             </div>
 
                             <nav class="flex flex-1 flex-col gap-1 px-3 py-4 text-sm font-medium text-ivt-ink">
-                                <template v-for="item in navLinks" :key="item.label">
+                                <template v-for="item in visibleNavLinks" :key="item.label">
                                     <Link
                                         v-if="item.current"
                                         :href="item.href()"
@@ -240,6 +306,11 @@ const logout = () => router.post(route('logout'));
                                         <HeartIcon class="h-5 w-5 text-ivt-ink-soft" />
                                         Favorite
                                     </Link>
+                                    <Link v-if="can.saveSearch" :href="route('saved-searches.index')" @click="mobileMenuOpen = false" class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-ivt-paper-2">
+                                        <BookmarkIcon class="h-5 w-5 text-ivt-ink-soft" />
+                                        Căutări salvate
+                                    </Link>
+                                    <PushNotificationToggle />
                                     <button type="button" @click="logout" class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-ivt-wine transition-colors duration-150 hover:bg-ivt-wine/10">
                                         <ArrowRightStartOnRectangleIcon class="h-5 w-5" />
                                         Deconectare
@@ -265,5 +336,7 @@ const logout = () => router.post(route('logout'));
                 </div>
             </Dialog>
         </TransitionRoot>
+
+        <GlobalSearch v-model:show="searchOpen" />
     </header>
 </template>

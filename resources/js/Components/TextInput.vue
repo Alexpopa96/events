@@ -1,16 +1,20 @@
 <template>
     <div :class="$attrs.class">
-        <label v-if="label" class="block text-sm font-medium dark:text-textInputDark text-gray-800" :for="id">{{ label }}</label>
-        <input :id="id" ref="input" v-bind="{ ...$attrs, class: null }" class="w-full pr-3 sm:py-1 md:py-2 rounded-lg dark:text-textInputDark dark:bg-inputDark dark:border-borderInputDark border-gray-200 focus:outline-none focus:ring-0 focus:border-primaryColor sm:text-[11px] md:text-sm"
-               :class="[error ? ' @apply border-red-500' : ''] " :type="type" :placeholder="placeholder"
+        <label v-if="label" class="mb-1.5 block text-sm font-medium text-ivt-ink" :for="id">{{ label }}</label>
+        <input :id="id" ref="input" v-bind="{ ...$attrs, class: null }" :class="[fieldClass, error && fieldErrorClass]" :type="type" :placeholder="placeholder"
                :value="modelValue" @input="$emit('update:modelValue', $event.target.value)">
         <slot/>
-        <div v-if="error" class="mt-1 text-red-500 sm:text-[10px] sm:text-sm lg:text-sm">{{ error }}</div>
+        <div v-if="error" class="mt-1.5 text-sm text-red-600" role="alert">{{ error }}</div>
     </div>
 </template>
 
 <script>
+import { fieldClass, fieldErrorClass } from '@/Composables/useFieldClasses';
+
 export default {
+    data() {
+        return { fieldClass, fieldErrorClass };
+    },
     props: {
         id: {
             type: String,

@@ -25,6 +25,13 @@ class AnafLookup extends Controller
             ], 422);
         }
 
-        return response()->json($company);
+        // The admin explicitly asked to check this CUI against ANAF right now — that's
+        // itself a real verification, worth recording even outside the registration flow.
+        $provider->update([
+            'anaf_verified_at' => now(),
+            'anaf_status' => $company['stare_inregistrare'],
+        ]);
+
+        return response()->json([...$company, 'verified_at' => $provider->anaf_verified_at->format('d.m.Y H:i')]);
     }
 }

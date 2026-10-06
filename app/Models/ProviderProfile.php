@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,8 @@ class ProviderProfile extends Model
         'company_name',
         'cui',
         'reg_com',
+        'anaf_verified_at',
+        'anaf_status',
         'slug',
         'description',
         'phone',
@@ -46,7 +49,13 @@ class ProviderProfile extends Model
             'approved_at' => 'datetime',
             'rejected_at' => 'datetime',
             'suspended_at' => 'datetime',
+            'anaf_verified_at' => 'datetime',
         ];
+    }
+
+    public function isAnafVerified(): bool
+    {
+        return $this->anaf_verified_at !== null;
     }
 
     public function user(): BelongsTo
@@ -72,6 +81,21 @@ class ProviderProfile extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function offers(): HasMany
+    {
+        return $this->hasMany(Offer::class);
+    }
+
+    public function availabilityBlocks(): HasMany
+    {
+        return $this->hasMany(AvailabilityBlock::class);
+    }
+
+    public function isAvailableOn(string $date): bool
+    {
+        return ! $this->availabilityBlocks()->whereDate('date', $date)->exists();
     }
 
     public function invoices(): HasMany
@@ -105,6 +129,11 @@ class ProviderProfile extends Model
     public function events(): HasMany
     {
         return $this->hasMany(ListingEvent::class);
+    }
+
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
     }
 
     public function isActive(): bool
@@ -181,6 +210,48 @@ class ProviderProfile extends Model
     }
 
     /**
+     * A friendly label for how quickly this provider tends to reply to a client's
+     * first message, based on their most recent conversations. Null when there
+     * isn't enough history yet (no point showing a number nobody can trust).
+     */
+    public function responseTimeLabel(): ?string
+    {
+        $conversations = $this->conversations()
+            ->whereNotNull('last_message_at')
+            ->latest('last_message_at')
+            ->limit(30)
+            ->with(['messages' => fn ($query) => $query->orderBy('id')->limit(20)])
+            ->get();
+
+        $minutes = $conversations
+            ->map(function ($conversation) {
+                $clientFirst = $conversation->messages->firstWhere('sender_id', $conversation->client_id);
+                $providerFirst = $conversation->messages->first(fn ($m) => $m->sender_id !== $conversation->client_id);
+
+                if (! $clientFirst || ! $providerFirst || ! $providerFirst->created_at->gt($clientFirst->created_at)) {
+                    return null;
+                }
+
+                return $clientFirst->created_at->diffInMinutes($providerFirst->created_at);
+            })
+            ->filter(fn ($value) => $value !== null);
+
+        if ($minutes->count() < 3) {
+            return null;
+        }
+
+        $average = $minutes->avg();
+
+        return match (true) {
+            $average < 60 => 'Răspunde de obicei în mai puțin de o oră',
+            $average < 60 * 4 => 'Răspunde de obicei în câteva ore',
+            $average < 60 * 24 => 'Răspunde de obicei în aceeași zi',
+            $average < 60 * 24 * 2 => 'Răspunde de obicei în 1-2 zile',
+            default => null,
+        };
+    }
+
+    /**
      * Human-readable labels for the fields still missing from the
      * completion score, so the dashboard can tell a provider exactly
      * what to fill in next instead of just showing a bare percentage.
@@ -201,5 +272,21 @@ class ProviderProfile extends Model
             ->filter(fn ($label, $field) => empty($this->{$field}))
             ->values()
             ->all();
+    }
+
+    /**
+     * Store phone numbers in E.164 whenever they are valid Romanian numbers.
+     */
+    protected function phone(): Attribute
+    {
+        return Attribute::set(fn (?string $value) => filled($value) ? (User::normalizePhone($value) ?? $value) : null);
+    }
+
+    /**
+     * Store phone numbers in E.164 whenever they are valid Romanian numbers.
+     */
+    protected function whatsapp(): Attribute
+    {
+        return Attribute::set(fn (?string $value) => filled($value) ? (User::normalizePhone($value) ?? $value) : null);
     }
 }

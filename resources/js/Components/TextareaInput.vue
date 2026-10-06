@@ -1,16 +1,20 @@
 <template>
     <div :class="$attrs.class" class="flex flex-col">
-        <label v-if="label" class="block text-sm font-medium dark:text-textInputDark text-gray-800" :for="id">{{ label }}</label>
-        <textarea :id="id" ref="input" v-bind="{ ...$attrs, class: null }" class="w-full pr-3 sm:py-1 md:py-2 rounded-lg dark:text-textInputDark dark:bg-inputDark dark:border-borderInputDark border-gray-200 focus:outline-none focus:ring-0 focus:border-primaryColor sm:text-[11px] md:text-sm" :class="{ error: error }" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
-        <div v-if="error" class="mt-1 text-red-500 sm:text-[10px] sm:text-sm lg:text-sm">{{ error }}</div>
+        <label v-if="label" class="mb-1.5 block text-sm font-medium text-ivt-ink" :for="id">{{ label }}</label>
+        <textarea :id="id" ref="input" v-bind="{ ...$attrs, class: null }" class="resize-y" :class="[fieldClass, error && fieldErrorClass]" :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
+        <div v-if="error" class="mt-1.5 text-sm text-red-600" role="alert">{{ error }}</div>
     </div>
 </template>
 
 <script>
 import { v4 as uuid } from 'uuid'
+import { fieldClass, fieldErrorClass } from '@/Composables/useFieldClasses'
 
 export default {
     inheritAttrs: false,
+    data() {
+        return { fieldClass, fieldErrorClass }
+    },
     props: {
         id: {
             type: String,
@@ -33,4 +37,3 @@ export default {
     },
 }
 </script>
-

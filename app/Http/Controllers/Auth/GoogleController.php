@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\EmailTwoFactor;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Http\RedirectResponse;
@@ -47,6 +48,13 @@ class GoogleController extends Controller
             $user->assignRole('client');
 
             event(new Registered($user));
+        }
+
+        // Accounts with two-step verification still owe the emailed code.
+        if ($user->hasEmailTwoFactor()) {
+            EmailTwoFactor::beginLogin($request, $user, true);
+
+            return redirect()->route('email-two-factor.challenge');
         }
 
         $this->guard->login($user, true);

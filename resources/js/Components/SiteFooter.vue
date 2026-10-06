@@ -1,6 +1,10 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import { Link, usePage } from '@inertiajs/vue3';
 import Logo from '@/Components/Logo.vue';
+
+const page = usePage();
+const isClient = computed(() => !!page.props.auth.user && !page.props.auth.isProvider);
 </script>
 
 <template>
@@ -20,7 +24,7 @@ import Logo from '@/Components/Logo.vue';
                         <li><Link :href="route('categories.index')" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Categorii</Link></li>
                         <li><Link :href="route('listings.index')" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Furnizori</Link></li>
                         <li><a href="/#cereri" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Cereri de ofertă</a></li>
-                        <li><a href="/#abonamente" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Abonamente</a></li>
+                        <li v-if="!isClient"><a href="/#abonamente" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Abonamente</a></li>
                     </ul>
                 </div>
 

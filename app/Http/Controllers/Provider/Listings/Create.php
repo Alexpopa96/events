@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Provider\Listings;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\County;
+use App\Support\EventTypes;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,6 +22,7 @@ class Create extends Controller
             'categories' => Category::where('is_active', true)
                 ->orderBy('position')
                 ->get(['id', 'name', 'slug', 'parent_id']),
+            'eventTypes' => EventTypes::options(),
             'counties' => County::orderBy('name')->get(['id', 'name']),
             'quota' => [
                 'used' => $activeListings,

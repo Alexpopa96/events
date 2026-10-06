@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Support\EventTypes;
 use Illuminate\Validation\Rule;
 
 class Store extends Controller
@@ -32,6 +33,8 @@ class Store extends Controller
             'price_to' => ['nullable', 'numeric', 'min:0', 'gte:price_from'],
             'benefits' => ['nullable', 'array'],
             'benefits.*' => ['string', 'max:120'],
+            'event_types' => ['nullable', 'array'],
+            'event_types.*' => ['string', Rule::in(EventTypes::values())],
             'county_id' => ['nullable', 'integer', 'exists:counties,id'],
             'locality_id' => ['nullable', 'integer', 'exists:localities,id'],
         ]);

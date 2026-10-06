@@ -1,27 +1,20 @@
 <template>
     <form action="#" method="POST">
-        <div class="shadow sm:rounded-md border dark:border-gray-600">
-            <div class="space-y-6 bg-gray-50 dark:bg-tableDark px-4 py-5 p-2 md:p-4">
+        <div class="rounded-2xl border border-ivt-line bg-white shadow-sm shadow-ivt-ink/5 overflow-hidden">
+            <div class="p-5 sm:p-6">
                 <slot></slot>
             </div>
-            <div v-if="buttons" class="dark:bg-layoutDark bg-gray-100 px-2 py-3 text-right sm:px-6 flex justify-between">
-                <Link href="" @click="back"
-                      class="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent shadow-sm leading-4 font-bold rounded-md text-white bg-gray-400 hover:bg-gray-500 focus:outline-none">
-                    Inapoi
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                         stroke="currentColor" class="w-5 h-5 ml-2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
-                    </svg>
-                </Link>
+            <div v-if="buttons" class="flex items-center justify-between gap-3 border-t border-ivt-line bg-ivt-paper-2/40 px-5 py-4 sm:px-6">
+                <button type="button" @click="back"
+                        class="inline-flex items-center gap-2 rounded-full bg-ivt-paper-2 px-5 py-2.5 text-sm font-semibold text-ivt-ink-soft transition-colors hover:bg-ivt-paper-3 hover:text-ivt-ink">
+                    <ArrowLeft class="h-4 w-4" />
+                    Înapoi
+                </button>
                 <button v-if="save" type="submit" :disabled="loading"
-                        class="px-4 py-2 flex space-x-2 items-center border bg-primaryColor hover:bg-hoverColor border-transparent shadow-sm leading-4 text-white font-bold rounded-md focus:outline-none">
-                    <svg v-if="!loading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                         stroke-width="2.5" stroke="currentColor" class="w-5 h-5 mr-3">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <spinner class="mr-3" v-if="loading" />
-                    Salveaza
+                        class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright hover:shadow-glow-primary active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60">
+                    <Loader2 v-if="loading" class="h-4 w-4 animate-spin" />
+                    <Check v-else class="h-4 w-4" />
+                    Salvează
                 </button>
             </div>
         </div>
@@ -29,14 +22,13 @@
 </template>
 
 <script>
-import { Link } from '@inertiajs/vue3';
-import Spinner from '@/Components/Spinner.vue';
+import { ArrowLeft, Check, Loader2 } from '@lucide/vue';
 
 export default {
-
     components: {
-        Link,
-        Spinner
+        ArrowLeft,
+        Check,
+        Loader2,
     },
     props: {
         type: {
@@ -61,4 +53,3 @@ export default {
     }
 }
 </script>
-

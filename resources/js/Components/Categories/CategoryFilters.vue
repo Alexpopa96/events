@@ -15,7 +15,7 @@ defineProps({
 
 const emit = defineEmits(['toggle-event-type']);
 
-const inputClasses = 'w-full rounded-xl border-line text-sm text-ink focus:border-brand-400 focus:ring-brand-400/20';
+const inputClasses = 'w-full rounded-xl border-line text-sm text-ink focus:border-primary focus:ring-primary/20';
 </script>
 
 <template>
@@ -44,8 +44,8 @@ const inputClasses = 'w-full rounded-xl border-line text-sm text-ink focus:borde
                     @click="emit('toggle-event-type', type)"
                     class="rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-150"
                     :class="filters.eventTypes.includes(type)
-                        ? 'border-transparent bg-brand-500 text-white shadow-sm shadow-brand-500/25'
-                        : 'border-line text-ink-soft hover:border-brand-300 hover:text-brand-600'"
+                        ? 'border-transparent bg-primary text-white shadow-sm shadow-primary/25'
+                        : 'border-line text-ink-soft hover:border-primary/40 hover:text-primary-bright'"
                 >
                     {{ type }}
                 </button>
@@ -65,16 +65,16 @@ const inputClasses = 'w-full rounded-xl border-line text-sm text-ink focus:borde
                     @click="filters.priceRange = range"
                     class="rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-150"
                     :class="filters.priceRange === range
-                        ? 'border-transparent bg-brand-500 text-white shadow-sm shadow-brand-500/25'
-                        : 'border-line text-ink-soft hover:border-brand-300 hover:text-brand-600'"
+                        ? 'border-transparent bg-primary text-white shadow-sm shadow-primary/25'
+                        : 'border-line text-ink-soft hover:border-primary/40 hover:text-primary-bright'"
                 >
                     {{ range }}
                 </button>
             </div>
             <div class="mt-3 flex items-center gap-2">
-                <input v-model="filters.minPrice" type="number" placeholder="Min" class="w-full rounded-full border-line text-xs text-ink focus:border-brand-400 focus:ring-brand-400/20" />
+                <input v-model="filters.minPrice" type="number" placeholder="Min" class="w-full rounded-full border-line text-xs text-ink focus:border-primary focus:ring-primary/20" />
                 <span class="flex-none text-ink-soft/50">–</span>
-                <input v-model="filters.maxPrice" type="number" placeholder="Max" class="w-full rounded-full border-line text-xs text-ink focus:border-brand-400 focus:ring-brand-400/20" />
+                <input v-model="filters.maxPrice" type="number" placeholder="Max" class="w-full rounded-full border-line text-xs text-ink focus:border-primary focus:ring-primary/20" />
                 <span class="flex-none text-xs text-ink-soft">RON</span>
             </div>
         </div>
@@ -91,10 +91,10 @@ const inputClasses = 'w-full rounded-xl border-line text-sm text-ink focus:borde
                     type="button"
                     @click="filters.rating = option.value"
                     class="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-sm transition-colors duration-150"
-                    :class="filters.rating === option.value ? 'bg-brand-50 font-medium text-brand-700' : 'text-ink-soft hover:bg-paper'"
+                    :class="filters.rating === option.value ? 'bg-primary/10 font-medium text-primary' : 'text-ink-soft hover:bg-paper'"
                 >
                     <span v-if="option.stars" class="flex items-center gap-0.5">
-                        <StarIcon v-for="n in option.stars" :key="n" class="h-3.5 w-3.5 text-gold-400" />
+                        <StarIcon v-for="n in option.stars" :key="n" class="h-3.5 w-3.5 text-primary" />
                     </span>
                     {{ option.label }}
                 </button>

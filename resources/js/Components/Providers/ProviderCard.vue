@@ -1,6 +1,6 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { MapPinIcon, PhoneIcon, EnvelopeIcon, ChatBubbleLeftEllipsisIcon, HeartIcon } from '@heroicons/vue/24/outline';
+import { MapPinIcon, PhoneIcon, EnvelopeIcon, ChatBubbleLeftEllipsisIcon, HeartIcon, CheckBadgeIcon } from '@heroicons/vue/24/outline';
 import { HeartIcon as HeartIconSolid, StarIcon } from '@heroicons/vue/24/solid';
 import { categoryIcon } from '@/Composables/useCategoryIcon';
 import { formatListingPrice } from '@/Composables/useListingPrice';
@@ -57,8 +57,9 @@ const location = (provider) => [provider.locality, provider.county].filter(Boole
         </button>
 
         <div class="flex flex-1 flex-col p-[18px]">
-            <Link :href="route('providers.show', provider.slug)" class="font-serif text-lg font-medium leading-snug text-ivt-ink transition-colors hover:text-ivt-wine">
-                {{ provider.company_name }}
+            <Link :href="route('providers.show', provider.slug)" class="flex items-center gap-1.5 font-serif text-lg font-medium leading-snug text-ivt-ink transition-colors hover:text-ivt-wine">
+                <span class="truncate">{{ provider.company_name }}</span>
+                <CheckBadgeIcon v-if="provider.is_verified" class="h-4 w-4 flex-none text-ivt-sage" title="Verificat ANAF" />
             </Link>
             <p v-if="location(provider)" class="mt-1 flex items-center gap-1 text-xs text-ivt-ink-faint">
                 <MapPinIcon class="h-3.5 w-3.5 flex-none" /> {{ location(provider) }}

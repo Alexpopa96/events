@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Provider\Listings;
 use App\Http\Controllers\Controller;
 use App\Models\ProviderProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,6 +16,9 @@ class Index extends Controller
         $profile = $request->user()->providerProfile;
 
         $listings = $profile->listings()
+            ->withCount([
+                'conversations as conversations_count' => fn ($query) => $query->whereNotNull('last_message_at'),
+            ])
             ->with([
                 'category',
                 'county:id,name',
@@ -37,7 +41,10 @@ class Index extends Controller
                 'locality' => $listing->locality?->only(['id', 'name']),
                 'cover_url' => $listing->media->first() ? "/storage/{$listing->media->first()->path}" : null,
                 'photos_count' => $listing->media->where('type', 'photo')->count(),
+                'conversations_count' => $listing->conversations_count,
                 'published_at' => optional($listing->published_at)->format('d.m.Y'),
+                'posted_at' => ($listing->published_at ?? $listing->created_at)->diffForHumans(),
+                'excerpt' => Str::limit(trim(strip_tags((string) $listing->description)), 220),
             ]);
 
         $plan = $profile->activePlan();

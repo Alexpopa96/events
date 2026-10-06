@@ -5,6 +5,10 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\QuoteRequest;
 use App\Models\User;
+use App\Notifications\NewQuoteRequestPendingApproval;
+use App\Notifications\QuoteRequestApproved;
+use App\Notifications\QuoteRequestReceived;
+use App\Notifications\QuoteRequestRejected;
 use Database\Seeders\PermmisionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -35,6 +39,8 @@ class QuoteRequestApprovalTest extends TestCase
 
     public function test_submitting_a_quote_request_creates_it_as_pending_review(): void
     {
+        Notification::fake();
+
         $this->seed(RoleSeeder::class);
         $this->seed(PermmisionSeeder::class);
 
@@ -43,7 +49,7 @@ class QuoteRequestApprovalTest extends TestCase
         $user->assignRole('client');
 
         $response = $this->actingAs($user)->post(route('quote-requests.store'), [
-            'category_id' => $category->id,
+            'category_ids' => [$category->id],
             'title' => 'Caut fotograf pentru nuntă',
             'message' => 'Căutăm un fotograf profesionist.',
             'name' => $user->name,
@@ -55,6 +61,15 @@ class QuoteRequestApprovalTest extends TestCase
 
         $response->assertRedirect(route('quote-requests.success', $quoteRequest));
         $this->assertSame('pending_review', $quoteRequest->status);
+
+        Notification::assertSentOnDemand(
+            QuoteRequestReceived::class,
+            fn ($notification, $channels, $notifiable) => array_key_exists($user->email, $notifiable->routes['mail']),
+        );
+        Notification::assertSentOnDemand(
+            NewQuoteRequestPendingApproval::class,
+            fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'suport@eventhub.ro',
+        );
     }
 
     public function test_owner_can_view_their_success_page(): void
@@ -102,7 +117,7 @@ class QuoteRequestApprovalTest extends TestCase
         $this->assertSame('open', $quoteRequest->fresh()->status);
         $this->assertNotNull($quoteRequest->fresh()->approved_at);
 
-        Notification::assertSentTo($quoteRequest->user, \App\Notifications\QuoteRequestApproved::class);
+        Notification::assertSentTo($quoteRequest->user, QuoteRequestApproved::class);
     }
 
     public function test_admin_can_reject_a_pending_quote_request(): void
@@ -126,7 +141,7 @@ class QuoteRequestApprovalTest extends TestCase
         $this->assertSame('rejected', $quoteRequest->fresh()->status);
         $this->assertSame('Informații insuficiente.', $quoteRequest->fresh()->rejection_reason);
 
-        Notification::assertSentTo($quoteRequest->user, \App\Notifications\QuoteRequestRejected::class);
+        Notification::assertSentTo($quoteRequest->user, QuoteRequestRejected::class);
     }
 
     public function test_non_admin_cannot_approve_a_quote_request(): void

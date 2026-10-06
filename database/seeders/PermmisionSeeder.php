@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -57,6 +56,7 @@ class PermmisionSeeder extends Seeder
             ['name' => 'manage own favorites', 'group' => 'client', 'parent' => ''],
             ['name' => 'submit quote request', 'group' => 'client', 'parent' => ''],
             ['name' => 'submit review', 'group' => 'client', 'parent' => ''],
+            ['name' => 'save search', 'group' => 'client', 'parent' => ''],
         ])->each(function ($factory) {
             Permission::firstOrCreate(
                 ['name' => $factory['name'], 'guard_name' => 'web'],
@@ -77,7 +77,7 @@ class PermmisionSeeder extends Seeder
                 ])->pluck('id'));
             } elseif ($role->name === 'user') {
                 $role->syncPermissions(Permission::whereIn('name', [
-                    'view dashboard'
+                    'view dashboard',
                 ])->pluck('id'));
             } elseif ($role->name === 'furnizor') {
                 $role->syncPermissions(Permission::whereIn('group', ['furnizor'])

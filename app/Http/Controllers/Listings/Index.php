@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Listings;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Listing;
+use App\Support\EventTypes;
 use App\Support\Listings\ListingFacets;
 use App\Support\Listings\ListingFilters;
 use App\Support\Listings\ListingQueryScope;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -19,12 +21,18 @@ class Index extends Controller
         $validated = $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
             'category' => ['nullable', 'string', 'max:100'],
+            'categories' => ['nullable', 'array'],
+            'categories.*' => ['string', 'max:100'],
+            'event_type' => ['nullable', 'string', Rule::in(EventTypes::values())],
+            'event_types' => ['nullable', 'array'],
+            'event_types.*' => ['string', Rule::in(EventTypes::values())],
             'county_ids' => ['nullable', 'array'],
             'county_ids.*' => ['integer', 'exists:counties,id'],
             'price_min' => ['nullable', 'numeric', 'min:0'],
             'price_max' => ['nullable', 'numeric', 'min:0'],
             'rating' => ['nullable', 'numeric', 'in:4,4.5'],
             'featured' => ['nullable', 'boolean'],
+            'available_on' => ['nullable', 'date', 'after_or_equal:today'],
             'sort' => ['nullable', 'in:newest,price_asc,price_desc,rating'],
         ]);
 
@@ -61,7 +69,7 @@ class Index extends Controller
         $facetData = $facets->compute(
             Listing::query()->where('status', 'published'),
             $filters,
-            ['counties', 'rating', 'featured', 'price', 'categories']
+            ['counties', 'rating', 'featured', 'price', 'categories', 'event_types']
         );
 
         return Inertia::render('Listings/Index', [
@@ -69,24 +77,28 @@ class Index extends Controller
             'favoriteListingIds' => $favoriteListingIds,
             'filters' => [
                 'q' => $validated['q'] ?? '',
-                'category' => $validated['category'] ?? null,
+                'categories' => $filters->categorySlugs,
+                'event_types' => $filters->eventTypes,
                 'county_ids' => $validated['county_ids'] ?? [],
                 'price_min' => $validated['price_min'] ?? null,
                 'price_max' => $validated['price_max'] ?? null,
                 'rating' => $validated['rating'] ?? null,
                 'featured' => $validated['featured'] ?? false,
+                'available_on' => $validated['available_on'] ?? null,
                 'sort' => $sort,
             ],
             'categories' => Category::where('is_active', true)
                 ->whereNull('parent_id')
                 ->orderBy('position')
                 ->get(['id', 'name', 'slug']),
+            'eventTypes' => EventTypes::options(),
             'counties' => $facetData['counties'],
             'facets' => [
                 'rating' => $facetData['rating'],
                 'featured' => $facetData['featured'],
                 'price' => $facetData['price'],
                 'categories' => $facetData['categories'],
+                'event_types' => $facetData['event_types'],
             ],
         ]);
     }

@@ -22,7 +22,11 @@ class Show extends Controller
                 'category' => $quoteRequest->category?->only(['id', 'name']),
                 'event_type' => $quoteRequest->event_type,
                 'event_date' => optional($quoteRequest->event_date)->format('d.m.Y'),
-                'county' => $quoteRequest->county?->only(['name']) ?? ($quoteRequest->county ? ['name' => $quoteRequest->county] : null),
+                'days_until_event' => $quoteRequest->event_date
+                    ? (int) now()->startOfDay()->diffInDays($quoteRequest->event_date->copy()->startOfDay(), false)
+                    : null,
+                // `county` is both a legacy string column and a relation; the column wins on attribute access, so read the relation explicitly.
+                'county' => $quoteRequest->getRelation('county')?->only(['name']) ?? ($quoteRequest->getAttribute('county') ? ['name' => $quoteRequest->getAttribute('county')] : null),
                 'locality' => $quoteRequest->locality?->only(['name']) ?? ($quoteRequest->city ? ['name' => $quoteRequest->city] : null),
                 'guest_count' => $quoteRequest->guest_count,
                 'budget_range' => $quoteRequest->budget_range,
@@ -30,6 +34,8 @@ class Show extends Controller
                 'name' => $quoteRequest->name,
                 'email' => $quoteRequest->email,
                 'phone' => $quoteRequest->phone,
+                'contact_method' => $quoteRequest->contact_method,
+                'platform_only' => (bool) $quoteRequest->platform_only,
                 'status' => $quoteRequest->status,
                 'created_at' => $quoteRequest->created_at->format('d.m.Y H:i'),
                 'approved_at' => $quoteRequest->approved_at?->format('d.m.Y H:i'),

@@ -161,6 +161,7 @@ const codeFor = (id) => `INV-${String(id).padStart(5, '0')}`;
                             <h3 class="text-[16.5px] font-semibold text-ivt-ink">{{ qr.title }}</h3>
                             <div class="mt-1.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[12.5px] text-ivt-ink-faint">
                                 <span class="flex items-center gap-1"><TagIcon class="h-3.5 w-3.5" /> {{ qr.category }}</span>
+                                <span v-if="qr.package_size > 1" class="rounded-full bg-ivt-gold/15 px-2 py-0.5 font-semibold text-ivt-gold">Pachet · {{ qr.package_size }} servicii</span>
                                 <span v-if="qr.city || qr.county" class="flex items-center gap-1"><MapPinIcon class="h-3.5 w-3.5" /> {{ [qr.city, qr.county].filter(Boolean).join(', ') }}</span>
                                 <span v-if="qr.event_date" class="flex items-center gap-1"><CalendarIcon class="h-3.5 w-3.5" /> {{ qr.event_date }}</span>
                                 <span v-if="qr.guest_count" class="flex items-center gap-1"><UsersIcon class="h-3.5 w-3.5" /> {{ qr.guest_count }} persoane</span>

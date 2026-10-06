@@ -1,9 +1,7 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { useToast } from 'vue-toastification';
-import { DatePicker } from 'v-calendar';
-import 'v-calendar/style.css';
 import {
     ChevronRightIcon,
     TagIcon,
@@ -12,22 +10,33 @@ import {
     BanknotesIcon,
     ChatBubbleLeftRightIcon,
     LockClosedIcon,
-    CalendarDaysIcon,
     ExclamationTriangleIcon,
     PhoneIcon,
     EnvelopeIcon,
+    CurrencyDollarIcon,
+    ClockIcon,
+    XCircleIcon,
+    SparklesIcon,
 } from '@heroicons/vue/24/outline';
-import { CheckIcon } from '@heroicons/vue/24/solid';
+import { CheckIcon, StarIcon } from '@heroicons/vue/24/solid';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
 import CountyLocalitySelect from '@/Components/CountyLocalitySelect.vue';
+import ModalSelect from '@/Components/ModalSelect.vue';
+import DatePickerModal from '@/Components/DatePickerModal.vue';
+import Modal from '@/Components/Modal.vue';
 import { categoryIcon } from '@/Composables/useCategoryIcon';
 
 const props = defineProps({
     quoteRequest: Object,
     categories: { type: Array, default: () => [] },
     counties: { type: Array, default: () => [] },
+    offers: { type: Array, default: () => [] },
+    // `package` is a reserved word, so it's declared under that key but read via `pkg`.
+    package: { type: Array, default: () => [] },
 });
+
+const pkg = computed(() => props.package);
 
 const toast = useToast();
 const page = usePage();
@@ -51,12 +60,14 @@ const eventTypeLabels = {
 };
 const eventTypeLabel = computed(() => eventTypeLabels[props.quoteRequest.event_type] ?? props.quoteRequest.event_type);
 
-const statusMeta = computed(() => ({
+const statusMetaFor = (status) => ({
     pending_review: { label: 'În așteptare', class: 'bg-ivt-gold/10 text-ivt-gold' },
     open: { label: 'Activă', class: 'bg-ivt-sage/10 text-ivt-sage' },
     rejected: { label: 'Respinsă', class: 'bg-ivt-wine/10 text-ivt-wine' },
     closed: { label: 'Închisă', class: 'bg-ivt-paper-2 text-ivt-ink-faint' },
-}[props.quoteRequest.status] ?? { label: props.quoteRequest.status, class: 'bg-ivt-paper-2 text-ivt-ink-faint' }));
+}[status] ?? { label: status, class: 'bg-ivt-paper-2 text-ivt-ink-faint' });
+
+const statusMeta = computed(() => statusMetaFor(props.quoteRequest.status));
 
 const statusDescription = computed(() => ({
     pending_review: 'Cererea ta a fost trimisă și este în curs de verificare de către echipa noastră.',
@@ -72,6 +83,43 @@ const daysLeft = computed(() => {
     const diff = Math.ceil((new Date(props.quoteRequest.event_date_iso) - new Date()) / 86400000);
     return diff >= 0 ? diff : null;
 });
+
+// ---- Offers ----------------------------------------------------------------
+
+const offerStatusMeta = {
+    sent: { label: 'Nouă', class: 'bg-ivt-gold/15 text-ivt-gold', icon: CurrencyDollarIcon },
+    viewed: { label: 'Nouă', class: 'bg-ivt-gold/15 text-ivt-gold', icon: CurrencyDollarIcon },
+    accepted: { label: 'Acceptată', class: 'bg-ivt-sage/15 text-ivt-sage', icon: CheckIcon },
+    declined: { label: 'Refuzată', class: 'bg-ivt-wine/10 text-ivt-wine', icon: XCircleIcon },
+    expired: { label: 'Expirată', class: 'bg-ivt-paper-2 text-ivt-ink-faint', icon: ClockIcon },
+};
+
+const hasAcceptedOffer = computed(() => props.offers.some((offer) => offer.status === 'accepted'));
+
+const busyOfferId = ref(null);
+
+const acceptOffer = (offer) => {
+    if (busyOfferId.value) return;
+    busyOfferId.value = offer.id;
+    router.post(route('offers.accept', offer.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => toast.success('Ai acceptat oferta.'),
+        onFinish: () => { busyOfferId.value = null; },
+    });
+};
+
+const offerToDecline = ref(null);
+const declineReason = ref('');
+
+const confirmDeclineOffer = () => {
+    if (busyOfferId.value) return;
+    busyOfferId.value = offerToDecline.value.id;
+    router.post(route('offers.decline', offerToDecline.value.id), { reason: declineReason.value.trim() || null }, {
+        preserveScroll: true,
+        onSuccess: () => toast.success('Ai refuzat oferta.'),
+        onFinish: () => { busyOfferId.value = null; offerToDecline.value = null; declineReason.value = ''; },
+    });
+};
 
 // ---- Inline edit form ----------------------------------------------------
 
@@ -261,6 +309,25 @@ const minDate = new Date(Date.now() + 86400000);
                 <div class="mx-auto grid max-w-7xl grid-cols-1 gap-9 px-6 lg:grid-cols-[1fr_300px] lg:px-8">
 
                     <div class="min-w-0">
+                        <!-- Package -->
+                        <div v-if="pkg.length" class="mb-8 rounded-[18px] border border-ivt-gold/40 bg-ivt-gold/5 p-6">
+                            <h3 class="mb-1 flex items-center gap-1.5 text-[12.5px] font-bold uppercase tracking-[0.06em] text-ivt-gold">
+                                <SparklesIcon class="h-3.5 w-3.5" /> Parte dintr-un pachet
+                            </h3>
+                            <p class="mb-3.5 text-[13.5px] text-ivt-ink-soft">Ai mai publicat cereri pentru același eveniment, către alte categorii de furnizori.</p>
+                            <div class="flex flex-wrap gap-2">
+                                <Link
+                                    v-for="item in pkg"
+                                    :key="item.id"
+                                    :href="route('quote-requests.show', item.id)"
+                                    class="inline-flex items-center gap-2 rounded-full bg-white py-1 pl-3 pr-1 text-xs font-semibold text-ivt-ink ring-1 ring-ivt-line transition-colors hover:border-ivt-gold hover:text-ivt-wine"
+                                >
+                                    {{ item.category }}
+                                    <span class="rounded-full px-2 py-1 text-[10.5px] font-bold uppercase tracking-wide" :class="statusMetaFor(item.status).class">{{ statusMetaFor(item.status).label }}</span>
+                                </Link>
+                            </div>
+                        </div>
+
                         <!-- Details -->
                         <div class="mb-11">
                             <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
@@ -307,17 +374,75 @@ const minDate = new Date(Date.now() + 86400000);
                         </div>
 
                         <!-- Offers -->
-                        <div>
+                        <div id="oferte" class="scroll-mt-28">
                             <div class="mb-5 flex flex-wrap items-center justify-between gap-2">
                                 <h2 class="font-serif text-[21px] font-medium text-ivt-ink">Oferte primite</h2>
                                 <span class="text-[13px] text-ivt-ink-faint">{{ quoteRequest.offers_count }} furnizori au răspuns</span>
                             </div>
 
-                            <div class="rounded-2xl border border-dashed border-ivt-line px-5 py-12 text-center">
+                            <div v-if="!offers.length" class="rounded-2xl border border-dashed border-ivt-line px-5 py-12 text-center">
                                 <ChatBubbleLeftRightIcon class="mx-auto h-7 w-7 text-ivt-ink-faint" />
                                 <p class="mt-3 font-serif text-lg italic text-ivt-ink">Nicio ofertă primită încă</p>
                                 <p class="mt-1.5 text-[13.5px] text-ivt-ink-faint">Te vom notifica imediat ce un furnizor răspunde la cererea ta.</p>
                             </div>
+
+                            <ul v-else class="space-y-4">
+                                <li
+                                    v-for="offer in offers"
+                                    :key="offer.id"
+                                    class="rounded-2xl border p-6"
+                                    :class="offer.status === 'accepted' ? 'border-ivt-sage/40 bg-ivt-sage/5' : 'border-ivt-line'"
+                                >
+                                    <div class="flex flex-wrap items-start justify-between gap-3">
+                                        <Link :href="route('providers.show', offer.provider.slug)" class="flex min-w-0 items-center gap-3 group">
+                                            <span class="flex h-11 w-11 flex-none items-center justify-center overflow-hidden rounded-full bg-ivt-paper-2 text-sm font-semibold text-ivt-ink">
+                                                <img v-if="offer.provider.logo_url" :src="offer.provider.logo_url" :alt="offer.provider.company_name" class="h-full w-full object-cover" />
+                                                <span v-else>{{ offer.provider.company_name[0] }}</span>
+                                            </span>
+                                            <span class="min-w-0">
+                                                <span class="block truncate text-sm font-semibold text-ivt-ink group-hover:text-ivt-wine">{{ offer.provider.company_name }}</span>
+                                                <span v-if="offer.listing" class="block truncate text-xs text-ivt-ink-faint">{{ offer.listing.title }}</span>
+                                            </span>
+                                        </Link>
+                                        <span class="inline-flex flex-none items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold" :class="offerStatusMeta[offer.status].class">
+                                            <component :is="offerStatusMeta[offer.status].icon" class="h-3.5 w-3.5" /> {{ offerStatusMeta[offer.status].label }}
+                                        </span>
+                                    </div>
+
+                                    <div class="mt-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                                        <span class="font-serif text-[26px] font-semibold text-ivt-ink">{{ offer.price.toLocaleString('ro-RO') }} lei</span>
+                                        <span class="text-xs text-ivt-ink-faint">valabilă până la {{ offer.valid_until }}</span>
+                                    </div>
+
+                                    <ul v-if="offer.includes.length" class="mt-3 space-y-1.5">
+                                        <li v-for="line in offer.includes" :key="line" class="flex items-start gap-1.5 text-sm text-ivt-ink-soft">
+                                            <CheckIcon class="mt-0.5 h-3.5 w-3.5 flex-none text-ivt-sage" /> {{ line }}
+                                        </li>
+                                    </ul>
+
+                                    <p v-if="offer.message" class="mt-3 whitespace-pre-line text-sm leading-relaxed text-ivt-ink-soft">{{ offer.message }}</p>
+                                    <p v-if="offer.decline_reason" class="mt-3 text-sm text-ivt-ink-faint">Motivul tău: {{ offer.decline_reason }}</p>
+
+                                    <div v-if="offer.status === 'sent' || offer.status === 'viewed'" class="mt-5 flex flex-wrap gap-2.5">
+                                        <button
+                                            type="button"
+                                            :disabled="busyOfferId === offer.id || hasAcceptedOffer"
+                                            @click="acceptOffer(offer)"
+                                            class="inline-flex items-center gap-1.5 rounded-full bg-ivt-sage px-5 py-2 text-[13px] font-semibold text-white shadow-sm transition-colors hover:bg-ivt-sage/90 disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            <CheckIcon class="h-4 w-4" /> Acceptă oferta
+                                        </button>
+                                        <button
+                                            type="button"
+                                            :disabled="busyOfferId === offer.id || hasAcceptedOffer"
+                                            @click="offerToDecline = offer"
+                                            class="inline-flex items-center gap-1.5 rounded-full border border-ivt-line px-5 py-2 text-[13px] font-semibold text-ivt-ink-soft transition-colors hover:border-ivt-wine hover:text-ivt-wine disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            Refuză
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
                     </div>
 
@@ -451,31 +576,29 @@ const minDate = new Date(Date.now() + 86400000);
                         <div class="mb-[22px] grid gap-[18px] sm:grid-cols-2">
                             <div>
                                 <label :class="labelClasses" for="guestCount">Număr aproximativ de invitați</label>
-                                <select id="guestCount" v-model="form.guest_count" :class="fieldClasses">
-                                    <option value="">Nespecificat</option>
-                                    <option v-for="option in guestCountOptions" :key="option" :value="option">{{ option }}</option>
-                                </select>
+                                <ModalSelect
+                                    id="guestCount"
+                                    v-model="form.guest_count"
+                                    :options="guestCountOptions"
+                                    title="Număr aproximativ de invitați"
+                                    placeholder="Nespecificat"
+                                    clear-label="Nespecificat"
+                                    :button-class="fieldClasses"
+                                />
                             </div>
                         </div>
 
                         <div>
                             <label :class="labelClasses" for="reqDate">Data evenimentului</label>
-                            <DatePicker v-model="form.event_date" mode="date" :model-config="{ type: 'string', mask: 'YYYY-MM-DD' }" :min-date="minDate" :first-day-of-week="2" locale="ro" :disabled="flexibleDate">
-                                <template #default="{ inputValue, inputEvents }">
-                                    <div class="relative">
-                                        <CalendarDaysIcon class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ivt-wine" />
-                                        <input
-                                            id="reqDate"
-                                            readonly
-                                            :value="flexibleDate ? '' : inputValue"
-                                            v-on="flexibleDate ? {} : inputEvents"
-                                            :disabled="flexibleDate"
-                                            placeholder="Selectează data"
-                                            :class="[fieldClasses, 'cursor-pointer pl-11 disabled:cursor-not-allowed disabled:opacity-50']"
-                                        />
-                                    </div>
-                                </template>
-                            </DatePicker>
+                            <DatePickerModal
+                                id="reqDate"
+                                v-model="form.event_date"
+                                title="Data evenimentului"
+                                placeholder="Selectează data"
+                                :min-date="minDate"
+                                :disabled="flexibleDate"
+                                :button-class="fieldClasses"
+                            />
                             <p v-if="form.errors.event_date" class="mt-1.5 text-xs text-ivt-wine">{{ form.errors.event_date }}</p>
                             <label class="mt-3 flex items-center gap-2.5 text-[13.5px] text-ivt-ink-soft">
                                 <input v-model="flexibleDate" type="checkbox" class="h-[15px] w-[15px] rounded border-ivt-line text-ivt-wine focus:ring-ivt-wine/30" />
@@ -592,5 +715,33 @@ const minDate = new Date(Date.now() + 86400000);
         </main>
 
         <SiteFooter />
+
+        <Modal :show="!!offerToDecline" max-width="md" @close="offerToDecline = null">
+            <div class="p-6">
+                <h3 class="font-serif text-lg text-ivt-ink">Refuzi oferta de la {{ offerToDecline?.provider.company_name }}?</h3>
+                <p class="mt-1.5 text-sm text-ivt-ink-soft">Poți spune pe scurt de ce, ca furnizorul să înțeleagă (opțional).</p>
+
+                <textarea
+                    v-model="declineReason"
+                    rows="3"
+                    placeholder="Ex: am ales altă ofertă, bugetul nu se potrivește..."
+                    class="mt-4 w-full rounded-2xl border-ivt-line text-sm text-ivt-ink placeholder:text-ivt-ink-soft/50 focus:border-primary focus:ring-primary"
+                ></textarea>
+
+                <div class="mt-5 flex items-center justify-end gap-3">
+                    <button type="button" class="rounded-xl px-4 py-2 text-sm font-medium text-ivt-ink-soft transition-colors hover:bg-ivt-paper" @click="offerToDecline = null; declineReason = '';">
+                        Renunță
+                    </button>
+                    <button
+                        type="button"
+                        :disabled="busyOfferId === offerToDecline?.id"
+                        class="rounded-xl bg-ivt-wine px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-ivt-wine-bright disabled:cursor-not-allowed disabled:opacity-50"
+                        @click="confirmDeclineOffer"
+                    >
+                        Refuză oferta
+                    </button>
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>

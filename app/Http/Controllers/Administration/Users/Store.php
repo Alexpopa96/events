@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Administration\Users;
 
+use App\Rules\RomanianPhone;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -14,15 +15,20 @@ class Store extends Controller
 {
     public function __invoke()
     {
+        // Unique checks compare against the stored E.164 form.
+        if (filled(Request::get('phone')) && ($phone = User::normalizePhone((string) Request::get('phone')))) {
+            Request::merge(['phone' => $phone]);
+        }
+
         Request::validate([
             'name' => ['required'],
             'email' => ['required', 'max:50', Rule::unique('users'),'email:rfc,dns'],
             'role_id' => ['required'],
-            'phone' => ['nullable'],
+            'phone' => ['nullable', 'string', new RomanianPhone, Rule::unique('users', 'phone')],
             'obs' => ['nullable'],
         ], [
             'required' => 'Campul este obligatoriu',
-            'unique' => 'Username-ul este deja ales.'
+            'unique' => 'Valoarea este deja folosită.'
         ]);
 
         $user =  User::create([

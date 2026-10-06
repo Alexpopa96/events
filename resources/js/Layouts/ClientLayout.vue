@@ -18,6 +18,7 @@ import {
 } from '@heroicons/vue/24/solid';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
+import FloatingChatBubble from '@/Components/Messages/FloatingChatBubble.vue';
 
 defineProps({
     title: {
@@ -74,6 +75,8 @@ const logout = () => router.post(route('logout'));
 
         <SiteFooter />
 
+        <FloatingChatBubble />
+
         <!-- Mobile bottom app nav -->
         <nav class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
             <div class="mx-auto flex max-w-md items-center justify-between px-3 pt-2">
@@ -82,7 +85,7 @@ const logout = () => router.post(route('logout'));
                     :key="item.label"
                     :href="item.href"
                     class="flex flex-1 flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150"
-                    :class="item.current() ? 'text-brand-600' : 'text-ink-soft'"
+                    :class="item.current() ? 'text-primary-bright' : 'text-ink-soft'"
                 >
                     <component :is="item.current() ? item.iconActive : item.icon" class="h-6 w-6" />
                     {{ item.label }}
@@ -93,7 +96,7 @@ const logout = () => router.post(route('logout'));
                     :href="route('quote-requests.create')"
                     class="relative -top-5 flex flex-1 flex-col items-center"
                 >
-                    <span class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-gold-400 text-white shadow-glow-brand ring-4 ring-paper transition-transform duration-150 active:scale-95">
+                    <span class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-bright text-white shadow-glow-primary ring-4 ring-paper transition-transform duration-150 active:scale-95">
                         <PlusIcon class="h-6 w-6" />
                     </span>
                 </Link>
@@ -103,7 +106,7 @@ const logout = () => router.post(route('logout'));
                     :key="item.label"
                     :href="item.href"
                     class="flex flex-1 flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150"
-                    :class="item.current() ? 'text-brand-600' : 'text-ink-soft'"
+                    :class="item.current() ? 'text-primary-bright' : 'text-ink-soft'"
                 >
                     <component :is="item.current() ? item.iconActive : item.icon" class="h-6 w-6" />
                     {{ item.label }}
@@ -113,7 +116,7 @@ const logout = () => router.post(route('logout'));
                     type="button"
                     @click="accountSheetOpen = true"
                     class="flex flex-1 flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150"
-                    :class="accountSheetOpen || route().current('profile.*') ? 'text-brand-600' : 'text-ink-soft'"
+                    :class="accountSheetOpen || route().current('profile.*') ? 'text-primary-bright' : 'text-ink-soft'"
                 >
                     <UserIcon class="h-6 w-6" />
                     Cont
@@ -157,14 +160,14 @@ const logout = () => router.post(route('logout'));
                     </div>
                     <p class="mt-2 text-sm text-ink-soft">Autentifică-te pentru cereri de ofertă și favorite.</p>
                     <div class="mt-4 flex gap-2">
-                        <Link href="/login" class="flex-1 rounded-xl bg-brand-500 px-4 py-2.5 text-center text-sm font-semibold text-white" @click="accountSheetOpen = false">Autentificare</Link>
+                        <Link href="/login" class="flex-1 rounded-xl bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white" @click="accountSheetOpen = false">Autentificare</Link>
                         <Link href="/register/client" class="flex-1 rounded-xl border border-line px-4 py-2.5 text-center text-sm font-semibold text-ink" @click="accountSheetOpen = false">Cont nou</Link>
                     </div>
                 </template>
                 <template v-else>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
-                            <span class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-600 text-sm font-semibold text-white shadow-sm shadow-brand-500/20">
+                            <span class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-bright text-sm font-semibold text-white shadow-sm shadow-primary/20">
                                 {{ initials(user.name) }}
                             </span>
                             <div class="min-w-0">

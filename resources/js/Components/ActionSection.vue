@@ -3,20 +3,20 @@ import SectionTitle from './SectionTitle.vue';
 </script>
 
 <template>
-    <div class="md:grid md:grid-cols-3 md:gap-6">
-        <SectionTitle>
-            <template #title>
-                <slot name="title" />
-            </template>
-            <template #description>
-                <slot name="description" />
-            </template>
-        </SectionTitle>
+    <section class="overflow-hidden rounded-2xl border border-ivt-line bg-white p-5 shadow-sm shadow-ivt-ink/5 sm:p-7">
+        <div class="grid gap-x-10 gap-y-6 lg:grid-cols-[14rem_1fr]">
+            <SectionTitle>
+                <template #title>
+                    <slot name="title" />
+                </template>
+                <template #description>
+                    <slot name="description" />
+                </template>
+            </SectionTitle>
 
-        <div class="mt-5 md:mt-0 md:col-span-2">
-            <div class="px-4 py-5 sm:p-6 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+            <div class="min-w-0">
                 <slot name="content" />
             </div>
         </div>
-    </div>
+    </section>
 </template>

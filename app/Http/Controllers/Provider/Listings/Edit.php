@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\County;
 use App\Models\Listing;
+use App\Support\EventTypes;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -35,7 +36,7 @@ class Edit extends Controller
             'listing' => [
                 ...$listing->only([
                     'id', 'title', 'category_id', 'description', 'price_type',
-                    'price_from', 'price_to', 'benefits', 'county_id', 'locality_id',
+                    'price_from', 'price_to', 'benefits', 'event_types', 'county_id', 'locality_id',
                     'status', 'rejection_reason', 'views_count',
                 ]),
                 'county' => $listing->county?->only(['id', 'name']),
@@ -53,6 +54,7 @@ class Edit extends Controller
             'categories' => Category::where('is_active', true)
                 ->orderBy('position')
                 ->get(['id', 'name', 'slug', 'parent_id']),
+            'eventTypes' => EventTypes::options(),
             'counties' => County::orderBy('name')->get(['id', 'name']),
             'mediaLimits' => [
                 'max_photos' => $plan?->max_photos_per_listing,

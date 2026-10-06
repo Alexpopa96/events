@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Administration\Users;
 
+use App\Rules\RomanianPhone;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 
@@ -14,11 +15,16 @@ class Update extends Controller
 {
     public function __invoke(User $user)
     {
+        // Unique checks compare against the stored E.164 form.
+        if (filled(Request::get('phone')) && ($phone = User::normalizePhone((string) Request::get('phone')))) {
+            Request::merge(['phone' => $phone]);
+        }
+
         $user->update(
             Request::validate([
                 'name' => ['required', 'max:50'],
                 'email' => ['required', 'max:50', Rule::unique('users')->ignore($user->id),'email:rfc,dns'],
-                'phone' => ['nullable'],
+                'phone' => ['nullable', 'string', new RomanianPhone, Rule::unique('users', 'phone')->ignore($user->id)],
                 'status' => ['boolean'],
                 'obs' => ['nullable'],
             ],[
@@ -31,7 +37,7 @@ class Update extends Controller
             $user->syncRoles([Role::find(request()->get('role_id'))->name]);
         }
 
-        return Redirect::to('/administration/users')->with(['success'=> ['message' => 'Utilizator actualizat cu success!']]);
+        return Redirect::to('/administration/users')->with(['success'=> ['message' => 'Utilizatorul a fost actualizat cu succes!']]);
     }
 }
 

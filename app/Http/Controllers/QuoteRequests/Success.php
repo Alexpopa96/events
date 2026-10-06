@@ -4,8 +4,8 @@ namespace App\Http\Controllers\QuoteRequests;
 
 use App\Http\Controllers\Controller;
 use App\Models\QuoteRequest;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,6 +20,10 @@ class Success extends Controller
         }
 
         $quoteRequest->load('category:id,name');
+
+        $siblings = $quoteRequest->group_token
+            ? $quoteRequest->siblings()->with('category:id,name')->get(['id', 'category_id', 'status'])
+            : collect();
 
         return Inertia::render('QuoteRequests/Success', [
             'quoteRequest' => [
@@ -40,6 +44,12 @@ class Success extends Controller
                 'rejection_reason' => $quoteRequest->rejection_reason,
                 'created_at' => $quoteRequest->created_at->format('d.m.Y, H:i'),
             ],
+            // The other categories submitted in the same package, so the success
+            // page can say "and 2 more" instead of only confirming this one.
+            'package' => $siblings->map(fn (QuoteRequest $sibling) => [
+                'id' => $sibling->id,
+                'category' => $sibling->category->name,
+            ])->values(),
         ]);
     }
 }

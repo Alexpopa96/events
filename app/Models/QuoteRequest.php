@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +13,7 @@ class QuoteRequest extends Model
         'category_id',
         'title',
         'user_id',
+        'group_token',
         'name',
         'email',
         'phone',
@@ -65,6 +67,21 @@ class QuoteRequest extends Model
         return $this->belongsTo(Locality::class);
     }
 
+    public function offers(): HasMany
+    {
+        return $this->hasMany(Offer::class);
+    }
+
+    /**
+     * The other requests submitted alongside this one as a package (same event,
+     * several service categories at once). Empty when this request stands alone.
+     */
+    public function siblings(): HasMany
+    {
+        return $this->hasMany(self::class, 'group_token', 'group_token')
+            ->where('id', '!=', $this->id);
+    }
+
     public function events(): HasMany
     {
         return $this->hasMany(ListingEvent::class);
@@ -83,5 +100,13 @@ class QuoteRequest extends Model
     public function isRejected(): bool
     {
         return $this->status === 'rejected';
+    }
+
+    /**
+     * Store phone numbers in E.164 whenever they are valid Romanian numbers.
+     */
+    protected function phone(): Attribute
+    {
+        return Attribute::set(fn (?string $value) => filled($value) ? (User::normalizePhone($value) ?? $value) : null);
     }
 }

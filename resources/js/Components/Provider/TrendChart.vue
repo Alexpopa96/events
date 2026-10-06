@@ -88,11 +88,11 @@ const tooltipStyle = computed(() => {
 
 <template>
     <div v-if="!hasData" class="flex h-56 flex-col items-center justify-center text-center">
-        <span class="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-500">
+        <span class="flex h-11 w-11 items-center justify-center rounded-full bg-ivt-paper-2 text-primary">
             <ChartBarIcon class="h-5 w-5" />
         </span>
-        <p class="mt-3 text-sm font-medium text-ink">Încă nu sunt date suficiente</p>
-        <p class="mt-1 text-xs text-ink-soft">Graficul va apărea imediat ce anunțurile tale primesc vizualizări.</p>
+        <p class="mt-3 text-sm font-medium text-ivt-ink">Încă nu sunt date suficiente</p>
+        <p class="mt-1 text-xs text-ivt-ink-soft">Graficul va apărea imediat ce anunțurile tale primesc vizualizări.</p>
     </div>
 
     <div v-else class="relative select-none">
@@ -192,22 +192,22 @@ const tooltipStyle = computed(() => {
         <!-- tooltip -->
         <div
             v-if="hoverPoint"
-            class="absolute top-0 z-10 pointer-events-none bg-white border border-line rounded-xl shadow-lg px-3 py-2 min-w-[9rem]"
+            class="absolute top-0 z-10 pointer-events-none bg-white border border-ivt-line rounded-xl shadow-lg px-3 py-2 min-w-[9rem]"
             :style="tooltipStyle"
         >
-            <p class="text-xs font-semibold text-ink mb-1.5">{{ hoverPoint.date }}</p>
+            <p class="text-xs font-semibold text-ivt-ink mb-1.5">{{ hoverPoint.date }}</p>
             <div v-for="s in series" :key="`tt-${s.key}`" class="flex items-center justify-between gap-3 text-xs py-0.5">
-                <span class="flex items-center gap-1.5 text-ink-soft">
+                <span class="flex items-center gap-1.5 text-ivt-ink-soft">
                     <span class="inline-block w-2.5 h-0.5 rounded-full" :style="{ backgroundColor: s.color }"></span>
                     {{ s.label }}
                 </span>
-                <span class="font-semibold text-ink tabular-nums">{{ hoverPoint[s.key] }}</span>
+                <span class="font-semibold text-ivt-ink tabular-nums">{{ hoverPoint[s.key] }}</span>
             </div>
         </div>
 
         <!-- legend -->
-        <div class="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-3 pt-3 border-t border-line">
-            <span v-for="s in series" :key="`legend-${s.key}`" class="flex items-center gap-1.5 text-xs text-ink-soft">
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-3 pt-3 border-t border-ivt-line">
+            <span v-for="s in series" :key="`legend-${s.key}`" class="flex items-center gap-1.5 text-xs text-ivt-ink-soft">
                 <span class="inline-block w-2.5 h-0.5 rounded-full" :style="{ backgroundColor: s.color }"></span>
                 {{ s.label }}
             </span>

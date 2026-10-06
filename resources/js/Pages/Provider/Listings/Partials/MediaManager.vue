@@ -129,8 +129,8 @@ function onDragEnd() {
 <template>
     <div>
         <div
-            class="relative rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-colors duration-150 cursor-pointer"
-            :class="dragOver ? 'border-brand-400 bg-brand-50/60' : 'border-line hover:border-brand-300 hover:bg-paper/60'"
+            class="relative rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-all duration-150 cursor-pointer"
+            :class="dragOver ? 'border-primary bg-primary/5 scale-[1.01]' : 'border-ivt-line bg-ivt-paper-2/40 hover:border-primary/50 hover:bg-primary/[0.03]'"
             @click="openPicker"
             @dragover.prevent="dragOver = true"
             @dragleave.prevent="dragOver = false"
@@ -144,14 +144,16 @@ function onDragEnd() {
                 class="hidden"
                 @change="onFileChange"
             />
-            <CloudArrowUpIcon class="w-8 h-8 text-brand-500 mx-auto mb-2" />
-            <p class="text-sm font-medium text-ink">
+            <span class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-white text-primary shadow-sm shadow-ivt-ink/10">
+                <CloudArrowUpIcon class="h-6 w-6" />
+            </span>
+            <p class="text-sm font-medium text-ivt-ink">
                 Trage {{ videosAllowed ? 'fotografii sau video' : 'fotografii' }} aici sau apasă pentru a alege
             </p>
-            <p class="text-xs text-ink-soft mt-1">{{ hintText }}</p>
+            <p class="text-xs text-ivt-ink-soft mt-1">{{ hintText }}</p>
 
-            <div v-if="uploadForm.progress" class="mt-3 h-1.5 w-full max-w-xs mx-auto rounded-full bg-line overflow-hidden">
-                <div class="h-full bg-brand-500 transition-all duration-150" :style="{ width: uploadForm.progress.percentage + '%' }"></div>
+            <div v-if="uploadForm.progress" class="mt-3 h-1.5 w-full max-w-xs mx-auto rounded-full bg-ivt-paper-3 overflow-hidden">
+                <div class="h-full bg-primary transition-all duration-150" :style="{ width: uploadForm.progress.percentage + '%' }"></div>
             </div>
         </div>
         <p v-if="uploadForm.errors.photos" class="mt-2 text-sm text-red-500">{{ uploadForm.errors.photos }}</p>
@@ -165,27 +167,27 @@ function onDragEnd() {
                 @dragstart="onDragStart(item)"
                 @dragover.prevent="onDragOverItem(item)"
                 @dragend="onDragEnd"
-                class="group relative aspect-square rounded-xl overflow-hidden border border-line bg-paper cursor-grab active:cursor-grabbing"
+                class="group relative aspect-square rounded-xl overflow-hidden border border-ivt-line bg-ivt-paper cursor-grab active:cursor-grabbing"
                 :class="draggingId === item.id && 'opacity-40'"
             >
                 <video v-if="item.type === 'video'" :src="item.url" class="w-full h-full object-cover" muted playsinline controls />
                 <img v-else :src="item.url" class="w-full h-full object-cover" alt="" />
 
-                <span v-if="item.type === 'video'" class="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-ink/70 text-white text-[11px] font-semibold px-2 py-0.5 shadow-sm pointer-events-none">
+                <span v-if="item.type === 'video'" class="absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-ivt-ink/70 text-white text-[11px] font-semibold px-2 py-0.5 shadow-sm pointer-events-none">
                     <VideoCameraIcon class="w-3 h-3" /> Video
                 </span>
 
-                <span v-if="item.is_cover" class="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-gold-500 text-white text-[11px] font-semibold px-2 py-0.5 shadow-sm">
+                <span v-if="item.is_cover" class="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-ivt-gold text-white text-[11px] font-semibold px-2 py-0.5 shadow-sm">
                     <StarIconSolid class="w-3 h-3" /> Principală
                 </span>
 
-                <div class="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-ink/50 p-1.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                <div class="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-ivt-ink/50 p-1.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
                     <button
                         v-if="item.type !== 'video' && !item.is_cover"
                         type="button"
                         @click.stop="setCover(item)"
                         title="Fă fotografia principală"
-                        class="p-2 rounded-lg bg-white/95 text-ink-soft transition-colors duration-150 hover:text-gold-500"
+                        class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft transition-colors duration-150 hover:text-ivt-gold"
                     >
                         <StarIcon class="w-4 h-4" />
                     </button>
@@ -193,7 +195,7 @@ function onDragEnd() {
                         type="button"
                         @click.stop="destroy(item)"
                         title="Șterge"
-                        class="p-2 rounded-lg bg-white/95 text-ink-soft transition-colors duration-150 hover:text-rose-600"
+                        class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft transition-colors duration-150 hover:text-rose-600"
                     >
                         <TrashIcon class="w-4 h-4" />
                     </button>
@@ -203,9 +205,9 @@ function onDragEnd() {
             <div
                 v-for="n in pendingCount"
                 :key="`pending-${n}`"
-                class="relative aspect-square rounded-xl overflow-hidden border border-line bg-line/50 animate-pulse flex items-center justify-center"
+                class="relative aspect-square rounded-xl overflow-hidden border border-ivt-line bg-ivt-paper-2 animate-pulse flex items-center justify-center"
             >
-                <PhotoIcon class="w-6 h-6 text-ink-soft/30" />
+                <PhotoIcon class="w-6 h-6 text-ivt-ink-soft/30" />
             </div>
         </div>
 
@@ -213,13 +215,13 @@ function onDragEnd() {
             <div
                 v-for="n in pendingCount"
                 :key="`pending-${n}`"
-                class="relative aspect-square rounded-xl overflow-hidden border border-line bg-line/50 animate-pulse flex items-center justify-center"
+                class="relative aspect-square rounded-xl overflow-hidden border border-ivt-line bg-ivt-paper-2 animate-pulse flex items-center justify-center"
             >
-                <PhotoIcon class="w-6 h-6 text-ink-soft/30" />
+                <PhotoIcon class="w-6 h-6 text-ivt-ink-soft/30" />
             </div>
         </div>
 
-        <div v-else class="flex items-center gap-2 mt-4 text-xs text-ink-soft">
+        <div v-else class="flex items-center gap-2 mt-4 text-xs text-ivt-ink-soft">
             <PhotoIcon class="w-4 h-4" /> Fără fotografii încă — anunțurile cu fotografii primesc mai multe cereri de ofertă.
         </div>
 

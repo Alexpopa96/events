@@ -46,6 +46,8 @@ class Show extends Controller
                 'company_name' => $provider->company_name,
                 'cui' => $provider->cui,
                 'reg_com' => $provider->reg_com,
+                'anaf_verified_at' => $provider->anaf_verified_at?->format('d.m.Y H:i'),
+                'anaf_status' => $provider->anaf_status,
                 'slug' => $provider->slug,
                 'description' => $provider->description,
                 'phone' => $provider->phone,

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\QuoteRequests;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\County;
+use App\Models\Offer;
 use App\Models\QuoteRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,6 +18,36 @@ class Show extends Controller
         abort_unless($quoteRequest->user_id === $request->user()->id, 403);
 
         $quoteRequest->load('category:id,name,slug');
+
+        // Opening the request marks any offers still waiting on the client as seen.
+        $quoteRequest->offers()->where('status', Offer::SENT)->update(['status' => Offer::VIEWED, 'viewed_at' => now()]);
+
+        $offers = $quoteRequest->offers()
+            ->with(['providerProfile:id,company_name,slug,logo_path', 'listing:id,title,slug'])
+            ->get()
+            ->map(fn (Offer $offer) => [
+                'id' => $offer->id,
+                'status' => $offer->effectiveStatus(),
+                'price' => $offer->price,
+                'includes' => $offer->includes ?? [],
+                'message' => $offer->message,
+                'valid_until' => $offer->valid_until->format('d.m.Y'),
+                'valid_until_iso' => $offer->valid_until->toDateString(),
+                'decline_reason' => $offer->decline_reason,
+                'created_at' => $offer->created_at->diffForHumans(),
+                'provider' => [
+                    'company_name' => $offer->providerProfile->company_name,
+                    'slug' => $offer->providerProfile->slug,
+                    'logo_url' => $offer->providerProfile->logoUrl(),
+                ],
+                'listing' => $offer->listing ? ['title' => $offer->listing->title, 'slug' => $offer->listing->slug] : null,
+            ])
+            ->sortBy(fn ($offer) => match ($offer['status']) {
+                'sent', 'viewed' => 0,
+                'accepted' => 1,
+                default => 2,
+            })
+            ->values();
 
         return Inertia::render('QuoteRequests/Show', [
             'quoteRequest' => [
@@ -43,10 +74,7 @@ class Show extends Controller
                 'platform_only' => $quoteRequest->platform_only,
                 'status' => $quoteRequest->status,
                 'rejection_reason' => $quoteRequest->rejection_reason,
-                // No offers/messaging system exists yet — providers can't respond
-                // to a request in-app, so these are always 0 until that's built.
-                'offers_count' => 0,
-                'messages_count' => 0,
+                'offers_count' => $offers->count(),
                 'created_at' => $quoteRequest->created_at->format('d.m.Y, H:i'),
                 'updated_at' => $quoteRequest->updated_at->format('d.m.Y, H:i'),
             ],
@@ -55,6 +83,14 @@ class Show extends Controller
                 ->orderBy('position')
                 ->get(['id', 'name', 'slug']),
             'counties' => County::orderBy('name')->get(['id', 'name']),
+            'offers' => $offers,
+            'package' => $quoteRequest->group_token
+                ? $quoteRequest->siblings()->with('category:id,name')->get()->map(fn (QuoteRequest $sibling) => [
+                    'id' => $sibling->id,
+                    'category' => $sibling->category->name,
+                    'status' => $sibling->status,
+                ])->values()
+                : [],
         ]);
     }
 }

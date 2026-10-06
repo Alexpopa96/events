@@ -249,6 +249,7 @@ class Index extends Controller
             'price_from' => $provider->min_price,
             'price_type' => $provider->min_price !== null ? 'starting_from' : 'on_request',
             'is_featured' => (bool) $provider->has_featured_listing,
+            'is_verified' => $provider->isAnafVerified(),
             'rating' => $provider->reviews_avg_rating ? round((float) $provider->reviews_avg_rating, 1) : null,
             'reviews_count' => $provider->reviews_count ?? 0,
             'phone' => $provider->phone,

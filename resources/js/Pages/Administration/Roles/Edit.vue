@@ -12,84 +12,41 @@
                         <text-input v-model="form.guard_name" :error="errors.guard_name" label="Guard name" />
                     </div>
                 </div>
-                <div class="rounded-md p-4 mt-6 shadow-md text-sm dark:bg-layoutDark bg-white border dark:border-borderInputDark">
-                    <div class="md:col-span-1 lg:col-span-12">
-                        <div class="text-center mb-4">
-                            Permisii
-                        </div>
+                <div class="mt-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-ivt-ink">Permisii</h3>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-ivt-paper-2 text-primary text-xs font-semibold">
+                            {{ form.selected?.length ?? 0 }} selectate
+                        </span>
                     </div>
-                    <div class="flex space-x-2 overflow-x-auto">
-                        <div v-for="group in permissionGroups"
-                             class="dark:text-textInputDark sp-1 rounded-md">
-                            <div class="text-center">
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        <div v-for="group in permissionGroups" :key="group" class="rounded-2xl border border-ivt-line bg-white p-4">
+                            <div class="mb-3 text-xs font-semibold uppercase tracking-wider text-ivt-ink-soft/70">
                                 {{ group }}
                             </div>
-                            <div v-for="permission in permissions" :key="permission.id"
-                                 class="">
-                                <div v-if="permission.group == group"
-                                     class="flex items-center m-1 dark:bg-tableDark bg-white border-2 dark:border-borderInputDark border-primaryColor px-2 py-1 rounded-md shadow-md text-hoverColor font-bold">
-                                    <input class="rounded-full mr-2 font-bold border-gray-300 text-ps3purple shadow-sm focus:outline-none focus:ring-0"
-                                           type="checkbox"
-                                           :id="'permission-'+permission.id"
-                                           :value="permission.id"
-                                           v-model="form.selected">
-                                    <label :for="'permission-'+permission.id"
-                                           class="cursor-pointer">
+                            <div class="space-y-1.5">
+                                <template v-for="permission in permissions" :key="permission.id">
+                                    <label
+                                        v-if="permission.group == group"
+                                        :for="'permission-' + permission.id"
+                                        class="flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2 text-sm transition-colors"
+                                        :class="form.selected?.includes(permission.id)
+                                            ? 'border-primary/40 bg-primary/5 text-ivt-ink font-medium'
+                                            : 'border-ivt-line text-ivt-ink-soft hover:border-primary/40 hover:bg-primary/5'"
+                                    >
+                                        <input
+                                            class="h-4 w-4 rounded border-ivt-line text-primary focus:ring-primary/30"
+                                            type="checkbox"
+                                            :id="'permission-' + permission.id"
+                                            :value="permission.id"
+                                            v-model="form.selected"
+                                        >
                                         {{ permission.name }}
                                     </label>
-                                </div>
+                                </template>
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="flex flex-wrap">
-                        <div v-for="permission in permissions" :key="permission.id"
-                            class="">
-                            <div>
-                                <input type="checkbox" :id="'permission-'+permission.id" :value="permission.id" v-model="form.selected">
-                                <label :for="'permission-'+permission.id">
-                                    {{ permission.name }}
-                                </label>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- <Accordion title="Administrare">
-                        <Accordion v-for="(admin,index) in admins" :key="index" :title="admin">
-                            <div v-for="(permission) in permissions" :key="permission.id" class="mt-4 text-center sm:w-full md:w-full lg:w-1/2 m-auto shadow-md rounded">
-                                <div v-show="permission.group === admin" class="flex text-white justify-between p-4 hover:shadow-lg hover:shadow-blue-300/50 sm:p-2">
-                                    <label class="switch">
-                                        <input type="checkbox" :value="permission.id" v-model="form.selected">
-                                        <div class="slider round"></div>
-                                    </label>
-
-                                    <span :class="showFirstWord(permission.name) == 'view' ? 'bg-blue-400 p-2 rounded'
-                                        : showFirstWord(permission.name) == 'edit' ? 'bg-green-400 p-2 rounded'
-                                        : showFirstWord(permission.name) == 'create' ? 'bg-yellow-400 p-2 rounded'
-                                        : showFirstWord(permission.name) == 'show' ? 'bg-gray-400 p-2 rounded' : ''" style="width:4rem;">
-                                        {{showFirstWord(permission.name).toUpperCase()}}
-                                    </span>
-
-                                </div>
-                            </div>
-                        </Accordion>
-                    </Accordion> -->
-                    <!-- <Accordion v-for="(group,index) in permissionGroups" :key="index" :title="group">
-                        <div v-for="(permission) in permissions" :key="permission.id" class="mt-4 text-center lg:w-1/2 m-auto shadow-md rounded">
-                            <div v-show="permission.group === group" class="text-center text-white flex justify-between px-8 hover:shadow-lg p-4 sm:p-2">
-                                <label class="switch">
-                                    <input type="checkbox" :value="permission.id" v-model="form.selected">
-                                    <div class="slider round"></div>
-                                </label>
-
-                                <span :class="showFirstWord(permission.name) == 'view' ? 'bg-green-400 p-2 rounded'
-                                    : showFirstWord(permission.name) == 'edit' ? 'bg-blue-400 p-2 rounded'
-                                    : showFirstWord(permission.name) == 'create' ? 'bg-yellow-400 p-2 rounded'
-                                    : showFirstWord(permission.name) == 'show' ? 'bg-gray-400 p-2 rounded' : ''" style="width:4rem;">
-
-                                    {{showFirstWord(permission.name).toUpperCase()}}
-                                </span>
-                            </div>
-                        </div>
-                    </Accordion>         -->
                 </div>
             </Form>
         </div>
@@ -195,73 +152,3 @@ export default {
 };
 </script>
 
-<style>
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 90px;
-    height: 34px;
-}
-
-.switch input {display:none;}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ca2222;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 34px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #2ab934;
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(55px);
-}
-
-/*------ ADDED CSS ---------*/
-.slider:after
-{
-    content:'OFF';
-    color: white;
-    display: block;
-    position: absolute;
-    transform: translate(-50%,-50%);
-    top: 50%;
-    left: 50%;
-    font-size: 10px;
-    font-family: Verdana, sans-serif;
-}
-
-input:checked + .slider:after
-{
-    content:'ON';
-}
-
-</style>

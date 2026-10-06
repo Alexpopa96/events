@@ -8,6 +8,7 @@ use App\Models\ProviderProfile;
 use App\Models\QuoteRequest;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Support\DashboardMetrics;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,30 +17,63 @@ if (! function_exists('dashboardProps')) {
 function dashboardProps(): array
 {
     $user = auth()->user();
+    $metrics = new DashboardMetrics((int) request('range', 30));
 
-    $stats = [];
+    $canUsers = $user->can('view users');
+    $canProviders = $user->can('moderate providers');
+    $canQuotes = $user->can('moderate quote requests');
 
-    if ($user->can('view users')) {
-        $stats[] = ['label' => 'Utilizatori', 'value' => User::count(), 'href' => '/administration/users'];
+    $kpis = [];
+    $growth = [];
+
+    if ($canUsers) {
+        $kpis[] = ['key' => 'users', 'label' => 'Utilizatori', 'total' => User::count(), 'href' => '/administration/users']
+            + $metrics->trend(User::class);
+        $growth['users'] = $metrics->dailyCounts(User::class);
     }
 
-    if ($user->can('moderate providers')) {
-        $stats[] = ['label' => 'Furnizori activi', 'value' => ProviderProfile::where('status', 'active')->count(), 'href' => '/administration/providers'];
-        $stats[] = ['label' => 'Furnizori în așteptare', 'value' => ProviderProfile::where('status', 'pending')->count(), 'href' => '/administration/providers'];
+    if ($canProviders) {
+        $kpis[] = ['key' => 'providers', 'label' => 'Furnizori activi', 'total' => ProviderProfile::where('status', 'active')->count(), 'href' => '/administration/providers']
+            + $metrics->trend(ProviderProfile::class);
+        $growth['providers'] = $metrics->dailyCounts(ProviderProfile::class);
     }
 
-    if ($user->can('moderate quote requests')) {
-        $stats[] = ['label' => 'Cereri în așteptare', 'value' => QuoteRequest::where('status', 'pending_review')->count(), 'href' => '/administration/quote-requests'];
+    if ($canQuotes) {
+        $kpis[] = ['key' => 'quote_requests', 'label' => 'Cereri de ofertă', 'total' => QuoteRequest::count(), 'href' => '/administration/quote-requests']
+            + $metrics->trend(QuoteRequest::class);
+        $growth['quote_requests'] = $metrics->dailyCounts(QuoteRequest::class);
     }
 
     if ($user->can('view dashboard')) {
-        $stats[] = ['label' => 'Anunțuri publicate', 'value' => Listing::where('status', 'published')->count(), 'href' => null];
-        $stats[] = ['label' => 'Cereri de ofertă deschise', 'value' => QuoteRequest::where('status', 'open')->count(), 'href' => null];
+        $kpis[] = ['key' => 'listings', 'label' => 'Anunțuri publicate', 'total' => Listing::where('status', 'published')->count(), 'href' => null]
+            + $metrics->trend(Listing::class, fn ($query) => $query->where('status', 'published'), 'published_at');
+    }
+
+    $attention = [];
+
+    if ($canProviders) {
+        $attention[] = ['label' => 'Furnizori de aprobat', 'value' => ProviderProfile::where('status', 'pending')->count(), 'href' => '/administration/providers'];
+    }
+
+    if ($canQuotes) {
+        $attention[] = ['label' => 'Cereri de moderat', 'value' => QuoteRequest::where('status', 'pending_review')->count(), 'href' => '/administration/quote-requests'];
     }
 
     return [
-        'stats' => $stats,
-        'pendingProviders' => $user->can('moderate providers')
+        'range' => $metrics->range(),
+        'kpis' => $kpis,
+        'attention' => $attention,
+        'growth' => $growth ? $metrics->growth($growth) : null,
+        'providerStatus' => $canProviders
+            ? $metrics->statusBreakdown(ProviderProfile::class, ['active' => 'Activi', 'pending' => 'În așteptare', 'suspended' => 'Suspendați', 'rejected' => 'Respinși'])
+            : [],
+        'quoteStatus' => $canQuotes
+            ? $metrics->statusBreakdown(QuoteRequest::class, ['open' => 'Deschise', 'pending_review' => 'De moderat', 'closed' => 'Închise', 'rejected' => 'Respinse'])
+            : [],
+        'topCategories' => $canQuotes ? $metrics->topCategories() : [],
+        'revenue' => $user->can('view dashboard') ? $metrics->revenue() : null,
+        'activity' => $metrics->activity(12, $canProviders, $canQuotes, $canUsers),
+        'pendingProviders' => $canProviders
             ? ProviderProfile::where('status', 'pending')
                 ->latest()
                 ->take(5)
@@ -177,5 +211,9 @@ require __DIR__.'/app/provider.php';
 require __DIR__.'/app/onboarding.php';
 require __DIR__.'/app/administration-providers.php';
 require __DIR__.'/app/administration-quote-requests.php';
+require __DIR__.'/app/administration-reviews.php';
 require __DIR__.'/app/client_auth.php';
+require __DIR__.'/app/two_factor.php';
 require __DIR__.'/app/listings.php';
+require __DIR__.'/app/push-subscriptions.php';
+require __DIR__.'/app/search.php';

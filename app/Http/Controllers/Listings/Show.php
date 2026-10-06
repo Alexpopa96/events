@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Listings;
 use App\Http\Controllers\Controller;
 use App\Models\Listing;
 use App\Models\ListingEvent;
+use App\Models\ProviderProfile;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -90,6 +92,8 @@ class Show extends Controller
                     'comment' => $review->comment,
                     'author' => $review->user->name,
                     'created_at' => $review->created_at->diffForHumans(),
+                    'provider_reply' => $review->provider_reply,
+                    'provider_replied_at' => $review->provider_replied_at?->diffForHumans(),
                 ]),
                 'provider' => [
                     'company_name' => $listing->providerProfile->company_name,
@@ -103,10 +107,49 @@ class Show extends Controller
                     'county' => $listing->providerProfile->county?->name,
                     'locality' => $listing->providerProfile->locality?->name,
                     'rating' => $listing->providerProfile->averageRating() ?: null,
+                    'is_verified' => $listing->providerProfile->isAnafVerified(),
+                    'response_time_label' => $listing->providerProfile->responseTimeLabel(),
                 ],
             ],
             'related' => $related,
+            'canMessage' => $user ? $listing->providerProfile->user_id !== $user->id : true,
+            'reviewState' => $this->reviewState($listing, $user),
+            'unavailableDates' => $this->unavailableDates($listing->providerProfile),
             'isFavorited' => $user ? $user->favorites()->where('listing_id', $listing->id)->exists() : false,
         ]);
+    }
+
+    /**
+     * Dates the provider is already booked on, for the next 6 months.
+     *
+     * @return array<int, string>
+     */
+    private function unavailableDates(ProviderProfile $providerProfile): array
+    {
+        return $providerProfile->availabilityBlocks()
+            ->whereBetween('date', [now()->toDateString(), now()->addMonths(6)->toDateString()])
+            ->orderBy('date')
+            ->pluck('date')
+            ->map(fn ($date) => $date->toDateString())
+            ->all();
+    }
+
+    /**
+     * What the review form should show this visitor: a form, their pending/finished review, or nothing.
+     *
+     * @return array{can_review: bool, my_review: array{rating: int, comment: ?string, status: string}|null}
+     */
+    private function reviewState(Listing $listing, ?User $user): array
+    {
+        if (! $user || ! $user->can('submit review')) {
+            return ['can_review' => false, 'my_review' => null];
+        }
+
+        $mine = $listing->reviews()->where('user_id', $user->id)->first();
+
+        return [
+            'can_review' => ! $mine && $listing->canBeReviewedBy($user),
+            'my_review' => $mine ? ['rating' => $mine->rating, 'comment' => $mine->comment, 'status' => $mine->status] : null,
+        ];
     }
 }

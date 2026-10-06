@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\ProviderProfile;
+use App\Notifications\Concerns\StoresInApp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -10,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class ProviderSuspended extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, StoresInApp;
 
     public function __construct(
         private readonly ProviderProfile $profile,
@@ -20,7 +21,7 @@ class ProviderSuspended extends Notification implements ShouldQueue
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage

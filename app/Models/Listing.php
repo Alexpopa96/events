@@ -18,6 +18,7 @@ class Listing extends Model
         'price_from',
         'price_to',
         'benefits',
+        'event_types',
         'currency',
         'county_id',
         'locality_id',
@@ -34,6 +35,7 @@ class Listing extends Model
             'price_from' => 'decimal:2',
             'price_to' => 'decimal:2',
             'benefits' => 'array',
+            'event_types' => 'array',
             'is_featured' => 'boolean',
             'published_at' => 'datetime',
         ];
@@ -79,6 +81,11 @@ class Listing extends Model
         return $this->hasMany(Favorite::class);
     }
 
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
+    }
+
     public function events(): HasMany
     {
         return $this->hasMany(ListingEvent::class);
@@ -92,5 +99,23 @@ class Listing extends Model
     public function averageRating(): float
     {
         return round((float) $this->approvedReviews()->avg('rating'), 1);
+    }
+
+    /**
+     * Only clients who actually talked to the provider about this listing (the provider
+     * replied in the thread) may review it, and the provider never reviews themselves.
+     */
+    public function canBeReviewedBy(User $user): bool
+    {
+        $providerUserId = $this->providerProfile->user_id;
+
+        if ($providerUserId === $user->id) {
+            return false;
+        }
+
+        return $this->conversations()
+            ->where('client_id', $user->id)
+            ->whereHas('messages', fn ($messages) => $messages->where('sender_id', $providerUserId))
+            ->exists();
     }
 }

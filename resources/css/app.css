@@ -8,6 +8,9 @@
 
 html {
     scroll-behavior: smooth;
+    /* Reserve the scrollbar's space so pages with and without a vertical
+       scrollbar keep the same width and don't shift sideways on navigation. */
+    scrollbar-gutter: stable;
 }
 
 /* Scroll-reveal (used with the v-reveal directive) */

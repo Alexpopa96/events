@@ -2,51 +2,52 @@
     <Layout title="Adaugare permisii" :breadcrumbs="['Administrare', 'Permisii', 'Adaugare permisii']">
         <Head title="Adaugare permisii" />
         <Title>Adauga o permisie</Title>
-        <div class="">
-            <form  @submit.prevent="store" :loading="sending" >
-                <div v-for="(form,index) in forms" :key="index" class="relative rounded animate__animated animate__fadeIn animate__faster shadow-md bg-gray-100 align-middle p-6 mt-4 grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 auto-cols-min">
-                    <span class="col-span-12">* - Camp obligatoriu </span>
-                    <span class="col-span-12 font-black m-auto text-xl">Formular #{{index+1}}</span>
-                    <div class="md:col-span-6 lg:col-span-6">
+        <div>
+            <form @submit.prevent="store" class="space-y-4">
+                <div v-for="(form,index) in forms" :key="index" class="relative rounded-2xl border border-ivt-line bg-white shadow-sm shadow-ivt-ink/5 p-5 sm:p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-ivt-ink">Formular #{{ index + 1 }}</h3>
+                        <button
+                            v-if="forms.length > 1"
+                            type="button"
+                            @click.prevent="deleteForm(index)"
+                            class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 transition-colors hover:bg-rose-100"
+                        >
+                            <Trash2 class="h-3.5 w-3.5" /> Elimină
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <text-input v-model="form.name" label="Denumire permisie *" />
-                    </div>
-                    <div class="md:col-span-6 lg:col-span-6">
-                        <text-input v-model="form.group" label="Denumire grupa" />
-                    </div>
-                    <div class="md:col-span-6 lg:col-span-6">
-                        <text-input v-model="form.parent" value=" " label="Denumire parinte" />
-                    </div>
-                    <div class="md:col-span-6 lg:col-span-6">
+                        <text-input v-model="form.group" label="Denumire grupă" />
+                        <text-input v-model="form.parent" value=" " label="Denumire părinte" />
                         <text-input v-model="form.guard_name" label="Guard name *" />
                     </div>
-                    <button v-if="forms.length > 1" @click.prevent="deleteForm(index)"
-                            class="px-4 py-2 border bg-red-500 border-transparent shadow-sm leading-4 text-white  font-bold rounded-md focus:outline-none">
-                        <div class="inline-flex items-center">
-                            <i class="fas fa-minus"></i>
-                        </div>
+                </div>
+
+                <div v-if="counter > 0 && alert" class="flex items-start justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700" role="alert">
+                    <p class="font-medium">Au apărut erori în formularele {{ arr.toString() }}. Verificați ca toate datele necesare să fie introduse.</p>
+                    <button type="button" @click.prevent="alert = false" class="flex-none text-rose-500 hover:text-rose-700" aria-label="Închide">
+                        <X class="h-4 w-4" />
                     </button>
                 </div>
-                <div class="flex justify-between mt-4">
-                    <button @click.prevent="addForm"
-                            class="px-4 py-2 border bg-green-500 border-transparent shadow-sm leading-4 text-white  font-bold rounded-md focus:outline-none">
-                        <div class="inline-flex items-center">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
+
+                <div class="flex items-center justify-between gap-3">
+                    <button
+                        type="button"
+                        @click.prevent="addForm"
+                        class="inline-flex items-center gap-2 rounded-xl border border-ivt-line bg-white px-4 py-2 text-sm font-semibold text-ivt-ink-soft transition-colors hover:border-ivt-gold hover:text-primary"
+                    >
+                        <Plus class="h-4 w-4" /> Adaugă încă una
                     </button>
-                    <button @click.prevent="store"
-                            class="px-4 py-2 border bg-green-500 border-transparent shadow-sm leading-4 text-white  font-bold rounded-md focus:outline-none">
-                        <div class="inline-flex items-center">
-                            Salveaza
-                        </div>
+                    <button
+                        type="submit"
+                        class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:bg-primary-bright"
+                    >
+                        <Check class="h-4 w-4" /> Salvează
                     </button>
                 </div>
+                <p class="text-xs text-ivt-ink-soft">* Câmp obligatoriu</p>
             </form>
-            <div v-if="counter > 0 && alert" class="animate__animated animate__fadeIn animate__faster mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <strong class="font-bold">Au aparut erori in forumarele {{arr.toString()}} ! Verificati ca toate datele necesare sa fie introduse</strong>
-                <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-					<svg @click.prevent="alert = false" class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
-				</span>
-            </div>
         </div>
     </Layout>
 </template>
@@ -60,6 +61,7 @@ import TextareaInput from '@/Components/TextareaInput.vue'
 import Layout from '@/Layouts/Layout.vue';
 import Form from "@/Components/Form.vue";
 import {Head} from '@inertiajs/vue3'
+import { Plus, Trash2, Check, X } from '@lucide/vue';
 
 
 export default {
@@ -71,7 +73,11 @@ export default {
         Title,
         Label,
         Head,
-        Layout
+        Layout,
+        Plus,
+        Trash2,
+        Check,
+        X
     },
 
     props: {

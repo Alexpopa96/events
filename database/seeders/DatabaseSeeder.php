@@ -21,5 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call(LocalitySeeder::class);
         $this->call(DemoProviderSeeder::class);
         $this->call(ProviderCatalogSeeder::class);
+        $this->call(DemoAccountsSeeder::class);
+        $this->call(ListingEventTypesSeeder::class);
     }
 }

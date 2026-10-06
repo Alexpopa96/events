@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
-import { MagnifyingGlassIcon, MapPinIcon, FaceFrownIcon, AdjustmentsHorizontalIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { MagnifyingGlassIcon, MapPinIcon, FaceFrownIcon, AdjustmentsHorizontalIcon, XMarkIcon, CheckBadgeIcon } from '@heroicons/vue/24/outline';
 import { StarIcon } from '@heroicons/vue/24/solid';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
@@ -248,7 +248,10 @@ const location = (item) => [item.locality, item.county].filter(Boolean).join(', 
                                         <span class="text-[10.5px] font-bold uppercase tracking-[0.06em] text-ivt-on-dark-dim">{{ item.category }}</span>
                                         <span v-if="item.is_featured" class="rounded-full border border-ivt-gold/50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ivt-gold-bright">Premium</span>
                                     </div>
-                                    <h4 class="relative font-serif text-[19px] font-medium text-ivt-on-dark">{{ item.company_name }}</h4>
+                                    <h4 class="relative flex items-center gap-1.5 font-serif text-[19px] font-medium text-ivt-on-dark">
+                                        <span class="truncate">{{ item.company_name }}</span>
+                                        <CheckBadgeIcon v-if="item.is_verified" class="h-4 w-4 flex-none text-ivt-gold-bright" title="Verificat ANAF" />
+                                    </h4>
                                     <p v-if="location(item)" class="relative flex items-center gap-1 text-[12.5px] text-ivt-on-dark-dim">
                                         <MapPinIcon class="h-3.5 w-3.5 flex-none" /> {{ location(item) }}
                                     </p>

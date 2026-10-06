@@ -3,6 +3,7 @@
 namespace App\Support\Listings;
 
 use App\Models\County;
+use App\Support\EventTypes;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListingFacets
@@ -33,6 +34,10 @@ class ListingFacets
 
         if (in_array('categories', $facets)) {
             $result['categories'] = $this->categoryCounts($baseQuery, $filters);
+        }
+
+        if (in_array('event_types', $facets)) {
+            $result['event_types'] = $this->eventTypeCounts($baseQuery, $filters);
         }
 
         return $result;
@@ -102,5 +107,18 @@ class ListingFacets
             ->groupBy('category_id')
             ->pluck('total', 'category_id')
             ->all();
+    }
+
+    private function eventTypeCounts(Builder $baseQuery, ListingFilters $filters): array
+    {
+        $query = ListingQueryScope::apply(clone $baseQuery, $filters, except: ['event_type']);
+
+        $counts = [];
+
+        foreach (EventTypes::values() as $type) {
+            $counts[$type] = ListingQueryScope::servesEventTypes(clone $query, [$type])->count();
+        }
+
+        return $counts;
     }
 }

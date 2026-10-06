@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Provider\Profile;
 
+use App\Rules\RomanianPhone;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,8 +17,8 @@ class Update extends Controller
         $data = $request->validate([
             'company_name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'phone' => ['nullable', 'string', 'max:30'],
-            'whatsapp' => ['nullable', 'string', 'max:30'],
+            'phone' => ['nullable', 'string', 'max:30', new RomanianPhone],
+            'whatsapp' => ['nullable', 'string', 'max:30', new RomanianPhone],
             'email' => ['nullable', 'email', 'max:255'],
             'website' => ['nullable', 'url', 'max:255'],
             'address' => ['nullable', 'string', 'max:255'],

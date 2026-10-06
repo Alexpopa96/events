@@ -1,85 +1,78 @@
+{{--
+    Generic EventHub email. View data (see also emails/layouts/base):
+
+      $greeting     serif heading
+      $lines        array of paragraphs
+      $code         optional one-time code, shown in a highlighted box
+      $validMinutes optional, validity note under the code
+      $actionUrl / $actionText   optional call-to-action button
+      $footnotes    optional array of small print lines (security notes etc.)
+--}}
+@extends('emails.layouts.base')
+
 @php
-    $tonePalette = [
-        'success' => ['bg' => '#F5F3FF', 'fg' => '#6D28D9'],
-        'info' => ['bg' => '#FFFBEB', 'fg' => '#B45309'],
-        'danger' => ['bg' => '#FBEAE8', 'fg' => '#B3413A'],
-    ][$tone ?? 'success'];
+    $sans = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+    $serif = "Georgia,'Iowan Old Style','Times New Roman',serif";
 @endphp
-<!DOCTYPE html>
-<html lang="ro">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $subject ?? '' }}</title>
-</head>
-<body style="margin:0; padding:0; background-color:#EAEAEE; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#EAEAEE; padding:40px 16px;">
-    <tr>
-        <td align="center">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
-                <!-- Wordmark -->
-                <tr>
-                    <td align="center" style="padding-bottom:28px;">
-                        <span style="font-family:Georgia,'Iowan Old Style','Times New Roman',serif; font-size:22px; color:#211C27;">
-                            Event<span style="color:#7C3AED;">Hub</span>
-                        </span>
-                    </td>
-                </tr>
 
-                <!-- Card -->
-                <tr>
-                    <td style="background-color:#FFFFFF; border-radius:24px; box-shadow:0 24px 60px -20px rgba(33,28,39,0.18); overflow:hidden;">
-                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td style="padding:40px 40px 32px 40px;">
-                                    @isset($badge)
-                                        <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-                                            <tr>
-                                                <td style="background-color:{{ $tonePalette['bg'] }}; color:{{ $tonePalette['fg'] }}; font-size:12px; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; padding:6px 14px; border-radius:999px;">
-                                                    {{ $badge }}
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    @endisset
+@section('content')
+    <h1 style="margin:0 0 14px 0; font-family:{!! $serif !!}; font-size:28px; line-height:1.25; font-weight:normal; color:#16281F;">
+        {{ $greeting }}
+    </h1>
 
-                                    <h1 style="margin:0 0 16px 0; font-family:Georgia,'Iowan Old Style','Times New Roman',serif; font-size:24px; line-height:1.3; color:#211C27;">
-                                        {{ $greeting }}
-                                    </h1>
+    @foreach ($lines as $line)
+        <p style="margin:0 0 16px 0; font-size:15px; line-height:1.7; color:#4B5C4F;">
+            {{ $line }}
+        </p>
+    @endforeach
 
-                                    @foreach ($lines as $line)
-                                        <p style="margin:0 0 16px 0; font-size:15px; line-height:1.65; color:#6B6373;">
-                                            {{ $line }}
-                                        </p>
-                                    @endforeach
+    @isset($code)
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:12px 0 0 0;">
+            <tr>
+                <td align="center" style="background-color:#F6F3EB; border:1px solid #E7E1D0; border-radius:18px; padding:26px 12px;">
+                    <div style="font-family:'SF Mono',SFMono-Regular,Menlo,Consolas,'Courier New',monospace; font-size:40px; line-height:1; font-weight:700; letter-spacing:12px; text-indent:12px; color:#7C2E3B;">{{ $code }}</div>
+                </td>
+            </tr>
+        </table>
 
-                                    @isset($actionUrl)
-                                        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 8px 0;">
-                                            <tr>
-                                                <td style="border-radius:999px; background-color:#7C3AED;">
-                                                    <a href="{{ $actionUrl }}" target="_blank" style="display:inline-block; padding:13px 28px; font-size:14px; font-weight:600; color:#FFFFFF; text-decoration:none; border-radius:999px;">
-                                                        {{ $actionText }}
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    @endisset
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
+        @isset($validMinutes)
+            <p style="margin:18px 0 0 0; text-align:center; font-size:13px; line-height:1.6; color:#8A9186;">
+                Codul este valabil <strong style="color:#16281F;">{{ $validMinutes }} minute</strong>.
+            </p>
+        @endisset
+    @endisset
 
-                <!-- Footer -->
-                <tr>
-                    <td align="center" style="padding-top:28px;">
-                        <p style="margin:0; font-size:12px; line-height:1.6; color:#6B6373;">
-                            &copy; {{ date('Y') }} EventHub &mdash; platforma pentru servicii de evenimente
-                        </p>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
-</body>
-</html>
+    @isset($actionUrl)
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 0 0;">
+            <tr>
+                <td align="center" bgcolor="#7C2E3B" style="border-radius:999px; background-color:#7C2E3B; background-image:linear-gradient(180deg,#96323F,#7C2E3B);">
+                    <a href="{{ $actionUrl }}" target="_blank" style="display:inline-block; padding:15px 34px; font-family:{!! $sans !!}; font-size:14px; font-weight:600; color:#FFFFFF; text-decoration:none; border-radius:999px;">
+                        {{ $actionText ?? 'Deschide' }}
+                    </a>
+                </td>
+            </tr>
+        </table>
+
+        <p style="margin:20px 0 0 0; font-size:12px; line-height:1.6; color:#8A9186; word-break:break-all;">
+            Dacă butonul nu funcționează, copiază acest link în browser:<br>
+            <a href="{{ $actionUrl }}" target="_blank" style="color:#7C2E3B; text-decoration:underline;">{{ $actionUrl }}</a>
+        </p>
+    @endisset
+
+    @if (! empty($footnotes))
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:32px 0 24px 0;">
+            <tr><td style="height:1px; line-height:1px; font-size:0; background-color:#EFEADB;">&nbsp;</td></tr>
+        </table>
+
+        @foreach ($footnotes as $footnote)
+            <p style="margin:0 0 10px 0; font-size:13px; line-height:1.65; color:#4B5C4F;">
+                @if (is_array($footnote))
+                    <strong style="color:#16281F;">{{ $footnote['title'] }}</strong>
+                    {{ $footnote['text'] }}
+                @else
+                    {{ $footnote }}
+                @endif
+            </p>
+        @endforeach
+    @endif
+@endsection

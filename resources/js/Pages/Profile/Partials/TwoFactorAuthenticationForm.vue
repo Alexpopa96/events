@@ -1,253 +1,213 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
-import { router, useForm, usePage } from '@inertiajs/vue3';
+import { computed, onBeforeUnmount, ref } from 'vue';
+import axios from 'axios';
+import { router, usePage } from '@inertiajs/vue3';
+import { useToast } from 'vue-toastification';
+import { CheckCircleIcon, EnvelopeIcon, ShieldCheckIcon } from '@heroicons/vue/24/outline';
 import ActionSection from '@/Components/ActionSection.vue';
-import ConfirmsPassword from '@/Components/ConfirmsPassword.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
 
-const props = defineProps({
-    requiresConfirmation: Boolean,
-});
-
+const toast = useToast();
 const page = usePage();
-const enabling = ref(false);
-const confirming = ref(false);
-const disabling = ref(false);
-const qrCode = ref(null);
-const setupKey = ref(null);
-const recoveryCodes = ref([]);
 
-const confirmationForm = useForm({
-    code: '',
-});
+const state = computed(() => page.props.emailTwoFactor);
+const enabled = computed(() => state.value?.enabled);
 
-const twoFactorEnabled = computed(
-    () => ! enabling.value && page.props.auth.user?.two_factor_enabled,
-);
+// 'idle' | 'code' (waiting for the emailed code) — for both enabling and disabling.
+const step = ref('idle');
+const mode = ref('enable');
+const sentTo = ref('');
+const code = ref('');
+const processing = ref(false);
+const errors = ref({});
+const cooldown = ref(0);
+let timer = null;
 
-watch(twoFactorEnabled, () => {
-    if (! twoFactorEnabled.value) {
-        confirmationForm.reset();
-        confirmationForm.clearErrors();
+const startCooldown = (seconds) => {
+    cooldown.value = seconds;
+    clearInterval(timer);
+    if (seconds <= 0) return;
+    timer = setInterval(() => {
+        cooldown.value -= 1;
+        if (cooldown.value <= 0) clearInterval(timer);
+    }, 1000);
+};
+
+onBeforeUnmount(() => clearInterval(timer));
+
+const request = async (call) => {
+    processing.value = true;
+    errors.value = {};
+
+    try {
+        return await call();
+    } catch (error) {
+        if (error.response?.status === 422) {
+            errors.value = Object.fromEntries(Object.entries(error.response.data.errors).map(([key, messages]) => [key, messages[0]]));
+        } else if (error.response?.status === 429) {
+            errors.value = { general: 'Prea multe încercări. Așteaptă un minut și încearcă din nou.' };
+        } else {
+            errors.value = { general: 'Ceva n-a mers. Încearcă din nou.' };
+        }
+
+        return null;
+    } finally {
+        processing.value = false;
     }
-});
-
-const enableTwoFactorAuthentication = () => {
-    enabling.value = true;
-
-    router.post(route('two-factor.enable'), {}, {
-        preserveScroll: true,
-        onSuccess: () => Promise.all([
-            showQrCode(),
-            showSetupKey(),
-            showRecoveryCodes(),
-        ]),
-        onFinish: () => {
-            enabling.value = false;
-            confirming.value = props.requiresConfirmation;
-        },
-    });
 };
 
-const showQrCode = () => {
-    return axios.get(route('two-factor.qr-code')).then(response => {
-        qrCode.value = response.data.svg;
-    });
+const reset = () => {
+    step.value = 'idle';
+    code.value = '';
+    errors.value = {};
+    clearInterval(timer);
+    cooldown.value = 0;
 };
 
-const showSetupKey = () => {
-    return axios.get(route('two-factor.secret-key')).then(response => {
-        setupKey.value = response.data.secretKey;
-    });
-}
+const sendEnableCode = async () => {
+    const { data } = (await request(() => axios.post(route('email-two-factor.send')))) ?? {};
+    if (!data) return;
 
-const showRecoveryCodes = () => {
-    return axios.get(route('two-factor.recovery-codes')).then(response => {
-        recoveryCodes.value = response.data;
-    });
+    mode.value = 'enable';
+    sentTo.value = data.email;
+    step.value = 'code';
+    code.value = '';
+    startCooldown(data.retry_in);
 };
 
-const confirmTwoFactorAuthentication = () => {
-    confirmationForm.post(route('two-factor.confirm'), {
-        errorBag: "confirmTwoFactorAuthentication",
-        preserveScroll: true,
-        preserveState: true,
-        onSuccess: () => {
-            confirming.value = false;
-            qrCode.value = null;
-            setupKey.value = null;
-        },
-    });
+const sendDisableCode = async () => {
+    const { data } = (await request(() => axios.post(route('email-two-factor.disable-code')))) ?? {};
+    if (!data) return;
+
+    mode.value = 'disable';
+    sentTo.value = data.email;
+    step.value = 'code';
+    code.value = '';
+    startCooldown(data.retry_in);
 };
 
-const regenerateRecoveryCodes = () => {
-    axios
-        .post(route('two-factor.recovery-codes'))
-        .then(() => showRecoveryCodes());
+const resend = () => (mode.value === 'enable' ? sendEnableCode() : sendDisableCode());
+
+const confirm = async () => {
+    const call = mode.value === 'enable'
+        ? () => axios.post(route('email-two-factor.confirm'), { code: code.value })
+        : () => axios.delete(route('email-two-factor.disable'), { data: { code: code.value } });
+
+    const response = await request(call);
+    if (!response) {
+        code.value = '';
+        return;
+    }
+
+    toast.success(mode.value === 'enable' ? 'Autentificarea în 2 pași este activă.' : 'Autentificarea în 2 pași a fost dezactivată.');
+    reset();
+    router.reload({ only: ['emailTwoFactor'] });
 };
 
-const disableTwoFactorAuthentication = () => {
-    disabling.value = true;
-
-    router.delete(route('two-factor.disable'), {
-        preserveScroll: true,
-        onSuccess: () => {
-            disabling.value = false;
-            confirming.value = false;
-        },
-    });
+const onCodeInput = (value) => {
+    code.value = String(value).replace(/\D/g, '').slice(0, 6);
+    if (code.value.length === 6 && !processing.value) confirm();
 };
 </script>
 
 <template>
     <ActionSection>
         <template #title>
-            Two Factor Authentication
+            Autentificare în 2 pași
+            <span
+                class="ml-2 inline-flex translate-y-[-1px] items-center gap-1 rounded-full px-2.5 py-0.5 align-middle text-xs font-semibold"
+                :class="enabled ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'"
+            >
+                <span class="h-1.5 w-1.5 rounded-full" :class="enabled ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                {{ enabled ? 'Activ' : 'Inactiv' }}
+            </span>
         </template>
 
         <template #description>
-            Add additional security to your account using two factor authentication.
+            La fiecare conectare, pe lângă parolă, îți cerem un cod trimis pe email.
         </template>
 
         <template #content>
-            <h3 v-if="twoFactorEnabled && ! confirming" class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                You have enabled two factor authentication.
-            </h3>
+            <p v-if="errors.general" class="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{{ errors.general }}</p>
 
-            <h3 v-else-if="twoFactorEnabled && confirming" class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                Finish enabling two factor authentication.
-            </h3>
+            <!-- Enabled -->
+            <div v-if="enabled && step === 'idle'">
+                <div class="flex items-start gap-3 rounded-2xl bg-emerald-50 px-4 py-4">
+                    <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-white text-emerald-600 shadow-sm"><ShieldCheckIcon class="h-5 w-5" /></span>
+                    <div class="min-w-0">
+                        <p class="flex items-center gap-1.5 text-sm font-semibold text-emerald-800"><CheckCircleIcon class="h-4 w-4" /> Autentificarea în 2 pași este activă</p>
+                        <p class="mt-0.5 break-all text-sm text-emerald-700/90">Codurile ajung pe emailul contului: {{ state.email }}.</p>
+                    </div>
+                </div>
 
-            <h3 v-else class="text-lg font-medium text-gray-900 dark:text-gray-100">
-                You have not enabled two factor authentication.
-            </h3>
-
-            <div class="mt-3 max-w-xl text-sm text-gray-600 dark:text-gray-400">
-                <p>
-                    When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone's Google Authenticator application.
+                <p class="mt-4 max-w-xl text-sm text-ivt-ink-soft">
+                    Contul tău e protejat: cineva care îți află parola nu poate intra fără codul din email.
                 </p>
-            </div>
 
-            <div v-if="twoFactorEnabled">
-                <div v-if="qrCode">
-                    <div class="mt-4 max-w-xl text-sm text-gray-600 dark:text-gray-400">
-                        <p v-if="confirming" class="font-semibold">
-                            To finish enabling two factor authentication, scan the following QR code using your phone's authenticator application or enter the setup key and provide the generated OTP code.
-                        </p>
-
-                        <p v-else>
-                            Two factor authentication is now enabled. Scan the following QR code using your phone's authenticator application or enter the setup key.
-                        </p>
-                    </div>
-
-                    <div class="mt-4 p-2 inline-block bg-white" v-html="qrCode" />
-
-                    <div v-if="setupKey" class="mt-4 max-w-xl text-sm text-gray-600 dark:text-gray-400">
-                        <p class="font-semibold">
-                            Setup Key: <span v-html="setupKey"></span>
-                        </p>
-                    </div>
-
-                    <div v-if="confirming" class="mt-4">
-                        <InputLabel for="code" value="Code" />
-
-                        <TextInput
-                            id="code"
-                            v-model="confirmationForm.code"
-                            type="text"
-                            name="code"
-                            class="block mt-1 w-1/2"
-                            inputmode="numeric"
-                            autofocus
-                            autocomplete="one-time-code"
-                            @keyup.enter="confirmTwoFactorAuthentication"
-                        />
-
-                        <InputError :message="confirmationForm.errors.code" class="mt-2" />
-                    </div>
-                </div>
-
-                <div v-if="recoveryCodes.length > 0 && ! confirming">
-                    <div class="mt-4 max-w-xl text-sm text-gray-600 dark:text-gray-400">
-                        <p class="font-semibold">
-                            Store these recovery codes in a secure password manager. They can be used to recover access to your account if your two factor authentication device is lost.
-                        </p>
-                    </div>
-
-                    <div class="grid gap-1 max-w-xl mt-4 px-4 py-4 font-mono text-sm bg-gray-100 dark:bg-gray-900 dark:text-gray-100 rounded-lg">
-                        <div v-for="code in recoveryCodes" :key="code">
-                            {{ code }}
-                        </div>
-                    </div>
+                <div class="mt-5">
+                    <DangerButton :disabled="processing" @click="sendDisableCode">Dezactivează</DangerButton>
                 </div>
             </div>
 
-            <div class="mt-5">
-                <div v-if="! twoFactorEnabled">
-                    <ConfirmsPassword @confirmed="enableTwoFactorAuthentication">
-                        <PrimaryButton type="button" :class="{ 'opacity-25': enabling }" :disabled="enabling">
-                            Enable
-                        </PrimaryButton>
-                    </ConfirmsPassword>
+            <!-- Not enabled -->
+            <div v-else-if="step === 'idle'" class="max-w-xl">
+                <div class="flex items-start gap-3 rounded-2xl bg-ivt-paper-2 px-4 py-4">
+                    <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-white text-primary shadow-sm"><EnvelopeIcon class="h-5 w-5" /></span>
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-ivt-ink">Autentificarea în 2 pași nu este activă</p>
+                        <p class="mt-0.5 text-sm text-ivt-ink-soft">
+                            Codurile vor fi trimise pe emailul contului tău:
+                            <strong class="break-all text-ivt-ink">{{ state.email }}</strong>.
+                            Îți trimitem acum un cod ca să confirmi că ai acces la el.
+                        </p>
+                    </div>
                 </div>
 
-                <div v-else>
-                    <ConfirmsPassword @confirmed="confirmTwoFactorAuthentication">
-                        <PrimaryButton
-                            v-if="confirming"
-                            type="button"
-                            class="me-3"
-                            :class="{ 'opacity-25': enabling }"
-                            :disabled="enabling"
-                        >
-                            Confirm
-                        </PrimaryButton>
-                    </ConfirmsPassword>
+                <InputError class="mt-3" :message="errors.email" />
 
-                    <ConfirmsPassword @confirmed="regenerateRecoveryCodes">
-                        <SecondaryButton
-                            v-if="recoveryCodes.length > 0 && ! confirming"
-                            class="me-3"
-                        >
-                            Regenerate Recovery Codes
-                        </SecondaryButton>
-                    </ConfirmsPassword>
-
-                    <ConfirmsPassword @confirmed="showRecoveryCodes">
-                        <SecondaryButton
-                            v-if="recoveryCodes.length === 0 && ! confirming"
-                            class="me-3"
-                        >
-                            Show Recovery Codes
-                        </SecondaryButton>
-                    </ConfirmsPassword>
-
-                    <ConfirmsPassword @confirmed="disableTwoFactorAuthentication">
-                        <SecondaryButton
-                            v-if="confirming"
-                            :class="{ 'opacity-25': disabling }"
-                            :disabled="disabling"
-                        >
-                            Cancel
-                        </SecondaryButton>
-                    </ConfirmsPassword>
-
-                    <ConfirmsPassword @confirmed="disableTwoFactorAuthentication">
-                        <DangerButton
-                            v-if="! confirming"
-                            :class="{ 'opacity-25': disabling }"
-                            :disabled="disabling"
-                        >
-                            Disable
-                        </DangerButton>
-                    </ConfirmsPassword>
+                <div class="mt-5">
+                    <PrimaryButton type="button" :disabled="processing" @click="sendEnableCode">Trimite codul</PrimaryButton>
                 </div>
             </div>
+
+            <!-- Waiting for the emailed code -->
+            <form v-else @submit.prevent="confirm" class="max-w-xl">
+                <p class="text-sm text-ivt-ink">
+                    Am trimis un cod de 6 cifre la <strong>{{ sentTo }}</strong>. Este valabil 10 minute.
+                </p>
+
+                <div class="mt-4">
+                    <input
+                        :value="code"
+                        @input="onCodeInput($event.target.value)"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="one-time-code"
+                        maxlength="6"
+                        placeholder="••••••"
+                        aria-label="Cod de 6 cifre"
+                        autofocus
+                        class="w-full rounded-2xl border-2 border-transparent bg-ivt-paper-2 py-4 text-center font-mono text-3xl font-semibold tracking-[0.5em] text-primary placeholder:text-ivt-ink-soft/30 focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/10"
+                        :class="{ '!border-red-400 !bg-red-50/60': errors.code }"
+                    />
+                    <InputError class="mt-2" :message="errors.code" />
+                </div>
+
+                <div class="mt-5 flex flex-wrap items-center gap-3">
+                    <component :is="mode === 'enable' ? PrimaryButton : DangerButton" :disabled="processing || code.length !== 6">
+                        {{ mode === 'enable' ? 'Activează' : 'Dezactivează' }}
+                    </component>
+                    <SecondaryButton :disabled="cooldown > 0 || processing" @click="resend">
+                        {{ cooldown > 0 ? `Retrimite în ${cooldown}s` : 'Trimite un cod nou' }}
+                    </SecondaryButton>
+                    <button type="button" class="text-sm font-medium text-ivt-ink-soft transition-colors hover:text-ivt-ink" @click="reset">
+                        Renunță
+                    </button>
+                </div>
+            </form>
         </template>
     </ActionSection>
 </template>

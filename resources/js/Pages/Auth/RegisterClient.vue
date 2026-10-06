@@ -1,13 +1,18 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { EnvelopeIcon, LockClosedIcon, UserIcon } from '@heroicons/vue/24/outline';
+import { EnvelopeIcon, LockClosedIcon, PhoneIcon, UserIcon } from '@heroicons/vue/24/outline';
 import GuestAuthLayout from '@/Layouts/GuestAuthLayout.vue';
 import IconField from '@/Components/Auth/IconField.vue';
 import GoogleAuthButton from '@/Components/Auth/GoogleAuthButton.vue';
 
+const props = defineProps({
+    prefill: { type: Object, default: () => ({}) },
+});
+
 const form = useForm({
     name: '',
-    email: '',
+    email: props.prefill.email ?? '',
+    phone: props.prefill.phone ?? '',
     password: '',
     password_confirmation: '',
 });
@@ -27,6 +32,13 @@ const submit = () => {
         title="Creează cont"
         subtitle="Creează-ți contul gratuit și descoperă furnizori pentru evenimentul tău."
     >
+        <div
+            v-if="prefill.email || prefill.phone"
+            class="mb-6 rounded-xl bg-ivt-sage/10 px-4 py-3 text-sm font-medium text-ivt-sage"
+        >
+            Nu am găsit niciun cont cu {{ prefill.email ? 'această adresă de email' : 'acest număr de telefon' }}. Completează datele de mai jos pentru a-ți crea unul.
+        </div>
+
         <form @submit.prevent="submit" class="space-y-4">
             <IconField
                 id="name"
@@ -47,6 +59,16 @@ const submit = () => {
                 autocomplete="username"
                 placeholder="Adresă de email"
                 :error="form.errors.email"
+            />
+
+            <IconField
+                id="phone"
+                v-model="form.phone"
+                type="tel"
+                :icon="PhoneIcon"
+                autocomplete="tel"
+                placeholder="Telefon, ex. 0722 123 456 (opțional)"
+                :error="form.errors.phone"
             />
 
             <IconField

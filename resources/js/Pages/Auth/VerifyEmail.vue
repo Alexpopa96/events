@@ -31,7 +31,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
         </div>
 
         <div v-if="verificationLinkSent" class="mb-4 font-medium text-sm text-green-600 dark:text-green-400">
-            A new verification link has been sent to the email address you provided in your profile settings.
+            Un nou link de verificare a fost trimis pe adresa de email din setările profilului.
         </div>
 
         <form @submit.prevent="submit">

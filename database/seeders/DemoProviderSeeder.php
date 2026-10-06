@@ -11,6 +11,7 @@ use App\Models\Locality;
 use App\Models\ProviderProfile;
 use App\Models\ProviderSubscription;
 use App\Models\QuoteRequest;
+use Database\Seeders\Concerns\SeedsLeadClients;
 use App\Models\Review;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
@@ -22,6 +23,8 @@ use Illuminate\Support\Str;
 
 class DemoProviderSeeder extends Seeder
 {
+    use SeedsLeadClients;
+
     /**
      * Seeds one login-ready furnizor account and one client account,
      * with enough sample data (profile, subscription, listings) to
@@ -158,17 +161,28 @@ class DemoProviderSeeder extends Seeder
                 [
                     'name' => 'Cristina M.',
                     'email' => 'cristina.m@exemplu.ro',
-                    'phone' => '0744556677',
+                    'phone' => '0733998877',
                     'event_date' => now()->addMonths(1)->toDateString(),
                     'city' => 'Turda',
                     'county' => 'Cluj',
                     'budget_range' => null,
                     'message' => 'Caut fotograf pentru o ședință de logodnă, undeva în natură. Ce pachete aveți disponibile?',
                 ],
-            ])->map(fn (array $lead) => QuoteRequest::firstOrCreate(
-                ['email' => $lead['email']],
-                $lead + ['category_id' => $photoCategory->id, 'status' => 'open']
-            ));
+            ])->map(function (array $lead) use ($photoCategory) {
+                $client = $this->leadClient($lead);
+
+                $quote = QuoteRequest::firstOrCreate(
+                    ['email' => $lead['email']],
+                    $lead + ['category_id' => $photoCategory->id, 'status' => 'open', 'user_id' => $client->id]
+                );
+
+                // Requests seeded before accounts were attached get linked on re-run.
+                if (! $quote->user_id) {
+                    $quote->update(['user_id' => $client->id]);
+                }
+
+                return $quote;
+            });
         }
 
         // Backfills 30 days of view/click activity plus a handful of approved

@@ -39,6 +39,7 @@ class Index extends Controller
                 'currency' => $invoice->currency,
                 'status' => $invoice->status,
                 'issued_at' => optional($invoice->issued_at)->format('d.m.Y'),
+                'download_url' => route('provider.invoices.show', $invoice),
             ]),
         ]);
     }

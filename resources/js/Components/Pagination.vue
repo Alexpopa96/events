@@ -1,52 +1,48 @@
 <template>
-    <div class="flex justify-between items-center" v-if="links.length > 2">
-        <div class="">
-            <p class="sm:text-[10px] md:text-sm text-gray-700">
-                De la
-                <span class="font-medium">{{ name.from }}</span>
-                la
-                <span class="font-medium">{{ name.to }}</span>
-                din
-                <span class="font-medium">{{ name.total }}</span>
-                inregistrari
-            </p>
-        </div>
-        <div class="sm:m-auto md:m-0 flex items-center justify-center">
-            <Link v-if="links[0].url" :href="links[0].url"
-                  class="bg-sky-500 text-white rounded-full sm:text-[8px] md:text-sm inline-flex items-center justify-center sm:w-6 md:w-8 sm:h-6 md:h-8">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75"/>
-                </svg>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3" v-if="links.length > 2">
+        <p class="text-sm text-ivt-ink-soft">
+            De la
+            <span class="font-semibold text-ivt-ink">{{ name.from }}</span>
+            la
+            <span class="font-semibold text-ivt-ink">{{ name.to }}</span>
+            din
+            <span class="font-semibold text-ivt-ink">{{ name.total }}</span>
+            înregistrări
+        </p>
+        <nav class="flex items-center gap-1" aria-label="Pagination">
+            <Link v-if="links[0].url" :href="links[0].url" preserve-scroll
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-ivt-line bg-white text-ivt-ink-soft transition-colors hover:border-ivt-gold hover:text-primary">
+                <ChevronLeft class="h-4 w-4" />
             </Link>
-            <nav class="isolate inline-flex items-center space-x-2 rounded-md shadow-sm p-2 rounded-full"
-                 aria-label="Pagination">
-                <template v-for="(link,key) in links" :key="key">
-                    <Link v-if="key > 0 && key < links.length - 1" :href="link.url" aria-current="page"
-                          :class="link.active ? 'bg-sky-500 text-white shadow-none' : 'bg-white'"
-                          class="relative sm:w-6 md:w-8 sm:h-6 md:h-8 z-10 inline-flex items-center justify-center leading-4 border border-gray-300 px-2 py-2 sm:text-[8px] md:text-sm font-medium shadow-md focus:z-20 rounded-full"
+            <template v-for="(link, key) in links" :key="key">
+                <template v-if="key > 0 && key < links.length - 1">
+                    <Link v-if="link.url" :href="link.url" preserve-scroll
+                          :aria-current="link.active ? 'page' : undefined"
+                          class="inline-flex h-8 min-w-[2rem] items-center justify-center rounded-lg border px-2 text-sm font-medium transition-colors"
+                          :class="link.active
+                              ? 'border-primary bg-primary text-white shadow-sm shadow-primary/25'
+                              : 'border-ivt-line bg-white text-ivt-ink-soft hover:border-ivt-gold hover:text-primary'"
                           v-html="link.label"></Link>
+                    <span v-else class="inline-flex h-8 min-w-[2rem] items-center justify-center px-2 text-sm text-ivt-ink-soft/50" v-html="link.label"></span>
                 </template>
-            </nav>
-            <Link v-if="links[links.length - 1].url" :href="links[links.length-1].url"
-                  class="bg-sky-500 text-white rounded-full sm:text-[8px] md:text-sm inline-flex items-center justify-center sm:w-6 md:w-8 sm:h-6 md:h-8">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"/>
-                </svg>
+            </template>
+            <Link v-if="links[links.length - 1].url" :href="links[links.length - 1].url" preserve-scroll
+                  class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-ivt-line bg-white text-ivt-ink-soft transition-colors hover:border-ivt-gold hover:text-primary">
+                <ChevronRight class="h-4 w-4" />
             </Link>
-        </div>
+        </nav>
     </div>
 </template>
 
 <script>
-import {Link} from '@inertiajs/vue3'
+import { Link } from '@inertiajs/vue3'
+import { ChevronLeft, ChevronRight } from '@lucide/vue';
 
 export default {
     components: {
         Link,
+        ChevronLeft,
+        ChevronRight,
     },
     props: {
         links: Array,

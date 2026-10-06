@@ -4,7 +4,7 @@ import { useForm } from '@inertiajs/vue3';
 import { useToast } from 'vue-toastification';
 import ProviderLayout from '@/Layouts/ProviderLayout.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
-import { CheckIcon, DocumentTextIcon } from '@heroicons/vue/24/outline';
+import { CheckIcon, DocumentTextIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline';
 
 const toast = useToast();
 
@@ -33,18 +33,18 @@ const confirmChoose = () => {
 
 const invoiceStatusMeta = {
     paid: { label: 'Plătită', class: 'bg-emerald-100 text-emerald-700' },
-    pending: { label: 'În așteptare', class: 'bg-gold-400/20 text-gold-500' },
+    pending: { label: 'În așteptare', class: 'bg-ivt-gold/20 text-ivt-gold' },
     failed: { label: 'Eșuată', class: 'bg-rose-100 text-rose-700' },
-    refunded: { label: 'Rambursată', class: 'bg-line/70 text-ink-soft' },
+    refunded: { label: 'Rambursată', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
 };
 </script>
 
 <template>
     <ProviderLayout title="Abonament & facturi">
-        <div v-if="subscription" class="bg-white border border-line rounded-2xl p-5 mb-6 flex items-center gap-4 text-sm shadow-sm shadow-ink/5">
-            <span class="text-ink-soft">Status abonament curent</span>
-            <span class="font-medium text-ink">{{ subscription.status === 'active' ? 'Activ' : subscription.status }}</span>
-            <span v-if="subscription.ends_at" class="text-ink-soft">· se reînnoiește la {{ subscription.ends_at }}</span>
+        <div v-if="subscription" class="bg-white border border-ivt-line rounded-2xl p-5 mb-6 flex items-center gap-4 text-sm shadow-sm shadow-ivt-ink/5">
+            <span class="text-ivt-ink-soft">Status abonament curent</span>
+            <span class="font-medium text-ivt-ink">{{ subscription.status === 'active' ? 'Activ' : subscription.status }}</span>
+            <span v-if="subscription.ends_at" class="text-ivt-ink-soft">· se reînnoiește la {{ subscription.ends_at }}</span>
         </div>
 
         <div class="grid sm:grid-cols-3 gap-5 mb-10">
@@ -53,26 +53,26 @@ const invoiceStatusMeta = {
                 :key="plan.id"
                 class="relative bg-white border rounded-2xl p-6 flex flex-col overflow-hidden transition-all duration-200"
                 :class="plan.id === currentPlanId
-                    ? 'border-brand-500 ring-1 ring-brand-500/30 shadow-glow-brand'
-                    : 'border-line shadow-sm shadow-ink/5 hover:shadow-glow-gold hover:-translate-y-1'"
+                    ? 'border-primary ring-1 ring-primary/30 shadow-glow-primary'
+                    : 'border-ivt-line shadow-sm shadow-ivt-ink/5 hover:shadow-glow-primary hover:-translate-y-1'"
             >
-                <span v-if="plan.id === currentPlanId" class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-brand-500 via-gold-400 to-brand-500"></span>
+                <span v-if="plan.id === currentPlanId" class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary-bright via-ivt-gold to-primary"></span>
 
                 <div class="flex items-center justify-between mb-1">
-                    <h3 class="font-serif text-lg text-ink">{{ plan.name }}</h3>
-                    <span v-if="plan.id === currentPlanId" class="text-[10px] font-semibold uppercase tracking-wide text-brand-600 bg-brand-50 rounded-full px-2 py-0.5">
+                    <h3 class="font-serif text-lg text-ivt-ink">{{ plan.name }}</h3>
+                    <span v-if="plan.id === currentPlanId" class="text-[10px] font-semibold uppercase tracking-wide text-primary bg-ivt-paper-2 rounded-full px-2 py-0.5">
                         Curent
                     </span>
                 </div>
-                <p class="font-serif text-3xl text-ink tabular-nums mb-1">
+                <p class="font-serif text-3xl text-ivt-ink tabular-nums mb-1">
                     {{ plan.price === 0 ? 'Gratuit' : `${plan.price} ${plan.currency}` }}
-                    <span v-if="plan.price > 0" class="font-sans text-sm font-normal text-ink-soft">/lună</span>
+                    <span v-if="plan.price > 0" class="font-sans text-sm font-normal text-ivt-ink-soft">/lună</span>
                 </p>
-                <p class="text-sm text-ink-soft mb-4">{{ plan.description }}</p>
+                <p class="text-sm text-ivt-ink-soft mb-4">{{ plan.description }}</p>
 
                 <ul class="space-y-2 mb-6 flex-1">
-                    <li v-for="feature in plan.features" :key="feature" class="flex items-start gap-2 text-sm text-ink">
-                        <CheckIcon class="w-4 h-4 text-brand-500 mt-0.5 flex-none" />
+                    <li v-for="feature in plan.features" :key="feature" class="flex items-start gap-2 text-sm text-ivt-ink">
+                        <CheckIcon class="w-4 h-4 text-primary mt-0.5 flex-none" />
                         {{ feature }}
                     </li>
                 </ul>
@@ -82,8 +82,8 @@ const invoiceStatusMeta = {
                     @click="choose(plan)"
                     class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200"
                     :class="plan.id === currentPlanId
-                        ? 'bg-paper text-ink-soft cursor-not-allowed'
-                        : 'bg-brand-500 text-white hover:bg-brand-600 shadow-sm shadow-brand-500/25 hover:shadow-md hover:shadow-brand-500/30 active:translate-y-0 disabled:opacity-60'"
+                        ? 'bg-ivt-paper text-ivt-ink-soft cursor-not-allowed'
+                        : 'bg-primary text-white hover:bg-primary-bright shadow-sm shadow-primary/25 hover:shadow-md hover:shadow-primary/30 active:translate-y-0 disabled:opacity-60'"
                 >
                     <svg v-if="form.processing && planToConfirm?.id === plan.id" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -94,31 +94,39 @@ const invoiceStatusMeta = {
             </div>
         </div>
 
-        <div class="bg-white border border-line rounded-2xl p-6 shadow-sm shadow-ink/5">
-            <h3 class="font-serif text-lg text-ink mb-4">Facturi</h3>
-            <div v-if="invoices.length" class="divide-y divide-line">
-                <div v-for="invoice in invoices" :key="invoice.id" class="py-3 flex items-center justify-between text-sm px-2 -mx-2 rounded-lg transition-colors duration-150 hover:bg-paper/60">
+        <div class="bg-white border border-ivt-line rounded-2xl p-6 shadow-sm shadow-ivt-ink/5">
+            <h3 class="font-serif text-lg text-ivt-ink mb-4">Facturi</h3>
+            <div v-if="invoices.length" class="divide-y divide-ivt-line">
+                <div v-for="invoice in invoices" :key="invoice.id" class="py-3 flex items-center justify-between text-sm px-2 -mx-2 rounded-lg transition-colors duration-150 hover:bg-ivt-paper/60">
                     <div class="flex items-center gap-3">
-                        <span class="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                        <span class="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-ivt-paper-2 text-primary">
                             <DocumentTextIcon class="w-4 h-4" />
                         </span>
                         <div>
-                            <p class="font-medium text-ink">{{ invoice.number }}</p>
-                            <p class="text-xs text-ink-soft">{{ invoice.issued_at }}</p>
+                            <p class="font-medium text-ivt-ink">{{ invoice.number }}</p>
+                            <p class="text-xs text-ivt-ink-soft">{{ invoice.issued_at }}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
-                        <span class="tabular-nums text-ink">{{ invoice.amount }} {{ invoice.currency }}</span>
+                        <span class="tabular-nums text-ivt-ink">{{ invoice.amount }} {{ invoice.currency }}</span>
                         <span class="text-xs font-medium rounded-full px-2.5 py-1" :class="invoiceStatusMeta[invoice.status]?.class">
                             {{ invoiceStatusMeta[invoice.status]?.label ?? invoice.status }}
                         </span>
+                        <a
+                            :href="invoice.download_url"
+                            target="_blank"
+                            rel="noopener"
+                            class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-bright"
+                        >
+                            <ArrowDownTrayIcon class="h-3.5 w-3.5" /> Descarcă
+                        </a>
                     </div>
                 </div>
             </div>
-            <p v-else class="text-sm text-ink-soft py-6 text-center">Nu există facturi încă.</p>
+            <p v-else class="text-sm text-ivt-ink-soft py-6 text-center">Nu există facturi încă.</p>
         </div>
 
-        <p class="text-xs text-ink-soft mt-4">
+        <p class="text-xs text-ivt-ink-soft mt-4">
             Schimbarea planului este instantă în această versiune de testare — procesarea reală a plăților (card bancar) va fi adăugată separat.
         </p>
 

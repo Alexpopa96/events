@@ -1,6 +1,6 @@
 <template>
-    <div class="py-2 ">
-        <h1 :class="$attrs.class" class="text-lg font-medium text-gray-800 dark:text-white">{{title}} <slot></slot> </h1>
+    <div class="mb-5">
+        <h2 :class="$attrs.class" class="font-serif text-lg text-ivt-ink">{{ title }} <slot></slot></h2>
     </div>
 </template>
 <script>

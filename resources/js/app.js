@@ -29,3 +29,13 @@ createInertiaApp({
         color: '#059669',
     },
 });
+
+// Registered app-wide (not gated on login) so "Add to Home Screen" and the
+// offline fallback work even for guests browsing the public marketplace.
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+            // Non-fatal: the app still works without it, just without offline/push support.
+        });
+    });
+}

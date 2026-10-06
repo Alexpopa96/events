@@ -14,6 +14,7 @@ class ProviderSubscription extends Model
         'status',
         'starts_at',
         'ends_at',
+        'reminder_sent_at',
         'cancel_at_period_end',
         'stripe_customer_id',
         'stripe_subscription_id',
@@ -24,6 +25,7 @@ class ProviderSubscription extends Model
         return [
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'reminder_sent_at' => 'datetime',
             'cancel_at_period_end' => 'boolean',
         ];
     }
