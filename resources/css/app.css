@@ -30,7 +30,7 @@ html {
 /* Smaller text on phones; postcss.config.js multiplies every font-size by this. */
 @media (max-width: 639px) {
     :root {
-        --fs-scale: 0.9;
+        --fs-scale: 0.82;
     }
 }
 
