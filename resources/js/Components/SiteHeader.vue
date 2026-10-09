@@ -310,14 +310,17 @@ onUnmounted(() => {
                         </div>
                     </template>
 
-                    <Link
-                        v-if="!user"
-                        href="/login"
-                        class="pressable rounded-full bg-ivt-paper-2 px-4 py-2 text-[13px] font-semibold text-ivt-ink transition-colors duration-150 hover:bg-ivt-paper-3 hover:text-primary lg:bg-transparent lg:text-sm lg:hover:bg-ivt-paper-2"
-                    >
-                        <span class="lg:hidden">Intră</span>
-                        <span class="hidden lg:inline">Autentificare</span>
-                    </Link>
+                    <template v-if="!user">
+                        <Link href="/login" title="Intră în cont" aria-label="Intră în cont" class="icon-btn pressable flex lg:hidden">
+                            <UserCircleIcon class="h-[24px] w-[24px]" />
+                        </Link>
+                        <Link
+                            href="/login"
+                            class="pressable hidden rounded-full px-4 py-2 text-sm font-semibold text-ivt-ink transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-primary lg:inline-flex"
+                        >
+                            Autentificare
+                        </Link>
+                    </template>
 
                     <Link
                         :href="postAdHref"
