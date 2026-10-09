@@ -9,6 +9,7 @@ import ListingCard from '@/Components/Listing/Card.vue';
 import CategoryFilterPanel from '@/Components/Categories/CategoryFilterPanel.vue';
 import Modal from '@/Components/Modal.vue';
 import DateField from '@/Components/DateField.vue';
+import Pagination from '@/Components/Pagination.vue';
 
 const toast = useToast();
 const page = usePage();
@@ -205,10 +206,10 @@ const submitSaveSearch = () => {
 </script>
 
 <template>
-    <ClientLayout title="Anunțuri" full-bleed>
+    <ClientLayout :title="$page.props.seo?.full_title ?? 'Anunțuri'" full-bleed>
         <div class="overflow-x-clip bg-ivt-paper font-invita text-ivt-ink antialiased">
             <!-- Hero + search -->
-            <section class="relative z-30 pb-8 pt-8 lg:pb-10 lg:pt-10">
+            <section class="relative z-30 pb-4 pt-8 sm:pb-8 lg:pb-10 lg:pt-10">
                 <div class="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_bottom,#000_55%,transparent)]">
                     <div class="absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-primary/15 blur-3xl animate-float-slow" />
                     <div class="absolute -right-32 top-10 h-[460px] w-[460px] rounded-full bg-ivt-violet/15 blur-3xl animate-float-slower" />
@@ -288,7 +289,7 @@ const submitSaveSearch = () => {
                 </div>
             </section>
 
-            <div id="rezultate" class="mx-auto grid max-w-[1600px] scroll-mt-28 grid-cols-1 gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[272px_1fr] lg:px-8 lg:py-10">
+            <div id="rezultate" class="mx-auto grid max-w-[1600px] scroll-mt-28 grid-cols-1 gap-8 px-4 pb-8 pt-3 sm:px-6 sm:py-8 lg:grid-cols-[272px_1fr] lg:px-8 lg:py-10">
                 <!-- FILTERS -->
                 <aside class="hidden self-start rounded-[24px] border border-ivt-line bg-white p-6 shadow-ivt-soft lg:sticky lg:top-[105px] lg:block lg:max-h-[calc(100vh-125px)] lg:overflow-y-auto lg:[scrollbar-width:thin]">
                     <div class="mb-5 flex items-center justify-between">
@@ -317,13 +318,13 @@ const submitSaveSearch = () => {
 
                 <!-- RESULTS -->
                 <div class="min-w-0">
-                    <div class="mb-5 flex flex-wrap items-center justify-between gap-4">
-                        <p class="text-[13.5px] text-ivt-ink-soft">
-                            <span class="font-display text-[22px] tabular-nums text-ivt-ink">{{ listings.total }}</span>
+                    <div class="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2 sm:justify-between sm:gap-4">
+                        <p class="order-last text-[13.5px] text-ivt-ink-soft sm:order-first" :class="activePills.length && 'hidden sm:block'">
+                            <span class="font-display text-[18px] tabular-nums text-ivt-ink sm:text-[22px]">{{ listings.total }}</span>
                             {{ listings.total === 1 ? 'rezultat' : 'rezultate' }}
                             <span v-if="availableOn">disponibile pe {{ formatDate(availableOn) }}</span>
                         </p>
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-2">
                             <button
                                 type="button"
                                 class="inline-flex items-center gap-1.5 rounded-full border border-ivt-line bg-white px-4 py-2 text-[13px] font-semibold text-ivt-ink transition-colors hover:border-primary/30 hover:text-primary lg:hidden"
@@ -339,7 +340,7 @@ const submitSaveSearch = () => {
                                 class="inline-flex items-center gap-1.5 rounded-full border border-ivt-line bg-white px-4 py-2 text-[13px] font-semibold text-ivt-ink transition-colors hover:border-primary/30 hover:text-primary"
                                 @click="openSaveSearch"
                             >
-                                <BookmarkIcon class="h-4 w-4 text-ivt-violet" /> Salvează căutarea
+                                <BookmarkIcon class="h-4 w-4 text-ivt-violet" /> Salvează<span class="hidden sm:inline"> căutarea</span>
                             </button>
                             <div class="relative">
                                 <select
@@ -372,10 +373,15 @@ const submitSaveSearch = () => {
                         <button type="button" class="ml-1 text-[12.5px] font-semibold text-ivt-ink-faint underline-offset-4 transition-colors hover:text-ivt-ink hover:underline" @click="resetFilters">
                             Șterge tot
                         </button>
+                        <p class="ml-2 text-[13.5px] text-ivt-ink-soft sm:hidden">
+                            <span class="font-display text-[18px] tabular-nums text-ivt-ink">{{ listings.total }}</span>
+                            {{ listings.total === 1 ? 'rezultat' : 'rezultate' }}
+                            <span v-if="availableOn">disponibile pe {{ formatDate(availableOn) }}</span>
+                        </p>
                     </div>
 
                     <div class="transition-opacity duration-300" :class="loading && 'pointer-events-none opacity-50'">
-                        <div v-if="listings.data.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                        <div v-if="listings.data.length" class="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                             <ListingCard
                                 v-for="listing in listings.data"
                                 :key="listing.id"
@@ -401,70 +407,56 @@ const submitSaveSearch = () => {
                     </div>
 
                     <!-- Pagination -->
-                    <nav v-if="listings.last_page > 1" class="mt-10 flex justify-center" aria-label="Paginare">
-                        <div class="inline-flex flex-wrap items-center gap-1 rounded-full border border-ivt-line bg-white p-1 shadow-ivt-soft">
-                            <button
-                                v-for="(link, index) in listings.links"
-                                :key="index"
-                                type="button"
-                                :disabled="!link.url"
-                                class="min-w-[2.25rem] rounded-full px-3 py-1.5 text-[13px] font-semibold tabular-nums transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
-                                :class="[
-                                    link.active ? 'bg-ivt-ink text-ivt-accent-bright' : 'text-ivt-ink-soft hover:bg-ivt-paper-2 hover:text-ivt-ink',
-                                    !link.url && 'cursor-not-allowed opacity-30',
-                                ]"
-                                @click="goToPage(link.url)"
-                                v-html="link.label"
-                            />
-                        </div>
-                    </nav>
+                    <Pagination v-if="listings.last_page > 1" class="mt-10" :name="listings" :links="listings.links" @navigate="goToPage" />
                 </div>
             </div>
         </div>
 
         <!-- MOBILE FILTERS BOTTOM SHEET -->
         <Teleport to="body">
-            <div v-if="showMobileFilters" class="fixed inset-0 z-50 font-invita text-ivt-ink lg:hidden">
-                <div class="absolute inset-0 bg-ivt-ink/50 backdrop-blur-sm" @click="showMobileFilters = false" />
+            <Transition name="sheet" :duration="{ enter: 350, leave: 250 }">
+                <div v-if="showMobileFilters" class="fixed inset-0 z-50 font-invita text-ivt-ink lg:hidden">
+                    <div class="sheet-backdrop absolute inset-0 bg-ivt-ink/50 backdrop-blur-sm" @click="showMobileFilters = false" />
 
-                <div class="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-[28px] bg-white shadow-2xl">
-                    <div class="mx-auto mt-2.5 h-1 w-10 rounded-full bg-ivt-paper-3" />
-                    <div class="flex items-center justify-between border-b border-ivt-line px-6 pb-4 pt-3">
-                        <h3 class="font-display text-[20px] tracking-tight">Filtre</h3>
-                        <button type="button" @click="showMobileFilters = false" class="flex h-8 w-8 items-center justify-center rounded-full text-ivt-ink-faint transition-colors hover:bg-ivt-paper-2 hover:text-ivt-ink">
-                            <XMarkIcon class="h-5 w-5" />
-                        </button>
-                    </div>
+                    <div class="sheet-panel absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-[28px] bg-white shadow-2xl">
+                        <div class="mx-auto mt-2.5 h-1 w-10 rounded-full bg-ivt-paper-3" />
+                        <div class="flex items-center justify-between border-b border-ivt-line px-6 pb-4 pt-3">
+                            <h3 class="font-display text-[20px] tracking-tight">Filtre</h3>
+                            <button type="button" @click="showMobileFilters = false" class="flex h-8 w-8 items-center justify-center rounded-full text-ivt-ink-faint transition-colors hover:bg-ivt-paper-2 hover:text-ivt-ink">
+                                <XMarkIcon class="h-5 w-5" />
+                            </button>
+                        </div>
 
-                    <div class="overflow-y-auto px-6 py-5">
-                        <CategoryFilterPanel
-                            v-model:selected-categories="selectedCategories"
-                            v-model:selected-event-types="selectedEventTypes"
-                            :categories="categories"
-                            :event-types="eventTypes"
-                            v-model:selected-counties="selectedCounties"
-                            v-model:price-min="priceMin"
-                            v-model:price-max="priceMax"
-                            v-model:rating="rating"
-                            v-model:featured-only="featuredOnly"
-                            :counties="counties"
-                            :facets="facets"
-                            @apply="applyFilters()"
-                        />
-                    </div>
+                        <div class="overflow-y-auto px-6 py-5">
+                            <CategoryFilterPanel
+                                v-model:selected-categories="selectedCategories"
+                                v-model:selected-event-types="selectedEventTypes"
+                                :categories="categories"
+                                :event-types="eventTypes"
+                                v-model:selected-counties="selectedCounties"
+                                v-model:price-min="priceMin"
+                                v-model:price-max="priceMax"
+                                v-model:rating="rating"
+                                v-model:featured-only="featuredOnly"
+                                :counties="counties"
+                                :facets="facets"
+                                @apply="applyFilters()"
+                            />
+                        </div>
 
-                    <div class="flex items-center gap-3 border-t border-ivt-line px-6 py-4">
-                        <button type="button" @click="resetFilters" class="text-[13px] font-semibold text-primary hover:underline">Resetează</button>
-                        <button
-                            type="button"
-                            @click="applyFilters(); showMobileFilters = false"
-                            class="ml-auto flex-1 rounded-2xl bg-ivt-ink px-5 py-3.5 text-sm font-bold text-ivt-paper transition-colors hover:bg-primary"
-                        >
-                            Vezi {{ listings.total }} anunțuri
-                        </button>
+                        <div class="flex items-center gap-3 border-t border-ivt-line px-6 py-4">
+                            <button type="button" @click="resetFilters" class="text-[13px] font-semibold text-primary hover:underline">Resetează</button>
+                            <button
+                                type="button"
+                                @click="applyFilters(); showMobileFilters = false"
+                                class="ml-auto flex-1 rounded-2xl bg-ivt-ink px-5 py-3.5 text-sm font-bold text-ivt-paper transition-colors hover:bg-primary"
+                            >
+                                Vezi {{ listings.total }} anunțuri
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </Transition>
         </Teleport>
 
         <Modal :show="showSaveSearch" max-width="md" @close="showSaveSearch = false">
@@ -499,3 +491,24 @@ const submitSaveSearch = () => {
         </Modal>
     </ClientLayout>
 </template>
+
+<style scoped>
+.sheet-enter-active .sheet-backdrop,
+.sheet-leave-active .sheet-backdrop {
+    transition: opacity 250ms ease;
+}
+.sheet-enter-active .sheet-panel {
+    transition: transform 350ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.sheet-leave-active .sheet-panel {
+    transition: transform 250ms ease-in;
+}
+.sheet-enter-from .sheet-backdrop,
+.sheet-leave-to .sheet-backdrop {
+    opacity: 0;
+}
+.sheet-enter-from .sheet-panel,
+.sheet-leave-to .sheet-panel {
+    transform: translateY(100%);
+}
+</style>

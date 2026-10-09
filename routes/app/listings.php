@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Categories\Events\Show as EventCategoriesShow;
 use App\Http\Controllers\Categories\Index as CategoriesIndex;
 use App\Http\Controllers\Categories\Show as CategoriesShow;
 use App\Http\Controllers\Favorites\Index as FavoritesIndex;
@@ -33,10 +34,24 @@ use App\Http\Controllers\SavedSearches\Destroy as SavedSearchesDestroy;
 use App\Http\Controllers\SavedSearches\Index as SavedSearchesIndex;
 use App\Http\Controllers\SavedSearches\Store as SavedSearchesStore;
 use App\Http\Controllers\Subscriptions\Index as SubscriptionsIndex;
+use App\Support\EventTypes;
 use Illuminate\Support\Facades\Route;
 
 Route::get('categorii', CategoriesIndex::class)->name('categories.index');
 Route::get('categorii/{category:slug}', CategoriesShow::class)->name('categories.show');
+Route::get('categorii/{category:slug}/{county:slug}', CategoriesShow::class)->withoutScopedBindings()->name('categories.county');
+Route::get('categorii/{category:slug}/{county:slug}/{localitySlug}', CategoriesShow::class)->withoutScopedBindings()->name('categories.locality');
+
+// Event type landing pages: /nunta/fotograf, /nunta/fotograf/cluj, /nunta/fotograf/cluj/cluj-napoca
+Route::prefix('{eventType}')
+    ->whereIn('eventType', EventTypes::landingValues())
+    ->as('events.categories.')
+    ->withoutScopedBindings()
+    ->group(function () {
+        Route::get('{category:slug}', EventCategoriesShow::class)->name('show');
+        Route::get('{category:slug}/{county:slug}', EventCategoriesShow::class)->name('county');
+        Route::get('{category:slug}/{county:slug}/{localitySlug}', EventCategoriesShow::class)->name('locality');
+    });
 
 Route::get('abonamente', SubscriptionsIndex::class)->name('subscriptions.index');
 Route::get('cereri-de-oferta', QuoteRequestsBrowse::class)->name('quote-requests.browse');

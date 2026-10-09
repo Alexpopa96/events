@@ -38,7 +38,7 @@ const initials = (name) => (name || '?')
         leave-from-class="opacity-100"
         leave-to-class="scale-90 opacity-0"
     >
-        <div v-if="visible" class="group fixed bottom-24 right-4 z-40 lg:bottom-6 lg:right-6">
+        <div v-if="visible" class="group fixed bottom-[calc(var(--tabbar-h)+0.5rem)] right-4 z-40 lg:bottom-6 lg:right-6">
             <!-- Hover label (desktop) -->
             <span class="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-2xl bg-ivt-ink px-3.5 py-2 text-xs text-white opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 lg:block">
                 <span class="block font-semibold">{{ chat.name }}</span>

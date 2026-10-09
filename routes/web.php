@@ -8,6 +8,7 @@ use App\Models\ProviderProfile;
 use App\Models\QuoteRequest;
 use App\Models\User;
 use App\Support\DashboardMetrics;
+use App\Support\Seo\Seo;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -172,7 +173,31 @@ Route::get('/', function () {
         return Inertia::render('Dashboard', dashboardProps());
     }
 
-    return Inertia::render('Welcome', homepageProps());
+    return Inertia::render('Welcome', homepageProps() + [
+        'seo' => Seo::make(
+            'Invita — furnizori pentru nunți, botezuri și evenimente',
+            'Găsește fotografi, DJ, formații, restaurante și alți furnizori pentru evenimentul tău. Compară prețuri și recenzii reale și primește oferte gratuite.',
+            route('home'),
+        )
+            ->jsonLd([
+                '@type' => 'Organization',
+                'name' => Seo::BRAND,
+                'url' => route('home'),
+                'logo' => url('/icons/icon-512.png'),
+            ])
+            ->jsonLd([
+                '@type' => 'WebSite',
+                'name' => Seo::BRAND,
+                'url' => route('home'),
+                'inLanguage' => 'ro-RO',
+                'potentialAction' => [
+                    '@type' => 'SearchAction',
+                    'target' => ['@type' => 'EntryPoint', 'urlTemplate' => route('listings.index').'?q={search_term_string}'],
+                    'query-input' => 'required name=search_term_string',
+                ],
+            ])
+            ->toArray(),
+    ]);
 })->name('home');
 
 Route::get('/dashboard', function () {
@@ -205,3 +230,4 @@ require __DIR__.'/app/two_factor.php';
 require __DIR__.'/app/listings.php';
 require __DIR__.'/app/push-subscriptions.php';
 require __DIR__.'/app/search.php';
+require __DIR__.'/app/seo.php';

@@ -11,11 +11,44 @@ html {
     /* Reserve the scrollbar's space so pages with and without a vertical
        scrollbar keep the same width and don't shift sideways on navigation. */
     scrollbar-gutter: stable;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* Space taken by the floating mobile tab bar (MobileTabBar.vue); fixed and
+   sticky bottom bars sit on top of it via bottom-[var(--tabbar-h)]. */
+:root {
+    --tabbar-h: calc(4rem + max(0.75rem, env(safe-area-inset-bottom)) + 0.5rem);
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --tabbar-h: 0px;
+    }
 }
 
 @layer base {
     body {
         @apply bg-ivt-paper text-ivt-ink;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior-x: none;
+    }
+
+    a,
+    button,
+    [role='button'],
+    label,
+    summary {
+        touch-action: manipulation;
+    }
+
+    /* iOS zooms into any field under 16px on focus — keep phones at 16px. */
+    @media (max-width: 639px) {
+        input:not([type='checkbox']):not([type='radio']):not([type='range']),
+        select,
+        textarea {
+            font-size: max(16px, 1em);
+        }
     }
 
     ::selection {
@@ -128,7 +161,59 @@ html {
     .ring-gradient:focus-within::after {
         opacity: 1;
     }
+
+    /* Native-feeling press feedback for touch targets. */
+    .pressable {
+        transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .pressable:active {
+        transform: scale(0.96);
+    }
+
+    /* Horizontal, snapping carousel that bleeds to the screen edge on phones. */
+    .scroll-row {
+        @apply -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6;
+        scrollbar-width: none;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .scroll-row::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scroll-row > * {
+        @apply snap-start;
+    }
+
+    /* Frosted surface used by the app chrome (header, tab bar, sheets). */
+    .glass {
+        @apply bg-white/80 backdrop-blur-xl backdrop-saturate-150;
+    }
+
+    .safe-top {
+        padding-top: env(safe-area-inset-top);
+    }
+
+    .safe-bottom {
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
 }
+
+/* Touch screens: hover lifts and cursor glows only flicker on tap, so drop them. */
+@media (hover: none) {
+    .spotlight::before,
+    .ring-gradient::after,
+    .btn-brand::after {
+        display: none;
+    }
+
+    .tilt {
+        transform: none !important;
+    }
+}
+
 
 /* Scroll-reveal (used with the v-reveal directive) */
 .reveal {
@@ -209,6 +294,10 @@ html {
 
     .btn-brand::after {
         display: none;
+    }
+
+    .pressable:active {
+        transform: none;
     }
 
     html {

@@ -87,9 +87,9 @@ const shareListing = async () => {
 /* ---------- tabs ---------- */
 const tabs = computed(() => [
     { id: 'despre', label: 'Despre' },
-    { id: 'galerie', label: `Galerie${props.listing.media.length ? ` (${props.listing.media.length})` : ''}` },
+    { id: 'galerie', label: 'Galerie', count: props.listing.media.length },
     { id: 'servicii', label: 'Servicii & prețuri' },
-    { id: 'recenzii', label: `Recenzii (${props.listing.reviews_count})` },
+    { id: 'recenzii', label: 'Recenzii', count: props.listing.reviews_count },
 ]);
 const activeTab = ref('despre');
 
@@ -161,7 +161,7 @@ const messageHref = computed(() => {
 </script>
 
 <template>
-    <ClientLayout :title="listing.title">
+    <ClientLayout :title="$page.props.seo?.full_title ?? listing.title">
         <!-- Breadcrumb -->
         <nav class="mb-5 flex flex-wrap items-center gap-2 text-[13px] text-ivt-ink-soft">
             <Link :href="route('home')" class="transition-colors hover:text-primary">Acasă</Link>
@@ -277,17 +277,26 @@ const messageHref = computed(() => {
             <!-- Main column -->
             <div class="min-w-0">
                 <!-- Tabs -->
-                <nav class="mb-8 flex overflow-x-auto p-px">
-                    <div class="inline-flex gap-1 rounded-full bg-primary/5 p-1 ring-1 ring-primary/10">
+                <nav class="-mx-4 mb-8 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:px-0">
+                    <div class="flex min-w-max gap-7 border-b border-ivt-line">
                         <button
                             v-for="tab in tabs"
                             :key="tab.id"
                             type="button"
                             @click="activeTab = tab.id"
-                            class="whitespace-nowrap rounded-full px-4 py-2 text-[13.5px] font-semibold transition-all duration-200"
-                            :class="activeTab === tab.id ? 'bg-primary text-white shadow-sm shadow-primary/25' : 'text-ivt-ink-soft hover:bg-white hover:text-primary'"
+                            class="group relative -mb-px inline-flex items-center gap-2 whitespace-nowrap pb-3.5 pt-1 text-[15px] font-semibold transition-colors duration-200"
+                            :class="activeTab === tab.id ? 'text-ivt-ink' : 'text-ivt-ink-soft hover:text-ivt-ink'"
                         >
                             {{ tab.label }}
+                            <span
+                                v-if="tab.count !== undefined"
+                                class="min-w-[1.5rem] rounded-md px-1.5 py-0.5 text-center text-[11px] font-bold tabular-nums transition-colors duration-200"
+                                :class="activeTab === tab.id ? 'bg-primary/10 text-primary' : 'bg-ivt-paper-3 text-ivt-ink-soft group-hover:text-ivt-ink'"
+                            >{{ tab.count }}</span>
+                            <span
+                                class="absolute inset-x-0 bottom-0 h-[3px] origin-left rounded-full bg-brand transition-transform duration-300"
+                                :class="activeTab === tab.id ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100 group-hover:opacity-30'"
+                            />
                         </button>
                     </div>
                 </nav>

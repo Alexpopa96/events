@@ -760,7 +760,7 @@ const minDate = new Date(Date.now() + 86400000);
                     </div>
 
                     <!-- SAVE BAR -->
-                    <div class="sticky bottom-0 mt-2 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-t from-ivt-paper from-30% to-transparent py-[18px] pb-10">
+                    <div class="sticky bottom-[var(--tabbar-h)] mt-2 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-t from-ivt-paper from-30% to-transparent py-[18px] pb-10">
                         <span class="text-[12.5px] text-ivt-ink-faint">Ultima modificare: {{ quoteRequest.updated_at }}</span>
                         <div class="ml-auto flex gap-2.5">
                             <button type="button" @click="closeEdit" class="rounded-full border border-ivt-line px-6 py-3 text-sm font-semibold text-ivt-ink transition-colors duration-150 hover:border-ivt-violet hover:text-primary">

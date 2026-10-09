@@ -9,6 +9,7 @@ use App\Support\Search\FuzzySearch;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use App\Support\Seo\Seo;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -156,6 +157,11 @@ class Index extends Controller
             ->avg('reviews_avg_rating');
 
         return Inertia::render('Providers/Index', [
+            'seo' => Seo::make(
+                'Furnizori pentru evenimente din toată țara',
+                'Furnizori verificați pentru nunți, botezuri și evenimente corporate. Vezi portofolii, prețuri și recenzii reale și contactează-i direct.',
+                route('providers.index'),
+            )->forIndexPage($request)->toArray(),
             'stats' => [
                 'providersCount' => $totalProvidersCount,
                 'categoriesCount' => $totalCategoriesCount,

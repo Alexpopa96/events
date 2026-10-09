@@ -9,6 +9,7 @@ use App\Support\EventTypes;
 use App\Support\Listings\ListingFacets;
 use App\Support\Listings\ListingFilters;
 use App\Support\Listings\ListingQueryScope;
+use App\Support\Seo\Seo;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -73,6 +74,11 @@ class Index extends Controller
         );
 
         return Inertia::render('Listings/Index', [
+            'seo' => Seo::make(
+                'Anunțuri furnizori evenimente — prețuri și recenzii',
+                'Caută printre anunțurile furnizorilor de evenimente: filtrează după categorie, județ, buget și rating, verifică disponibilitatea și cere oferte gratuite.',
+                route('listings.index'),
+            )->forIndexPage($request)->toArray(),
             'listings' => $listings,
             'favoriteListingIds' => $favoriteListingIds,
             'filters' => [

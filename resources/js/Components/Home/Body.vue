@@ -138,7 +138,7 @@ const heroStats = computed(() => [
 <template>
     <div class="overflow-x-clip bg-ivt-paper font-invita text-ivt-ink">
         <!-- Hero -->
-        <section class="relative pb-16 pt-14 lg:pb-24 lg:pt-20">
+        <section class="relative pb-12 pt-8 sm:pb-16 sm:pt-14 lg:pb-24 lg:pt-20">
             <div class="pointer-events-none absolute inset-0 overflow-hidden">
                 <div class="absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-primary/15 blur-3xl animate-float-slow" />
                 <div class="absolute -right-32 top-10 h-[460px] w-[460px] rounded-full bg-ivt-violet/15 blur-3xl animate-float-slower" />
@@ -149,16 +149,16 @@ const heroStats = computed(() => [
                 />
             </div>
 
-            <div class="relative mx-auto grid max-w-[1600px] gap-14 px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
-                <div>
-                    <p class="inline-flex items-center gap-2 rounded-full border border-ivt-line bg-white/80 py-1 pl-1.5 pr-3.5 text-[12.5px] font-semibold text-ivt-ink-soft shadow-sm backdrop-blur">
-                        <span class="rounded-full bg-brand px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-white">Nou</span>
-                        Marketplace pentru evenimente, fără comisioane
+            <div class="relative mx-auto grid max-w-[1600px] gap-14 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8">
+                <div class="min-w-0">
+                    <p class="inline-flex max-w-full items-center gap-2 rounded-full border border-ivt-line bg-white/80 py-1 pl-1.5 pr-3.5 text-[12.5px] font-semibold text-ivt-ink-soft shadow-sm backdrop-blur">
+                        <span class="flex-none rounded-full bg-brand px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-white">Nou</span>
+                        <span class="truncate">Marketplace pentru evenimente, fără comisioane</span>
                     </p>
 
-                    <h1 class="mt-6 text-balance font-display text-[42px] font-bold leading-[1.0] tracking-tight text-ivt-ink sm:text-[58px] lg:text-[74px]">
+                    <h1 class="mt-5 text-balance font-display text-[38px] font-bold leading-[1.02] sm:mt-6 tracking-tight text-ivt-ink sm:text-[58px] lg:text-[74px]">
                         Găsește furnizorul potrivit,
-                        <span class="relative whitespace-nowrap">
+                        <span class="relative inline-block sm:whitespace-nowrap">
                             <span class="text-gradient">fără intermediari.</span>
                             <svg class="absolute -bottom-2 left-0 h-3 w-full text-ivt-accent-bright" viewBox="0 0 300 12" preserveAspectRatio="none" aria-hidden="true">
                                 <path d="M2 9 C 80 2, 200 2, 298 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
@@ -166,13 +166,13 @@ const heroStats = computed(() => [
                         </span>
                     </h1>
 
-                    <p class="mt-7 max-w-[500px] text-lg leading-relaxed text-ivt-ink-soft">
+                    <p class="mt-5 max-w-[500px] text-base leading-relaxed text-ivt-ink-soft sm:mt-7 sm:text-lg">
                         Fotografi, formații, wedding planneri, restaurante și zeci de alți furnizori — toți într-un singur loc. Compari, alegi și îi contactezi direct.
                     </p>
 
                     <form
                         @submit.prevent="emit('search')"
-                        class="ring-gradient relative z-20 mt-9 grid max-w-[640px] gap-1.5 rounded-[22px] border border-ivt-line bg-white p-2 shadow-ivt-soft transition-shadow focus-within:shadow-ivt-deep hover:shadow-ivt-deep sm:grid-cols-[1.2fr_1fr_auto]"
+                        class="ring-gradient relative z-20 mt-7 grid sm:mt-9 max-w-[640px] gap-1.5 rounded-[22px] border border-ivt-line bg-white p-2 shadow-ivt-soft transition-shadow focus-within:shadow-ivt-deep hover:shadow-ivt-deep sm:grid-cols-[1.2fr_1fr_auto]"
                     >
                         <SearchField
                             v-model="searchCategory"
@@ -192,27 +192,27 @@ const heroStats = computed(() => [
                             :icon="MapPinIcon"
                             :options="countyOptions"
                         />
-                        <button type="submit" class="btn-brand rounded-2xl px-7 py-3.5 text-sm font-bold">
+                        <button type="submit" class="btn-brand pressable rounded-2xl px-7 py-4 text-[15px] font-bold sm:py-3.5 sm:text-sm">
                             <MagnifyingGlassIcon class="h-4 w-4" /> Caută
                         </button>
                     </form>
 
-                    <div v-if="popularCategories.length" class="mt-5 flex flex-wrap items-center gap-2">
-                        <span class="mr-1 text-[12.5px] text-ivt-ink-faint">Populare:</span>
+                    <div v-if="popularCategories.length" class="scroll-row mt-5 items-center gap-2 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+                        <span class="mr-1 flex-none text-[12.5px] text-ivt-ink-faint">Populare:</span>
                         <Link
                             v-for="category in popularCategories"
                             :key="category.id"
                             :href="route('categories.show', category.slug)"
-                            class="rounded-full border border-ivt-line bg-white/70 px-3 py-1 text-[12.5px] font-medium text-ivt-ink-soft transition-colors hover:border-ivt-violet hover:text-primary"
+                            class="pressable flex-none whitespace-nowrap rounded-full border border-ivt-line bg-white/70 px-3.5 py-1.5 text-[13px] font-medium text-ivt-ink-soft transition-colors hover:border-ivt-violet hover:text-primary sm:px-3 sm:py-1 sm:text-[12.5px]"
                         >
                             {{ category.name }}
                         </Link>
                     </div>
 
-                    <dl class="mt-10 grid max-w-[520px] grid-cols-3 divide-x divide-ivt-line">
-                        <div v-for="stat in heroStats" :key="stat.label" class="flex flex-col-reverse justify-end px-3 first:pl-0 sm:px-5">
+                    <dl class="mt-8 grid max-w-[520px] grid-cols-3 divide-x divide-ivt-line rounded-2xl border border-ivt-line bg-white/70 py-3 backdrop-blur sm:mt-10 sm:border-0 sm:bg-transparent sm:py-0 sm:backdrop-blur-none">
+                        <div v-for="stat in heroStats" :key="stat.label" class="flex flex-col-reverse justify-end px-3 sm:px-5 sm:first:pl-0">
                             <dt class="text-[12px] leading-snug text-ivt-ink-faint sm:text-[12.5px]">{{ stat.label }}</dt>
-                            <dd class="font-display text-[26px] font-bold leading-tight text-ivt-ink sm:text-[30px]">{{ stat.value }}</dd>
+                            <dd class="font-display text-[22px] font-bold leading-tight text-ivt-ink sm:text-[30px]">{{ stat.value }}</dd>
                         </div>
                     </dl>
                 </div>
@@ -296,18 +296,18 @@ const heroStats = computed(() => [
         </div>
 
         <!-- Categorii -->
-        <section id="categorii" class="mx-auto max-w-[1600px] px-6 py-16 lg:px-8 lg:py-24">
+        <section id="categorii" class="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
             <SectionHeading v-reveal eyebrow="Categorii" title="Fiecare detaliu al evenimentului, într-o singură vitrină.">
                 De la fotograf și DJ, până la florărie și torturi — tot ce îți trebuie, organizat pe categorii.
             </SectionHeading>
 
-            <div v-reveal="100" class="-mx-6 mt-12 flex snap-x snap-mandatory scroll-px-6 gap-3.5 overflow-x-auto px-6 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-6">
+            <div v-reveal="100" class="scroll-row mt-8 sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-3 sm:gap-3.5 sm:overflow-visible sm:px-0 lg:grid-cols-6">
                 <Link
                     v-for="category in categories"
                     :key="category.id"
                     :href="route('categories.show', category.slug)"
                     v-spotlight
-                    class="group relative flex w-[150px] flex-none snap-start flex-col gap-4 overflow-hidden rounded-[20px] border border-ivt-line bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-glow-primary sm:w-auto"
+                    class="pressable group relative flex w-[136px] flex-none snap-start flex-col gap-4 overflow-hidden rounded-[20px] border border-ivt-line bg-white p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-glow-primary sm:w-auto"
                 >
                     <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-ivt-paper-2 text-primary transition-all duration-300 group-hover:rotate-[-6deg] group-hover:scale-110 group-hover:bg-brand group-hover:text-white">
                         <component :is="categoryIcon(category.slug)" class="h-6 w-6" stroke-width="1.5" />
@@ -322,14 +322,14 @@ const heroStats = computed(() => [
         </section>
 
         <!-- Cum funcționează -->
-        <section id="cum-functioneaza" class="relative bg-ivt-paper-2 py-16 lg:py-24">
-            <div class="mx-auto max-w-[1600px] px-6 lg:px-8">
+        <section id="cum-functioneaza" class="relative bg-ivt-paper-2 py-12 sm:py-16 lg:py-24">
+            <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
                 <SectionHeading v-reveal eyebrow="Cum funcționează" title="Fără rezervări, fără comisioane. Doar conexiune directă.">
                     Platforma nu intermediază plăți sau rezervări — furnizorii plătesc un abonament ca să fie vizibili, clienții contactează direct cine le place.
                 </SectionHeading>
 
-                <div v-reveal="100" class="mt-12">
-                    <div class="inline-flex rounded-full border border-ivt-line bg-white p-1 shadow-sm" role="tablist">
+                <div v-reveal="100" class="mt-8 sm:mt-12">
+                    <div class="flex rounded-full sm:inline-flex border border-ivt-line bg-white p-1 shadow-sm" role="tablist">
                         <button
                             v-for="option in [{ key: 'clients', label: 'Pentru clienți' }, { key: 'providers', label: 'Pentru furnizori' }]"
                             :key="option.key"
@@ -337,31 +337,31 @@ const heroStats = computed(() => [
                             role="tab"
                             :aria-selected="audience === option.key"
                             @click="audience = option.key"
-                            class="rounded-full px-5 py-2 text-sm font-semibold transition-all duration-300"
+                            class="flex-1 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 sm:flex-none sm:py-2"
                             :class="audience === option.key ? 'bg-brand text-white shadow-glow-primary' : 'text-ivt-ink-soft hover:text-ivt-ink'"
                         >
                             {{ option.label }}
                         </button>
                     </div>
 
-                    <h3 class="mt-8 font-display text-2xl font-semibold text-ivt-ink">{{ steps[audience].title }}</h3>
+                    <h3 class="mt-6 font-display text-xl font-semibold text-ivt-ink sm:mt-8 sm:text-2xl">{{ steps[audience].title }}</h3>
 
                     <Transition mode="out-in" enter-from-class="opacity-0 translate-y-2" leave-to-class="opacity-0 -translate-y-2" enter-active-class="transition duration-300" leave-active-class="transition duration-200">
-                        <ol :key="audience" class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <ol :key="audience" class="mt-5 grid grid-cols-2 gap-3 sm:mt-6 sm:gap-4 lg:grid-cols-4">
                             <li
                                 v-for="(step, index) in steps[audience].items"
                                 :key="step.title"
                                 v-spotlight
-                                class="group relative overflow-hidden rounded-[22px] border border-ivt-line bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-ivt-violet/25 hover:shadow-ivt-soft"
+                                class="group relative overflow-hidden rounded-[22px] border border-ivt-line bg-white p-4 transition-all sm:p-6 duration-300 hover:-translate-y-1 hover:border-ivt-violet/25 hover:shadow-ivt-soft"
                             >
                                 <div class="flex items-center justify-between">
-                                    <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-ivt-paper-2 text-primary transition-all duration-300 group-hover:scale-110 group-hover:bg-brand group-hover:text-white">
+                                    <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-ivt-paper-2 text-primary transition-all duration-300 sm:h-11 sm:w-11 group-hover:scale-110 group-hover:bg-brand group-hover:text-white">
                                         <component :is="step.icon" class="h-5 w-5" />
                                     </span>
-                                    <span class="text-gradient font-display text-4xl font-bold opacity-30 transition-opacity duration-300 group-hover:opacity-100">0{{ index + 1 }}</span>
+                                    <span class="text-gradient font-display text-3xl font-bold opacity-30 sm:text-4xl transition-opacity duration-300 group-hover:opacity-100">0{{ index + 1 }}</span>
                                 </div>
-                                <p class="mt-5 text-[15px] font-semibold text-ivt-ink">{{ step.title }}</p>
-                                <p class="mt-1 text-[14px] leading-relaxed text-ivt-ink-soft">{{ step.text }}</p>
+                                <p class="mt-4 text-[14px] font-semibold leading-snug text-ivt-ink sm:mt-5 sm:text-[15px]">{{ step.title }}</p>
+                                <p class="mt-1 text-[13px] leading-relaxed text-ivt-ink-soft sm:text-[14px]">{{ step.text }}</p>
                             </li>
                         </ol>
                     </Transition>
@@ -370,13 +370,13 @@ const heroStats = computed(() => [
         </section>
 
         <!-- Furnizori -->
-        <section v-if="listings.length" id="furnizori" class="mx-auto max-w-[1600px] px-6 py-16 lg:px-8 lg:py-24">
+        <section v-if="listings.length" id="furnizori" class="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
             <SectionHeading v-reveal eyebrow="Furnizori recomandați" title="O selecție din vitrina săptămânii.">
                 Anunțurile Premium apar primele în rezultate și beneficiază de vizibilitate extinsă.
             </SectionHeading>
 
-            <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div v-for="(listing, index) in listings" :key="listing.id" v-reveal="index * 80">
+            <div class="scroll-row mt-8 gap-4 sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+                <div v-for="(listing, index) in listings" :key="listing.id" v-reveal="index * 80" class="w-[80%] max-w-[320px] flex-none sm:w-auto sm:max-w-none">
                     <article v-spotlight class="ring-gradient group relative flex h-full flex-col overflow-hidden rounded-[22px] border border-ivt-line bg-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-ivt-deep">
                         <Link :href="route('listings.show', listing.slug)" class="relative block aspect-[4/3] overflow-hidden">
                             <div
@@ -403,7 +403,7 @@ const heroStats = computed(() => [
                             <HeartIcon v-else class="h-4 w-4" />
                         </button>
 
-                        <div class="flex flex-1 flex-col p-5">
+                        <div class="flex flex-1 flex-col p-4 sm:p-5">
                             <p class="text-[11px] font-bold uppercase tracking-[0.1em] text-primary">{{ listing.category }}</p>
                             <Link :href="route('listings.show', listing.slug)" class="mt-1.5 block font-display text-lg font-semibold leading-snug text-ivt-ink line-clamp-2 hover:text-primary">
                                 {{ listing.title }}
@@ -422,30 +422,30 @@ const heroStats = computed(() => [
                 </div>
             </div>
 
-            <div class="mt-12 flex justify-center">
-                <Link :href="route('listings.index')" class="group inline-flex items-center gap-2 rounded-full border border-ivt-line bg-white px-6 py-3 text-sm font-semibold text-ivt-ink transition-all hover:-translate-y-0.5 hover:border-transparent hover:bg-ivt-ink hover:text-ivt-paper hover:shadow-ivt-deep">
+            <div class="mt-8 flex justify-center sm:mt-12">
+                <Link :href="route('listings.index')" class="pressable group inline-flex items-center gap-2 rounded-full border border-ivt-line bg-white px-6 py-3 text-sm font-semibold text-ivt-ink transition-all hover:-translate-y-0.5 hover:border-transparent hover:bg-ivt-ink hover:text-ivt-paper hover:shadow-ivt-deep">
                     Vezi toți furnizorii <ArrowRightIcon class="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
             </div>
         </section>
 
         <!-- Testimoniale -->
-        <section class="mx-auto max-w-[1600px] px-6 py-16 lg:px-8 lg:py-24">
+        <section class="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24">
             <SectionHeading v-reveal eyebrow="Furnizori mulțumiți" title="Cine folosește deja platforma." />
 
-            <div class="mt-12 grid gap-6 lg:grid-cols-3">
+            <div class="scroll-row mt-8 gap-4 sm:mt-12 lg:mx-0 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:px-0">
                 <figure
                     v-for="(testimonial, index) in testimonials"
                     :key="testimonial.name"
                     v-reveal="index * 100"
                     v-spotlight
-                    class="relative flex flex-col overflow-hidden rounded-[22px] border border-ivt-line bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-ivt-soft"
+                    class="relative flex w-[85%] max-w-[380px] flex-none flex-col overflow-hidden rounded-[22px] border border-ivt-line bg-white p-6 transition-all sm:p-7 lg:w-auto lg:max-w-none duration-300 hover:-translate-y-1 hover:shadow-ivt-soft"
                 >
                     <span class="text-gradient pointer-events-none absolute right-6 top-2 font-display text-[80px] font-bold leading-none opacity-20" aria-hidden="true">&rdquo;</span>
                     <div class="flex gap-0.5">
                         <StarIcon v-for="n in 5" :key="n" class="h-4 w-4 text-ivt-accent-bright" />
                     </div>
-                    <blockquote class="mt-4 flex-1 text-[16px] font-medium leading-relaxed text-ivt-ink">&ldquo;{{ testimonial.quote }}&rdquo;</blockquote>
+                    <blockquote class="mt-4 flex-1 text-[15px] font-medium sm:text-[16px] leading-relaxed text-ivt-ink">&ldquo;{{ testimonial.quote }}&rdquo;</blockquote>
                     <figcaption class="mt-6 flex items-center gap-3 border-t border-ivt-line pt-5">
                         <div class="h-10 w-10 flex-none rounded-full bg-gradient-to-br ring-2 ring-white" :class="testimonial.swatch" />
                         <div>
@@ -458,19 +458,19 @@ const heroStats = computed(() => [
         </section>
 
         <!-- Despre -->
-        <section id="despre" class="border-t border-ivt-line py-16 lg:py-20">
-            <div v-reveal class="mx-auto max-w-3xl px-6 text-center lg:px-8">
+        <section id="despre" class="border-t border-ivt-line py-12 sm:py-16 lg:py-20">
+            <div v-reveal class="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
                 <p class="text-xs font-bold uppercase tracking-[0.18em] text-primary">Despre noi</p>
                 <h2 class="mt-3.5 text-balance font-display text-[clamp(28px,3vw,40px)] leading-tight text-ivt-ink">O platformă făcută pentru piața de evenimente din România</h2>
-                <p class="mt-5 text-[17px] leading-relaxed text-ivt-ink-soft">
+                <p class="mt-5 text-[15.5px] leading-relaxed text-ivt-ink-soft sm:text-[17px]">
                     EventHub este locul unde oamenii care organizează o nuntă, un botez sau orice alt eveniment găsesc furnizori de încredere — fotografi, formații, restaurante, decoratori și mulți alții — și trimit cereri de ofertă direct, fără intermediari.
                 </p>
             </div>
         </section>
 
         <!-- CTA final -->
-        <section class="mx-auto max-w-[1600px] px-6 pb-20 lg:px-8">
-            <div v-reveal class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-ivt-ink-2 to-ivt-ink px-8 py-14 text-center sm:px-14 sm:py-20">
+        <section class="mx-auto max-w-[1600px] px-4 pb-12 sm:px-6 sm:pb-20 lg:px-8">
+            <div v-reveal class="relative overflow-hidden rounded-[28px] bg-gradient-to-br from-ivt-ink-2 to-ivt-ink px-6 py-12 text-center sm:rounded-[32px] sm:px-14 sm:py-20">
                 <div
                     class="pointer-events-none absolute inset-0 opacity-40"
                     style="background-image: linear-gradient(rgba(247,244,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(247,244,255,0.06) 1px, transparent 1px); background-size: 44px 44px; mask-image: radial-gradient(ellipse 60% 70% at 50% 50%, #000 20%, transparent 80%);"
@@ -486,8 +486,8 @@ const heroStats = computed(() => [
                 <p class="relative mx-auto mt-4 max-w-[460px] text-[15px] text-ivt-on-dark-dim">
                     Creezi cont în câteva minute și îți publici primul anunț chiar azi.
                 </p>
-                <div class="relative mt-9 flex flex-wrap justify-center gap-3">
-                    <Link href="/register" class="btn-brand px-7 py-3.5 text-sm">
+                <div class="relative mt-8 flex flex-col justify-center gap-3 sm:mt-9 sm:flex-row sm:flex-wrap">
+                    <Link href="/register" class="btn-brand pressable px-7 py-3.5 text-sm">
                         Creează cont furnizor <ArrowRightIcon class="h-4 w-4" />
                     </Link>
                     <Link :href="route('subscriptions.index')" class="rounded-full border border-white/25 bg-white/5 px-7 py-3.5 text-sm font-semibold text-ivt-on-dark backdrop-blur transition-colors hover:border-white/60 hover:bg-white/10">

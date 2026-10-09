@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Categories;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\ProviderProfile;
+use App\Support\Seo\Seo;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -29,6 +30,11 @@ class Index extends Controller
             ]);
 
         return Inertia::render('Categories/Index', [
+            'seo' => Seo::make(
+                'Categorii de furnizori pentru nunți și evenimente',
+                'Toate categoriile de furnizori pentru evenimente: fotografi, DJ, formații, restaurante, decor, torturi și altele. Compară prețuri și recenzii și cere oferte gratuite.',
+                route('categories.index'),
+            )->toArray(),
             'categories' => $categories,
             'stats' => [
                 'providers' => ProviderProfile::where('status', 'active')->count(),

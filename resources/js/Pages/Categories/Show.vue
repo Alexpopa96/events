@@ -6,6 +6,7 @@ import { MagnifyingGlassIcon, MapPinIcon, FaceFrownIcon, AdjustmentsHorizontalIc
 import { StarIcon } from '@heroicons/vue/24/solid';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
+import Pagination from '@/Components/Pagination.vue';
 import VendorCard from '@/Components/Listing/VendorCard.vue';
 import CategoryFilterPanel from '@/Components/Categories/CategoryFilterPanel.vue';
 import { categoryIcon } from '@/Composables/useCategoryIcon';
@@ -22,6 +23,20 @@ const props = defineProps({
     facets: { type: Object, default: () => ({ rating: {}, featured: 0, price: { min: null, max: null } }) },
     filters: { type: Object, required: true },
     categories: { type: Array, default: () => [] },
+    place: { type: Object, default: null },
+    eventType: { type: Object, default: null },
+    pageUrl: { type: String, required: true },
+    heading: { type: String, required: true },
+    breadcrumbs: { type: Array, default: () => [] },
+    intro: { type: String, default: null },
+    places: { type: Array, default: () => [] },
+    seo: { type: Object, default: null },
+});
+
+const eyebrow = computed(() => {
+    const where = props.place ? ` în ${props.place.locality ? props.place.locality.name : props.place.county.region}` : '';
+
+    return props.eventType ? `${props.eventType.label}${where}` : `Furnizori${where}`;
 });
 
 const search = ref(props.filters.q);
@@ -54,7 +69,7 @@ const sortOptions = [
 ];
 
 const applyFilters = (overrides = {}) => {
-    router.get(route('categories.show', props.category.slug), {
+    router.get(props.pageUrl, {
         q: search.value || undefined,
         county_ids: selectedCounties.value.length ? selectedCounties.value : undefined,
         price_min: priceMin.value || undefined,
@@ -98,7 +113,7 @@ const similarCategories = computed(() => {
 </script>
 
 <template>
-    <Head :title="`${category.name} — Invita`" />
+    <Head :title="seo?.full_title ?? category.name" />
 
     <div class="bg-ivt-paper font-invita text-ivt-ink antialiased">
         <SiteHeader />
@@ -112,12 +127,16 @@ const similarCategories = computed(() => {
                 />
 
                 <div class="relative mx-auto max-w-[1600px] px-6 lg:px-8">
-                    <p class="mb-5 flex items-center gap-2 text-[13px] text-ivt-ink-faint">
-                        <Link :href="route('home')" class="text-ivt-ink-soft transition-colors hover:text-primary">Acasă</Link>
-                        <span>›</span>
-                        <Link :href="route('categories.index')" class="text-ivt-ink-soft transition-colors hover:text-primary">Categorii</Link>
-                        <span>›</span>
-                        <span>{{ category.name }}</span>
+                    <p class="mb-5 flex flex-wrap items-center gap-2 text-[13px] text-ivt-ink-faint">
+                        <template v-for="(crumb, index) in breadcrumbs" :key="crumb.url">
+                            <span v-if="index > 0">›</span>
+                            <Link
+                                v-if="index < breadcrumbs.length - 1"
+                                :href="crumb.url"
+                                class="text-ivt-ink-soft transition-colors hover:text-primary"
+                            >{{ crumb.name }}</Link>
+                            <span v-else>{{ crumb.name }}</span>
+                        </template>
                     </p>
 
                     <div class="flex flex-wrap items-start justify-between gap-5">
@@ -127,11 +146,13 @@ const similarCategories = computed(() => {
                             </div>
                             <div>
                                 <p class="flex items-center gap-2.5 text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                                    <span class="inline-block h-px w-[22px] bg-ivt-violet" /> Furnizori
+                                    <span class="inline-block h-px w-[22px] bg-ivt-violet" /> {{ eyebrow }}
                                 </p>
-                                <h1 class="mt-2 font-display text-[clamp(30px,3.6vw,44px)] font-medium leading-[1.05] tracking-[-0.01em] text-ivt-ink">{{ category.name }}</h1>
-                                <p class="mt-2.5 max-w-[520px] text-[15.5px] leading-relaxed text-ivt-ink-soft">
-                                    {{ category.description || `Compară portofolii, prețuri și recenzii pentru furnizori de ${category.name.toLowerCase()}, apoi contactează direct pe cel potrivit.` }}
+                                <h1 class="mt-2 font-display text-[clamp(30px,3.6vw,44px)] font-medium leading-[1.05] tracking-[-0.01em] text-ivt-ink">
+                                    {{ heading }}
+                                </h1>
+                                <p class="mt-2.5 max-w-[620px] text-[15.5px] leading-relaxed text-ivt-ink-soft">
+                                    {{ intro || category.description || `Compară portofolii, prețuri și recenzii pentru furnizori de ${category.name.toLowerCase()}, apoi contactează direct pe cel potrivit.` }}
                                 </p>
                             </div>
                         </div>
@@ -272,23 +293,30 @@ const similarCategories = computed(() => {
                         </div>
 
                         <!-- PAGINATION -->
-                        <div v-if="listings.last_page > 1" class="mt-11 flex flex-wrap items-center justify-center gap-1.5">
-                            <template v-for="(link, index) in listings.links" :key="index">
-                                <button
-                                    type="button"
-                                    :disabled="!link.url"
-                                    @click="link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true, only: ['listings', 'filters', 'favoriteListingIds'] })"
-                                    class="min-w-[2.375rem] rounded-[10px] border border-ivt-line px-3 py-2 text-[13.5px] font-semibold text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-violet hover:text-primary"
-                                    :class="[
-                                        link.active && 'border-ivt-ink bg-ivt-ink text-ivt-paper hover:border-ivt-ink hover:text-ivt-paper',
-                                        !link.url && 'cursor-not-allowed opacity-30 hover:border-ivt-line hover:text-ivt-ink-soft',
-                                    ]"
-                                    v-html="link.label"
-                                />
-                            </template>
-                        </div>
+                        <Pagination v-if="listings.last_page > 1" class="mt-11" :name="listings" :links="listings.links"
+                                    @navigate="(url) => router.get(url, {}, { preserveState: true, preserveScroll: true, only: ['listings', 'filters', 'favoriteListingIds'] })" />
                     </div>
 
+                </div>
+            </section>
+
+            <!-- PLACES (internal links to category × place landing pages) -->
+            <section v-if="places.length" class="pb-16">
+                <div class="mx-auto flex max-w-[1600px] flex-col gap-9 px-6 lg:px-8">
+                    <nav v-for="group in places" :key="group.title" :aria-label="group.title">
+                        <h3 class="mb-4 font-display text-xl font-medium">{{ group.title }}</h3>
+                        <ul class="flex flex-wrap gap-2.5">
+                            <li v-for="item in group.items" :key="item.url">
+                                <Link
+                                    :href="item.url"
+                                    class="flex items-center gap-2 rounded-full border border-ivt-line px-[18px] py-2.5 text-[13.5px] font-semibold text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-violet hover:text-primary"
+                                >
+                                    {{ item.name }}
+                                    <span class="text-xs font-medium text-ivt-ink-faint">{{ item.count }}</span>
+                                </Link>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </section>
 

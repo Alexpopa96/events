@@ -6,6 +6,7 @@ import { ArrowRightIcon, MagnifyingGlassIcon, MapPinIcon, FaceFrownIcon, Adjustm
 import { StarIcon } from '@heroicons/vue/24/solid';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
+import Pagination from '@/Components/Pagination.vue';
 import ProviderCard from '@/Components/Providers/ProviderCard.vue';
 import ProviderFilterPanel from '@/Components/Providers/ProviderFilterPanel.vue';
 import { formatListingPrice } from '@/Composables/useListingPrice';
@@ -100,7 +101,7 @@ const location = (item) => [item.locality, item.county].filter(Boolean).join(', 
 </script>
 
 <template>
-    <Head title="Furnizori — Invita" />
+    <Head :title="$page.props.seo?.full_title ?? 'Furnizori — Invita'" />
 
     <div class="overflow-x-clip bg-ivt-paper font-invita text-ivt-ink antialiased">
         <SiteHeader />
@@ -330,21 +331,8 @@ const location = (item) => [item.locality, item.county].filter(Boolean).join(', 
                         </div>
 
                         <!-- PAGINATION -->
-                        <div v-if="providers.last_page > 1" class="mt-11 flex flex-wrap items-center justify-center gap-1.5">
-                            <template v-for="(link, index) in providers.links" :key="index">
-                                <button
-                                    type="button"
-                                    :disabled="!link.url"
-                                    @click="link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true, only: ['providers', 'filters'] })"
-                                    class="min-w-[2.375rem] rounded-[10px] border border-ivt-line px-3 py-2 text-[13.5px] font-semibold text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-violet hover:text-primary"
-                                    :class="[
-                                        link.active && 'border-ivt-ink bg-ivt-ink text-ivt-paper hover:border-ivt-ink hover:text-ivt-paper',
-                                        !link.url && 'cursor-not-allowed opacity-30 hover:border-ivt-line hover:text-ivt-ink-soft',
-                                    ]"
-                                    v-html="link.label"
-                                />
-                            </template>
-                        </div>
+                        <Pagination v-if="providers.last_page > 1" class="mt-11" :name="providers" :links="providers.links"
+                                    @navigate="(url) => router.get(url, {}, { preserveState: true, preserveScroll: true, only: ['providers', 'filters'] })" />
                     </div>
 
                 </div>

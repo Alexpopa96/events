@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import Logo from '@/Components/Logo.vue';
+import MobileTabBar from '@/Components/MobileTabBar.vue';
 
 const page = usePage();
 const isClient = computed(() => !!page.props.auth.user && !page.props.auth.isProvider);
@@ -9,9 +10,9 @@ const isClient = computed(() => !!page.props.auth.user && !page.props.auth.isPro
 
 <template>
     <footer class="border-t border-ivt-line bg-ivt-paper-2 font-invita">
-        <div class="mx-auto max-w-[1600px] px-6 pb-10 pt-14 lg:px-8">
-            <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-                <div>
+        <div class="mx-auto max-w-[1600px] px-4 pb-8 pt-10 sm:px-6 sm:pb-10 sm:pt-14 lg:px-8">
+            <div class="grid grid-cols-2 gap-x-6 gap-y-9 sm:gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+                <div class="col-span-2 lg:col-span-1">
                     <Logo variant="invita" />
                     <p class="mt-4 max-w-xs text-sm leading-relaxed text-ivt-ink-soft">
                         Platforma de anunțuri pentru furnizori de servicii destinate evenimentelor — nunți, botezuri, aniversări și evenimente corporate.
@@ -37,7 +38,7 @@ const isClient = computed(() => !!page.props.auth.user && !page.props.auth.isPro
                     </ul>
                 </div>
 
-                <div>
+                <div class="col-span-2 sm:col-span-1">
                     <h5 class="text-[13px] font-semibold uppercase tracking-wider text-primary">Companie</h5>
                     <ul class="mt-4 space-y-2.5">
                         <li><a href="/#despre" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Despre noi</a></li>
@@ -48,10 +49,12 @@ const isClient = computed(() => !!page.props.auth.user && !page.props.auth.isPro
                 </div>
             </div>
 
-            <div class="mt-14 flex flex-wrap items-center justify-between gap-3 border-t border-ivt-line pt-6 text-[12.5px] text-ivt-ink-faint">
+            <div class="mt-10 flex flex-wrap items-center justify-between gap-3 border-t sm:mt-14 border-ivt-line pt-6 text-[12.5px] text-ivt-ink-faint">
                 <span>&copy; {{ new Date().getFullYear() }} EventHub. Toate drepturile rezervate.</span>
                 <span>Platforma nu intermediază rezervări sau plăți între client și furnizor.</span>
             </div>
         </div>
     </footer>
+
+    <MobileTabBar />
 </template>

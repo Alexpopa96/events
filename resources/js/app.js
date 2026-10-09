@@ -13,10 +13,10 @@ import 'animate.css';
 import "vue-toastification/dist/index.css";
 import "vue-multiselect/dist/vue-multiselect.css";
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const brand = 'Invita';
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    title: (title) => (title.includes(brand) ? title : `${title} | ${brand}`),
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
         const inertiaApp =   createApp({render: () => h(App, props)})

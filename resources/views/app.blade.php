@@ -2,9 +2,33 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    @php($seo = $page['props']['seo'] ?? null)
+    {{-- With SSR running, @inertiaHead already renders the page <title>. --}}
+    @unless (app(\Inertia\Ssr\SsrState::class)->setPage($page)->dispatch())
+        <title inertia>{{ $seo['full_title'] ?? config('app.name', 'Laravel') }}</title>
+    @endunless
+    @if ($seo)
+        <meta name="description" content="{{ $seo['description'] }}">
+        <meta name="robots" content="{{ $seo['robots'] }}">
+        @if ($seo['canonical'])
+            <link rel="canonical" href="{{ $seo['canonical'] }}">
+            <meta property="og:url" content="{{ $seo['canonical'] }}">
+        @endif
+        <meta property="og:site_name" content="{{ \App\Support\Seo\Seo::BRAND }}">
+        <meta property="og:locale" content="ro_RO">
+        <meta property="og:type" content="{{ $seo['type'] }}">
+        <meta property="og:title" content="{{ $seo['full_title'] }}">
+        <meta property="og:description" content="{{ $seo['description'] }}">
+        <meta name="twitter:card" content="{{ $seo['image'] ? 'summary_large_image' : 'summary' }}">
+        @if ($seo['image'])
+            <meta property="og:image" content="{{ $seo['image'] }}">
+        @endif
+        @foreach ($seo['json_ld'] as $schema)
+            <script type="application/ld+json">{!! json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+        @endforeach
+    @endif
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +40,12 @@
 
     <!-- PWA -->
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#E11D63">
+    <meta name="theme-color" content="#FFFFFF">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Invita">
+    <meta name="format-detection" content="telephone=no">
     <link rel="apple-touch-icon" href="/icons/icon-192.png">
 
     <!--     Fonts and icons     -->

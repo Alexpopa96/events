@@ -7,7 +7,10 @@ use App\Models\Listing;
 use App\Models\ListingEvent;
 use App\Models\ProviderProfile;
 use App\Models\User;
+use App\Support\Seo\Landing;
+use App\Support\Seo\Seo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -20,8 +23,8 @@ class Show extends Controller
 
         $listing->load([
             'category:id,name,slug',
-            'county:id,name',
-            'locality:id,name',
+            'county:id,name,slug',
+            'locality:id,name,slug,county_id',
             'media' => fn ($query) => $query->orderByDesc('is_cover')->orderBy('position'),
             'providerProfile' => fn ($query) => $query->with(['county:id,name', 'locality:id,name']),
             'approvedReviews' => fn ($query) => $query->latest()->take(10)->with('user:id,name'),
@@ -116,7 +119,52 @@ class Show extends Controller
             'reviewState' => $this->reviewState($listing, $user),
             'unavailableDates' => $this->unavailableDates($listing->providerProfile),
             'isFavorited' => $user ? $user->favorites()->where('listing_id', $listing->id)->exists() : false,
+            'seo' => $this->seo($listing)->toArray(),
         ]);
+    }
+
+    private function seo(Listing $listing): Seo
+    {
+        $provider = $listing->providerProfile;
+        $place = $listing->locality?->name ?? $listing->county?->displayName();
+        $cover = $listing->media->firstWhere('type', '!=', 'video');
+        $rating = $listing->approvedReviews->avg('rating');
+        $priced = $listing->price_type !== 'on_request' && $listing->price_from > 0;
+
+        $description = $listing->description
+            ?: "{$listing->category->name}".($place ? " în {$place}" : '').": {$listing->title}. Vezi prețuri, portofoliu și recenzii, apoi cere o ofertă gratuită.";
+
+        $crumbs = [...(new Landing($listing->category, $listing->county))->breadcrumbs()];
+        $crumbs[] = ['name' => $listing->title, 'url' => route('listings.show', $listing->slug)];
+
+        return Seo::make(
+            $listing->title.' — '.$listing->category->name.($place ? " {$place}" : ''),
+            $description,
+            route('listings.show', $listing->slug),
+        )
+            ->image($cover ? "/storage/{$cover->path}" : $provider->logoUrl())
+            ->breadcrumbs($crumbs)
+            ->jsonLd(array_filter([
+                '@type' => 'Service',
+                'name' => $listing->title,
+                'serviceType' => $listing->category->name,
+                'description' => Str::limit(strip_tags((string) $listing->description), 500),
+                'url' => route('listings.show', $listing->slug),
+                'image' => $cover ? Seo::absolute("/storage/{$cover->path}") : null,
+                'areaServed' => $listing->county ? ['@type' => 'AdministrativeArea', 'name' => ucfirst($listing->county->regionLabel())] : null,
+                'provider' => [
+                    '@type' => 'LocalBusiness',
+                    'name' => $provider->company_name,
+                    'url' => route('providers.show', $provider->slug),
+                ],
+                'offers' => $priced ? [
+                    '@type' => 'Offer',
+                    'priceCurrency' => 'RON',
+                    'price' => (float) $listing->price_from,
+                    'availability' => 'https://schema.org/InStock',
+                ] : null,
+                'aggregateRating' => Seo::aggregateRating($rating, (int) $listing->approved_reviews_count),
+            ]));
     }
 
     /**

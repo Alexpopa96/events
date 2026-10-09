@@ -26,7 +26,7 @@ const submitSearch = () => {
 </script>
 
 <template>
-    <Head title="EventHub — găsește furnizorii perfecți pentru evenimentul tău" />
+    <Head :title="$page.props.seo?.full_title ?? 'Invita — găsește furnizorii perfecți pentru evenimentul tău'" />
 
     <div class="bg-ivt-paper text-ivt-ink antialiased">
         <SiteHeader />

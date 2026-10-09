@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\County;
 use App\Models\QuoteRequest;
 use Illuminate\Http\Request;
+use App\Support\Seo\Seo;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -45,6 +46,11 @@ class Browse extends Controller
             ]);
 
         return Inertia::render('QuoteRequests/Browse', [
+            'seo' => Seo::make(
+                'Cereri de ofertă pentru evenimente',
+                'Cereri de ofertă reale de la clienți care își organizează nunta, botezul sau un eveniment corporate. Înscrie-te ca furnizor și trimite oferte.',
+                route('quote-requests.browse'),
+            )->forIndexPage($request)->toArray(),
             'quoteRequests' => $quoteRequests,
             'filters' => [
                 'category' => $filters['category'] ?? '',

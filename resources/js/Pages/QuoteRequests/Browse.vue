@@ -14,6 +14,7 @@ import {
 } from '@heroicons/vue/24/outline';
 import SiteHeader from '@/Components/SiteHeader.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
+import Pagination from '@/Components/Pagination.vue';
 import SectionHeading from '@/Components/Home/SectionHeading.vue';
 
 const props = defineProps({
@@ -60,7 +61,7 @@ const meta = (quoteRequest) => [
 </script>
 
 <template>
-    <Head title="Cereri de ofertă — Invita" />
+    <Head :title="$page.props.seo?.full_title ?? 'Cereri de ofertă — Invita'" />
 
     <div class="overflow-x-clip bg-ivt-paper font-invita text-ivt-ink antialiased">
         <SiteHeader />
@@ -189,21 +190,8 @@ const meta = (quoteRequest) => [
                     </div>
 
                     <!-- PAGINATION -->
-                    <div v-if="quoteRequests.last_page > 1" class="mt-11 flex flex-wrap items-center justify-center gap-1.5">
-                        <template v-for="(link, index) in quoteRequests.links" :key="index">
-                            <button
-                                type="button"
-                                :disabled="!link.url"
-                                @click="link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true, only: ['quoteRequests', 'filters'] })"
-                                class="min-w-[2.375rem] rounded-[10px] border border-ivt-line bg-white px-3 py-2 text-[13.5px] font-semibold text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-violet hover:text-primary"
-                                :class="[
-                                    link.active && 'border-ivt-ink bg-ivt-ink text-ivt-paper hover:border-ivt-ink hover:text-ivt-paper',
-                                    !link.url && 'cursor-not-allowed opacity-30 hover:border-ivt-line hover:text-ivt-ink-soft',
-                                ]"
-                                v-html="link.label"
-                            />
-                        </template>
-                    </div>
+                    <Pagination v-if="quoteRequests.last_page > 1" class="mt-11" :name="quoteRequests" :links="quoteRequests.links"
+                                @navigate="(url) => router.get(url, {}, { preserveState: true, preserveScroll: true, only: ['quoteRequests', 'filters'] })" />
                 </div>
             </section>
         </main>

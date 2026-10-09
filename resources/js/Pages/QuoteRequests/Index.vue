@@ -27,18 +27,47 @@ const props = defineProps({
     },
 });
 
+// One colour per status, used by the badge, the row's icon tile and the filter dots.
 const STATUS_META = {
-    pending_review: { group: 'pending', label: 'În verificare', dot: 'bg-ivt-violet', badge: 'bg-ivt-accent-bright/15 text-ivt-violet' },
-    open: { group: 'published', label: 'Activă', dot: 'bg-ivt-teal', badge: 'bg-ivt-teal/15 text-ivt-teal' },
-    closed: { group: 'closed', label: 'Închisă', dot: 'bg-ivt-ink-faint', badge: 'bg-ivt-paper-3 text-ivt-ink-faint' },
-    rejected: { group: 'closed', label: 'Închisă', dot: 'bg-ivt-ink-faint', badge: 'bg-ivt-paper-3 text-ivt-ink-faint' },
+    pending_review: {
+        group: 'pending',
+        label: 'În verificare',
+        dot: 'bg-warning-500',
+        badge: 'bg-warning-50 text-warning-700 ring-1 ring-warning-200',
+        tile: 'bg-warning-50 text-warning-600',
+        accent: 'before:bg-warning-400',
+    },
+    open: {
+        group: 'published',
+        label: 'Activă',
+        dot: 'bg-success-500',
+        badge: 'bg-success-50 text-success-700 ring-1 ring-success-200',
+        tile: 'bg-success-50 text-success-600',
+        accent: 'before:bg-success-500',
+    },
+    closed: {
+        group: 'closed',
+        label: 'Închisă',
+        dot: 'bg-ivt-ink-faint',
+        badge: 'bg-ivt-paper-2 text-ivt-ink-soft ring-1 ring-ivt-line',
+        tile: 'bg-ivt-paper-2 text-ivt-ink-faint',
+        accent: 'before:bg-ivt-line',
+    },
+    rejected: {
+        group: 'closed',
+        label: 'Respinsă',
+        dot: 'bg-danger-500',
+        badge: 'bg-danger-50 text-danger-700 ring-1 ring-danger-200',
+        tile: 'bg-danger-50 text-danger-600',
+        accent: 'before:bg-danger-400',
+    },
 };
 const statusMeta = (status) => STATUS_META[status] ?? STATUS_META.closed;
 
 const tabs = computed(() => [
     { key: 'all', label: 'Toate', count: props.stats.total, dot: 'bg-gradient-to-br from-primary to-ivt-violet' },
-    { key: 'pending', label: 'În așteptare', count: props.stats.pending, dot: 'bg-ivt-violet' },
-    { key: 'published', label: 'Publicate', count: props.stats.active, dot: 'bg-ivt-teal' },
+    { key: 'pending', label: 'În așteptare', count: props.stats.pending, dot: 'bg-warning-500' },
+    { key: 'published', label: 'Publicate', count: props.stats.active, dot: 'bg-success-500' },
     { key: 'closed', label: 'Închise', count: props.stats.closed, dot: 'bg-ivt-ink-faint' },
 ]);
 
@@ -193,89 +222,90 @@ const codeFor = (id) => `INV-${String(id).padStart(5, '0')}`;
             <section id="cereri" class="scroll-mt-24 pb-10 pt-2 sm:pb-12">
                 <div class="mx-auto max-w-[1600px] px-6 lg:px-8">
 
-            <div v-if="filtered.length" class="grid grid-cols-1 gap-5 pb-16 md:grid-cols-2 2xl:grid-cols-3">
-                <Link
-                    v-for="qr in filtered"
-                    :key="qr.id"
-                    :href="route('quote-requests.show', qr.id)"
-                    class="group relative flex flex-col overflow-hidden rounded-[22px] border-2 border-ivt-line bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-glow-primary sm:p-6"
-                >
-                    <span
-                        class="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                        style="background: radial-gradient(circle, rgba(124,58,237,0.14), transparent 70%);"
-                    />
-
-                    <!-- Top: icon + status -->
-                    <div class="relative flex items-start justify-between gap-3">
-                        <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-ivt-paper-2 text-primary transition-all duration-300 group-hover:rotate-[-6deg] group-hover:scale-110 group-hover:bg-brand group-hover:text-white">
-                            <component :is="categoryIcon(qr.category_slug)" class="h-6 w-6" stroke-width="1.5" />
-                        </span>
-                        <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.08em]" :class="statusMeta(qr.status).badge">
-                            <span class="relative flex h-1.5 w-1.5">
-                                <span v-if="qr.status === 'open'" class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" :class="statusMeta(qr.status).dot" />
-                                <span class="relative h-1.5 w-1.5 rounded-full" :class="statusMeta(qr.status).dot" />
+            <ul v-if="filtered.length" class="flex flex-col gap-3 pb-16">
+                <li v-for="qr in filtered" :key="qr.id">
+                    <Link
+                        :href="route('quote-requests.show', qr.id)"
+                        :class="statusMeta(qr.status).accent"
+                        class="group relative flex flex-col gap-4 overflow-hidden rounded-[22px] bg-white p-4 pl-5 ring-1 ring-ivt-line before:absolute before:inset-y-0 before:left-0 before:w-1 sm:pl-6 transition-all duration-200 hover:shadow-ivt-soft hover:ring-primary/30 sm:p-5 lg:flex-row lg:items-center lg:gap-6"
+                    >
+                        <!-- Icon + main info -->
+                        <div class="flex min-w-0 flex-1 items-start gap-4">
+                            <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl transition-transform duration-200 group-hover:scale-105 sm:h-14 sm:w-14" :class="statusMeta(qr.status).tile">
+                                <component :is="categoryIcon(qr.category_slug)" class="h-6 w-6" stroke-width="1.5" />
                             </span>
-                            {{ statusMeta(qr.status).label }}
-                        </span>
-                    </div>
 
-                    <!-- Title + category -->
-                    <div class="relative mt-4">
-                        <p class="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-ivt-ink-faint">
-                            {{ qr.category }}
-                            <span v-if="qr.package_size > 1" class="rounded-full bg-ivt-violet/15 px-2 py-0.5 text-[10px] tracking-[0.06em] text-ivt-violet">Pachet · {{ qr.package_size }} servicii</span>
-                        </p>
-                        <h3 class="mt-1.5 line-clamp-2 font-display text-[19px] font-medium leading-snug text-ivt-ink transition-colors group-hover:text-primary">{{ qr.title }}</h3>
-                        <p v-if="qr.message" class="mt-1.5 line-clamp-2 text-[13px] leading-relaxed text-ivt-ink-soft">{{ qr.message }}</p>
-                    </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-start justify-between gap-3">
+                                    <div class="min-w-0">
+                                        <p class="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-primary">
+                                            {{ qr.category }}
+                                            <span v-if="qr.package_size > 1" class="rounded-full bg-ivt-violet/10 px-2 py-0.5 text-[10px] tracking-[0.06em] text-ivt-violet">Pachet · {{ qr.package_size }} servicii</span>
+                                        </p>
+                                        <h3 class="mt-1 truncate font-display text-[17px] font-medium leading-snug text-ivt-ink transition-colors group-hover:text-primary sm:text-[18px]">{{ qr.title }}</h3>
+                                    </div>
+                                    <!-- Status (mobile + tablet) -->
+                                    <span class="inline-flex flex-none items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-[0.08em] lg:hidden" :class="statusMeta(qr.status).badge">
+                                        <span class="h-1.5 w-1.5 rounded-full" :class="statusMeta(qr.status).dot" />
+                                        {{ statusMeta(qr.status).label }}
+                                    </span>
+                                </div>
 
-                    <!-- Details -->
-                    <div class="relative mt-4 flex flex-wrap gap-1.5">
-                        <span v-if="qr.event_date" class="inline-flex items-center gap-1.5 rounded-full bg-ivt-paper-2 px-2.5 py-1 text-[12px] font-medium text-ivt-ink-soft">
-                            <CalendarIcon class="h-3.5 w-3.5 text-primary" /> {{ qr.event_date }}
-                        </span>
-                        <span v-if="qr.city || qr.county" class="inline-flex items-center gap-1.5 rounded-full bg-ivt-paper-2 px-2.5 py-1 text-[12px] font-medium text-ivt-ink-soft">
-                            <MapPinIcon class="h-3.5 w-3.5 text-primary" /> {{ [qr.city, qr.county].filter(Boolean).join(', ') }}
-                        </span>
-                        <span v-if="qr.guest_count" class="inline-flex items-center gap-1.5 rounded-full bg-ivt-paper-2 px-2.5 py-1 text-[12px] font-medium text-ivt-ink-soft">
-                            <UsersIcon class="h-3.5 w-3.5 text-primary" /> {{ qr.guest_count }} persoane
-                        </span>
-                        <span v-if="qr.budget_range" class="inline-flex items-center gap-1.5 rounded-full bg-ivt-paper-2 px-2.5 py-1 text-[12px] font-medium text-ivt-ink-soft">
-                            <BanknotesIcon class="h-3.5 w-3.5 text-primary" /> {{ qr.budget_range }}
-                        </span>
-                    </div>
+                                <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[13px] text-ivt-ink-soft">
+                                    <span v-if="qr.event_date" class="inline-flex items-center gap-1.5">
+                                        <CalendarIcon class="h-4 w-4 text-primary/70" /> {{ qr.event_date }}
+                                    </span>
+                                    <span v-if="qr.city || qr.county" class="inline-flex min-w-0 items-center gap-1.5">
+                                        <MapPinIcon class="h-4 w-4 flex-none text-primary/70" /> <span class="truncate">{{ [qr.city, qr.county].filter(Boolean).join(', ') }}</span>
+                                    </span>
+                                    <span v-if="qr.guest_count" class="inline-flex items-center gap-1.5">
+                                        <UsersIcon class="h-4 w-4 text-primary/70" /> {{ qr.guest_count }} pers.
+                                    </span>
+                                    <span v-if="qr.budget_range" class="inline-flex items-center gap-1.5">
+                                        <BanknotesIcon class="h-4 w-4 text-primary/70" /> {{ qr.budget_range }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
 
-                    <!-- Footer: offers + CTA -->
-                    <div class="relative mt-auto pt-5">
-                        <div class="flex items-center justify-between gap-4 border-t border-ivt-line pt-4">
-                            <div v-if="qr.status === 'pending_review'" class="flex items-center gap-2.5">
-                                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-ivt-accent-bright/15 text-ivt-violet">
+                        <!-- Right side: status, offers, CTA -->
+                        <div class="flex items-center justify-between gap-4 border-t border-ivt-line pt-3.5 lg:flex-none lg:justify-end lg:gap-6 lg:border-0 lg:pt-0">
+                            <span class="hidden flex-none items-center gap-1.5 rounded-full px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.08em] lg:inline-flex" :class="statusMeta(qr.status).badge">
+                                <span class="relative flex h-1.5 w-1.5">
+                                    <span v-if="qr.status === 'open'" class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60" :class="statusMeta(qr.status).dot" />
+                                    <span class="relative h-1.5 w-1.5 rounded-full" :class="statusMeta(qr.status).dot" />
+                                </span>
+                                {{ statusMeta(qr.status).label }}
+                            </span>
+
+                            <div v-if="qr.status === 'pending_review'" class="flex items-center gap-2.5 lg:w-[150px]">
+                                <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-warning-50 text-warning-600">
                                     <ClockIcon class="h-5 w-5" />
                                 </span>
-                                <span class="text-[12.5px] leading-tight text-ivt-ink-faint">Ofertele apar<br />după aprobare</span>
+                                <span class="text-[12px] leading-tight text-ivt-ink-faint">Ofertele apar<br />după aprobare</span>
                             </div>
-                            <div v-else class="flex items-center gap-2.5">
+                            <div v-else class="flex items-center gap-2.5 lg:w-[150px]">
                                 <span
                                     class="flex h-10 min-w-10 items-center justify-center rounded-xl px-2 font-display text-[18px] font-semibold tabular-nums"
-                                    :class="qr.offers_count ? 'bg-ivt-ink text-ivt-accent-bright' : 'bg-ivt-paper-2 text-ivt-ink-faint'"
+                                    :class="qr.offers_count ? 'bg-brand text-white' : 'bg-ivt-paper-2 text-ivt-ink-faint'"
                                 >{{ qr.offers_count }}</span>
-                                <span class="text-[12.5px] leading-tight text-ivt-ink-faint">
+                                <span class="text-[12px] leading-tight text-ivt-ink-faint">
                                     {{ qr.offers_count === 1 ? 'ofertă' : 'oferte' }}<br />primite
                                 </span>
                             </div>
 
-                            <span class="inline-flex items-center gap-1.5 rounded-full bg-ivt-paper-2 py-2 pl-4 pr-3 text-[12.5px] font-semibold text-ivt-ink transition-all duration-300 group-hover:bg-ivt-ink group-hover:text-ivt-paper">
-                                Detalii
-                                <ArrowRightIcon class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5" stroke-width="2.5" />
-                            </span>
+                            <div class="flex items-center gap-3">
+                                <span class="hidden text-right text-[11.5px] leading-tight text-ivt-ink-faint sm:block">
+                                    {{ qr.created_at_human }}<br /><span class="font-mono tracking-tight">{{ codeFor(qr.id) }}</span>
+                                </span>
+                                <span class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-ivt-paper-2 text-ivt-ink transition-all duration-200 group-hover:bg-brand group-hover:text-white">
+                                    <ArrowRightIcon class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" stroke-width="2.5" />
+                                </span>
+                            </div>
                         </div>
-                        <p class="mt-3 flex items-center justify-between text-[11.5px] text-ivt-ink-faint">
-                            <span>Trimisă {{ qr.created_at_human }}</span>
-                            <span class="font-mono tracking-tight">{{ codeFor(qr.id) }}</span>
-                        </p>
-                    </div>
-                </Link>
-            </div>
+                    </Link>
+                </li>
+            </ul>
 
             <div v-else class="rounded-2xl border border-ivt-line bg-white px-6 py-12 text-center">
                 <p class="text-[34px]">🗂️</p>

@@ -10,7 +10,6 @@ import {
     ChatBubbleLeftRightIcon,
     BellIcon,
     LockClosedIcon,
-    Bars3Icon,
     XMarkIcon,
     BookmarkIcon,
     MagnifyingGlassIcon,
@@ -28,6 +27,7 @@ import Logo from '@/Components/Logo.vue';
 import PushNotificationToggle from '@/Components/PushNotificationToggle.vue';
 import GlobalSearch from '@/Components/GlobalSearch.vue';
 import { useLiveUnreadBadge } from '@/Composables/useLiveUnreadBadge';
+import { useMobileMenu } from '@/Composables/useMobileMenu';
 
 useLiveUnreadBadge();
 
@@ -38,7 +38,23 @@ const unreadMessages = computed(() => page.props.unreadMessages ?? 0);
 const unreadNotifications = computed(() => page.props.unreadNotifications ?? 0);
 
 const accountMenuOpen = ref(false);
-const mobileMenuOpen = ref(false);
+const { open: mobileMenuOpen } = useMobileMenu();
+
+/* Drag the sheet down by its handle to dismiss it, like a native sheet. */
+const sheetDrag = ref(0);
+let dragStartY = null;
+const onSheetTouchStart = (event) => {
+    dragStartY = event.touches[0].clientY;
+};
+const onSheetTouchMove = (event) => {
+    if (dragStartY === null) return;
+    sheetDrag.value = Math.max(0, event.touches[0].clientY - dragStartY);
+};
+const onSheetTouchEnd = () => {
+    if (sheetDrag.value > 110) mobileMenuOpen.value = false;
+    sheetDrag.value = 0;
+    dragStartY = null;
+};
 
 const closeAccountMenu = () => {
     accountMenuOpen.value = false;
@@ -82,9 +98,15 @@ const searchOpen = ref(false);
 const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
 
 // Compact the bar and lift it with a shadow once the page is scrolled.
+// The bar is sticky (in flow) and shrinks 16px on lg, so the browser's scroll
+// anchoring shifts scrollY by that much on every toggle. A single threshold
+// makes it flip back and forth (jitter) near the top; the hysteresis gap below
+// is wider than the height change so a toggle can't immediately undo itself.
 const scrolled = ref(false);
 const onScroll = () => {
-    scrolled.value = window.scrollY > 8;
+    const y = window.scrollY;
+    if (!scrolled.value && y > 40) scrolled.value = true;
+    else if (scrolled.value && y < 8) scrolled.value = false;
 };
 
 const onKeydown = (event) => {
@@ -114,7 +136,7 @@ onUnmounted(() => {
 
 <template>
     <header
-        class="sticky top-0 z-50 border-b border-ivt-line font-invita transition-[background-color,box-shadow] duration-300"
+        class="safe-top sticky top-0 z-50 border-b border-ivt-line font-invita transition-[background-color,box-shadow] duration-300"
         :class="scrolled
             ? 'bg-white/80 shadow-[0_10px_30px_-18px_rgba(26,20,51,0.25)] backdrop-blur-xl backdrop-saturate-150'
             : 'bg-white/95 shadow-[0_1px_2px_rgba(26,20,51,0.04)] backdrop-blur-md'"
@@ -122,7 +144,7 @@ onUnmounted(() => {
         <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
             <div
                 class="flex items-center justify-between gap-4 transition-[height] duration-300"
-                :class="scrolled ? 'h-16' : 'h-20'"
+                :class="scrolled ? 'h-14 sm:h-16' : 'h-14 sm:h-16 lg:h-20'"
             >
                 <div class="flex min-w-0 items-center gap-8">
                     <Link href="/" class="flex-none rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
@@ -167,7 +189,7 @@ onUnmounted(() => {
                         title="Caută"
                         aria-label="Caută"
                         @click="searchOpen = true"
-                        class="icon-btn flex xl:hidden"
+                        class="icon-btn pressable flex xl:hidden"
                     >
                         <MagnifyingGlassIcon class="h-[22px] w-[22px]" />
                     </button>
@@ -194,7 +216,7 @@ onUnmounted(() => {
                             <ChatBubbleLeftRightIcon class="h-[22px] w-[22px]" />
                             <LockClosedIcon class="absolute right-1.5 top-1.5 h-3 w-3 text-ivt-ink-soft/50" />
                         </span>
-                        <Link :href="route('notifications.index')" title="Notificări" aria-label="Notificări" class="icon-btn relative flex">
+                        <Link :href="route('notifications.index')" title="Notificări" aria-label="Notificări" class="icon-btn pressable relative flex">
                             <BellIcon class="h-[22px] w-[22px]" />
                             <span v-if="unreadNotifications" class="badge">{{ badge(unreadNotifications) }}</span>
                         </Link>
@@ -291,9 +313,10 @@ onUnmounted(() => {
                     <Link
                         v-if="!user"
                         href="/login"
-                        class="hidden rounded-full px-4 py-2 text-sm font-semibold text-ivt-ink transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-primary lg:inline-block"
+                        class="pressable rounded-full bg-ivt-paper-2 px-4 py-2 text-[13px] font-semibold text-ivt-ink transition-colors duration-150 hover:bg-ivt-paper-3 hover:text-primary lg:bg-transparent lg:text-sm lg:hover:bg-ivt-paper-2"
                     >
-                        Autentificare
+                        <span class="lg:hidden">Intră</span>
+                        <span class="hidden lg:inline">Autentificare</span>
                     </Link>
 
                     <Link
@@ -304,17 +327,6 @@ onUnmounted(() => {
                         Postează anunț
                     </Link>
 
-                    <button
-                        type="button"
-                        title="Meniu"
-                        aria-label="Deschide meniul"
-                        aria-haspopup="true"
-                        :aria-expanded="mobileMenuOpen"
-                        @click="mobileMenuOpen = true"
-                        class="icon-btn flex lg:hidden"
-                    >
-                        <Bars3Icon class="h-6 w-6" />
-                    </button>
                 </div>
             </div>
         </div>
@@ -330,14 +342,27 @@ onUnmounted(() => {
                     <div class="fixed inset-0 bg-ivt-ink/30 backdrop-blur-sm" />
                 </TransitionChild>
 
-                <div class="fixed inset-0 flex justify-end">
+                <div class="fixed inset-0 flex items-end justify-center">
                     <TransitionChild
                         as="template"
-                        enter="ease-[cubic-bezier(0.22,1,0.36,1)] duration-300" enter-from="translate-x-full" enter-to="translate-x-0"
-                        leave="ease-in duration-200" leave-from="translate-x-0" leave-to="translate-x-full"
+                        enter="ease-[cubic-bezier(0.22,1,0.36,1)] duration-[400ms]" enter-from="translate-y-full" enter-to="translate-y-0"
+                        leave="ease-in duration-200" leave-from="translate-y-0" leave-to="translate-y-full"
                     >
-                        <DialogPanel class="flex h-full w-full max-w-sm flex-col overflow-y-auto bg-white font-invita shadow-ivt-deep sm:rounded-l-3xl">
-                            <div class="flex flex-none items-center justify-between px-5 py-4">
+                        <DialogPanel
+                            class="flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[28px] bg-white font-invita shadow-ivt-deep"
+                            :class="sheetDrag ? '' : 'transition-transform duration-300 ease-out'"
+                            :style="sheetDrag ? { transform: `translateY(${sheetDrag}px)` } : undefined"
+                        >
+                            <div
+                                class="flex-none cursor-grab touch-none pt-2.5"
+                                @touchstart.passive="onSheetTouchStart"
+                                @touchmove.passive="onSheetTouchMove"
+                                @touchend="onSheetTouchEnd"
+                                @touchcancel="onSheetTouchEnd"
+                            >
+                                <div class="mx-auto h-1.5 w-10 rounded-full bg-ivt-paper-3" />
+                            </div>
+                            <div class="flex flex-none items-center justify-between px-5 pb-3 pt-2">
                                 <Logo variant="invita" />
                                 <button
                                     type="button"
@@ -349,7 +374,7 @@ onUnmounted(() => {
                                 </button>
                             </div>
 
-                            <div class="flex flex-1 flex-col gap-5 px-4 pb-4">
+                            <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 pb-4">
                                 <!-- Account card -->
                                 <div v-if="user" class="rounded-3xl bg-gradient-to-br from-ivt-ink-2 to-ivt-ink p-4 text-ivt-on-dark">
                                     <Link :href="route('profile.show')" class="flex items-center gap-3">

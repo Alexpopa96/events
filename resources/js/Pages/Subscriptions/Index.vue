@@ -58,7 +58,7 @@ const faqs = [
 </script>
 
 <template>
-    <Head title="Abonamente — Invita" />
+    <Head :title="$page.props.seo?.full_title ?? 'Abonamente — Invita'" />
 
     <div class="overflow-x-clip bg-ivt-paper font-invita text-ivt-ink antialiased">
         <SiteHeader />

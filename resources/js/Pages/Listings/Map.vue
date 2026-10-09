@@ -217,7 +217,7 @@ onBeforeUnmount(() => (hovered.value = null));
             </section>
 
             <!-- Filters -->
-            <section class="sticky top-[81px] z-20 shadow-glow-primary">
+            <section class="sticky top-[calc(57px+env(safe-area-inset-top))] z-20 shadow-glow-primary sm:top-[calc(65px+env(safe-area-inset-top))] lg:top-[81px]">
                 <div class="flex items-stretch bg-brand">
                     <p class="relative z-10 flex w-28 flex-none items-center bg-ivt-ink/25 px-6 text-[10.5px] font-bold uppercase tracking-[0.12em] text-white/80 lg:w-32 lg:px-8">Eveniment</p>
                     <div class="group flex min-w-0 flex-1 overflow-hidden py-3.5 [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)]">

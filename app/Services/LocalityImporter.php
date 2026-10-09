@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\County;
 use App\Models\Locality;
+use Illuminate\Support\Str;
 use Rap2hpoutre\FastExcel\FastExcel;
 
 class LocalityImporter
@@ -24,6 +25,7 @@ class LocalityImporter
         $localityRows = $rows->map(fn (array $row) => [
             'county_id' => $countyIds[trim($row['JUDET'])],
             'name' => trim($row['NUME']),
+            'slug' => Str::slug(trim($row['NUME'])),
             'latitude' => $row['LATITUDINE'],
             'longitude' => $row['LONGITUDINE'],
             'created_at' => now(),
@@ -34,7 +36,7 @@ class LocalityImporter
             fn ($chunk) => Locality::upsert(
                 $chunk->all(),
                 ['county_id', 'name'],
-                ['latitude', 'longitude', 'updated_at']
+                ['slug', 'latitude', 'longitude', 'updated_at']
             )
         );
     }

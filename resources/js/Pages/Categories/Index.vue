@@ -36,7 +36,7 @@ const popularCategories = computed(() =>
 </script>
 
 <template>
-    <Head title="Categorii — Invita" />
+    <Head :title="$page.props.seo?.full_title ?? 'Categorii — Invita'" />
 
     <div class="overflow-x-clip bg-ivt-paper font-invita text-ivt-ink antialiased">
         <SiteHeader />
