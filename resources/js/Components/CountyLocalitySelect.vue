@@ -30,7 +30,7 @@ const selectedLocalityName = computed(() => localities.value.find((locality) => 
 
 const triggerThemes = {
     ivt: {
-        base: 'border-ivt-line bg-white text-ivt-ink hover:border-ivt-gold/60 focus:border-ivt-gold focus:ring-ivt-gold/20',
+        base: 'border-ivt-line bg-white text-ivt-ink hover:border-ivt-violet/60 focus:border-ivt-violet focus:ring-ivt-violet/20',
         placeholder: 'text-ivt-ink-faint',
         chevron: 'text-ivt-ink-faint',
         label: 'text-ivt-ink',
@@ -104,7 +104,7 @@ if (countyId.value) {
                 id="county_id"
                 type="button"
                 aria-haspopup="dialog"
-                :class="[triggerClasses, trigger.base, { 'border-red-400 focus:border-red-400 focus:ring-red-400/20': countyError }]"
+                :class="[triggerClasses, trigger.base, { 'border-danger-400 focus:border-danger-400 focus:ring-danger-400/20': countyError }]"
                 @click="countyModalOpen = true"
             >
                 <span class="truncate" :class="selectedCountyName ? '' : trigger.placeholder">{{ selectedCountyName || 'Alege județul' }}</span>
@@ -120,7 +120,7 @@ if (countyId.value) {
                 type="button"
                 aria-haspopup="dialog"
                 :disabled="!countyId || loadingLocalities"
-                :class="[triggerClasses, trigger.base, { 'border-red-400 focus:border-red-400 focus:ring-red-400/20': localityError }]"
+                :class="[triggerClasses, trigger.base, { 'border-danger-400 focus:border-danger-400 focus:ring-danger-400/20': localityError }]"
                 @click="localityModalOpen = true"
             >
                 <span class="truncate" :class="selectedLocalityName ? '' : trigger.placeholder">

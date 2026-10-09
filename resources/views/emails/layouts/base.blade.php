@@ -10,10 +10,10 @@
 @php
     $tone = $tone ?? 'success';
     $palette = [
-        'success' => ['bg' => '#F6EDEF', 'fg' => '#7C2E3B', 'from' => '#7C2E3B', 'to' => '#A87F2E'],
-        'info' => ['bg' => '#F8F1E0', 'fg' => '#8A6420', 'from' => '#A87F2E', 'to' => '#C9A24F'],
-        'danger' => ['bg' => '#FBEAE8', 'fg' => '#B3413A', 'from' => '#B3413A', 'to' => '#7C2E3B'],
-    ][$tone] ?? ['bg' => '#F6EDEF', 'fg' => '#7C2E3B', 'from' => '#7C2E3B', 'to' => '#A87F2E'];
+        'success' => ['bg' => '#FDE7EF', 'fg' => '#E11D63', 'from' => '#E11D63', 'to' => '#7C3AED'],
+        'info' => ['bg' => '#F8F1E0', 'fg' => '#8A6420', 'from' => '#7C3AED', 'to' => '#A78BFA'],
+        'danger' => ['bg' => '#FFF1F2', 'fg' => '#BE123C', 'from' => '#BE123C', 'to' => '#E11D63'],
+    ][$tone] ?? ['bg' => '#FDE7EF', 'fg' => '#E11D63', 'from' => '#E11D63', 'to' => '#7C3AED'];
 
     $logoSrc = isset($message)
         ? $message->embed(public_path('assets/eventhub-logo.png'))
@@ -31,14 +31,14 @@
     <meta name="supported-color-schemes" content="light">
     <title>{{ $subject ?? 'EventHub' }}</title>
 </head>
-<body style="margin:0; padding:0; background-color:#F6F3EB; font-family:{!! $sans !!}; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+<body style="margin:0; padding:0; background-color:#F7F5FC; font-family:{!! $sans !!}; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
 <!-- Preheader -->
-<div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#F6F3EB; font-size:1px; line-height:1px;">
+<div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#F7F5FC; font-size:1px; line-height:1px;">
     {{ $preheader ?? $subject ?? '' }}
     &#8199;&zwnj;&#8199;&zwnj;&#8199;&zwnj;&#8199;&zwnj;&#8199;&zwnj;&#8199;&zwnj;&#8199;&zwnj;&#8199;&zwnj;
 </div>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F6F3EB;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F7F5FC;">
     <tr>
         <td align="center" style="padding:40px 16px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
@@ -54,7 +54,7 @@
 
                 <!-- Card -->
                 <tr>
-                    <td style="background-color:#FFFFFF; border:1px solid #E7E1D0; border-radius:24px; overflow:hidden; box-shadow:0 30px 60px -30px rgba(22,40,31,0.25);">
+                    <td style="background-color:#FFFFFF; border:1px solid #EEEAF8; border-radius:24px; overflow:hidden; box-shadow:0 30px 60px -30px rgba(26,20,51,0.25);">
                         <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                             <!-- Accent bar -->
                             <tr>
@@ -82,10 +82,10 @@
                 <!-- Footer -->
                 <tr>
                     <td align="center" style="padding:28px 16px 0 16px;">
-                        <p style="margin:0 0 4px 0; font-size:12px; line-height:1.6; color:#8A9186;">
-                            &copy; {{ date('Y') }} <a href="{{ $appUrl }}" target="_blank" style="color:#8A9186; text-decoration:none;">EventHub</a> &mdash; platforma pentru servicii de evenimente
+                        <p style="margin:0 0 4px 0; font-size:12px; line-height:1.6; color:#8F8AA6;">
+                            &copy; {{ date('Y') }} <a href="{{ $appUrl }}" target="_blank" style="color:#8F8AA6; text-decoration:none;">EventHub</a> &mdash; platforma pentru servicii de evenimente
                         </p>
-                        <p style="margin:0; font-size:12px; line-height:1.6; color:#8A9186;">
+                        <p style="margin:0; font-size:12px; line-height:1.6; color:#8F8AA6;">
                             Ai primit acest email deoarece este asociat unui cont EventHub.
                         </p>
                     </td>

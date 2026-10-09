@@ -1,11 +1,12 @@
 <script setup>
 import { computed, ref } from 'vue';
+import { ivt } from '@/palette';
 
 const props = defineProps({
     // [{ label: 'YYYY-MM', value }]
     months: { type: Array, required: true },
     currency: { type: String, default: 'RON' },
-    color: { type: String, default: '#1F3A2C' },
+    color: { type: String, default: ivt['ink-2'] },
 });
 
 const hover = ref(null);

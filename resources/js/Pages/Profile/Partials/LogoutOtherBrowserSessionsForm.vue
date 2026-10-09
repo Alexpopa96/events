@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
+import { ArrowRightStartOnRectangleIcon, ComputerDesktopIcon, DevicePhoneMobileIcon } from '@heroicons/vue/24/outline';
 import ActionMessage from '@/Components/ActionMessage.vue';
-import ActionSection from '@/Components/ActionSection.vue';
 import DialogModal from '@/Components/DialogModal.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -43,99 +43,81 @@ const closeModal = () => {
 </script>
 
 <template>
-    <ActionSection>
-        <template #title>
-            Sesiuni active
-        </template>
+    <div>
+        <p class="max-w-xl text-sm text-ivt-ink-soft">
+            Lista poate să nu fie completă. Dacă bănuiești că cineva îți folosește contul, deconectează celelalte sesiuni și schimbă parola.
+        </p>
 
-        <template #description>
-            Gestionează și deconectează sesiunile active de pe alte browsere și dispozitive.
-        </template>
-
-        <template #content>
-            <div class="max-w-xl text-sm text-ivt-ink-soft">
-                Dacă este nevoie, te poți deconecta de pe toate celelalte browsere și dispozitive. Mai jos sunt listate câteva sesiuni recente; lista poate să nu fie completă. Dacă bănuiești că contul a fost compromis, schimbă și parola.
-            </div>
-
-            <!-- Other Browser Sessions -->
-            <div v-if="sessions.length > 0" class="mt-5 space-y-6">
-                <div v-for="(session, i) in sessions" :key="i" class="flex items-center">
-                    <div>
-                        <svg v-if="session.agent.is_desktop" class="size-8 text-ivt-ink-soft" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
-                        </svg>
-
-                        <svg v-else class="size-8 text-ivt-ink-soft" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-                        </svg>
-                    </div>
-
-                    <div class="ms-3">
-                        <div class="text-sm text-ivt-ink">
-                            {{ session.agent.platform ? session.agent.platform : 'Necunoscut' }} - {{ session.agent.browser ? session.agent.browser : 'Necunoscut' }}
-                        </div>
-
-                        <div>
-                            <div class="text-xs text-ivt-ink-soft">
-                                {{ session.ip_address }},
-
-                                <span v-if="session.is_current_device" class="text-emerald-600 font-semibold">Acest dispozitiv</span>
-                                <span v-else>Ultima activitate {{ session.last_active }}</span>
-                            </div>
-                        </div>
-                    </div>
+        <ul v-if="sessions.length > 0" class="mt-4 divide-y divide-ivt-line overflow-hidden rounded-2xl border border-ivt-line">
+            <li v-for="(session, i) in sessions" :key="i" class="flex items-center gap-3 px-4 py-3" :class="session.is_current_device ? 'bg-success-50/50' : 'bg-white'">
+                <span class="flex h-10 w-10 flex-none items-center justify-center rounded-xl" :class="session.is_current_device ? 'bg-success-100 text-success-700' : 'bg-ivt-paper-2 text-ivt-ink-soft'">
+                    <component :is="session.agent.is_desktop ? ComputerDesktopIcon : DevicePhoneMobileIcon" class="h-5 w-5" />
+                </span>
+                <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-medium text-ivt-ink">
+                        {{ session.agent.browser || 'Browser necunoscut' }}
+                        <span class="font-normal text-ivt-ink-soft">pe {{ session.agent.platform || 'sistem necunoscut' }}</span>
+                    </p>
+                    <p class="truncate text-xs text-ivt-ink-soft">
+                        <span class="font-mono">{{ session.ip_address }}</span>
+                        <template v-if="!session.is_current_device"> · activ {{ session.last_active }}</template>
+                    </p>
                 </div>
-            </div>
+                <span v-if="session.is_current_device" class="inline-flex flex-none items-center gap-1.5 rounded-full bg-success-500 px-2.5 py-1 text-[11px] font-semibold text-white">
+                    <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+                    Acest dispozitiv
+                </span>
+            </li>
+        </ul>
 
-            <div class="flex items-center mt-5">
-                <PrimaryButton @click="confirmLogout">
+        <div class="mt-5 flex items-center gap-3">
+            <SecondaryButton :disabled="sessions.length <= 1" @click="confirmLogout">
+                <ArrowRightStartOnRectangleIcon class="h-4 w-4" />
+                Deconectează celelalte sesiuni
+            </SecondaryButton>
+
+            <ActionMessage :on="form.recentlySuccessful">
+                Gata.
+            </ActionMessage>
+        </div>
+
+        <!-- Log Out Other Devices Confirmation Modal -->
+        <DialogModal :show="confirmingLogout" @close="closeModal">
+            <template #title>
+                Deconectează celelalte sesiuni
+            </template>
+
+            <template #content>
+                Introdu parola pentru a confirma deconectarea de pe celelalte browsere și dispozitive.
+
+                <div class="mt-4">
+                    <TextInput
+                        ref="passwordInput"
+                        v-model="form.password"
+                        type="password"
+                        class="block w-full"
+                        placeholder="Parola"
+                        autocomplete="current-password"
+                        @keyup.enter="logoutOtherBrowserSessions"
+                    />
+
+                    <InputError :message="form.errors.password" class="mt-2" />
+                </div>
+            </template>
+
+            <template #footer>
+                <SecondaryButton @click="closeModal">
+                    Anulează
+                </SecondaryButton>
+
+                <PrimaryButton
+                    class="ms-3"
+                    :disabled="form.processing"
+                    @click="logoutOtherBrowserSessions"
+                >
                     Deconectează celelalte sesiuni
                 </PrimaryButton>
-
-                <ActionMessage :on="form.recentlySuccessful" class="ms-3">
-                    Gata.
-                </ActionMessage>
-            </div>
-
-            <!-- Log Out Other Devices Confirmation Modal -->
-            <DialogModal :show="confirmingLogout" @close="closeModal">
-                <template #title>
-                    Deconectează celelalte sesiuni
-                </template>
-
-                <template #content>
-                    Introdu parola pentru a confirma deconectarea de pe celelalte browsere și dispozitive.
-
-                    <div class="mt-4">
-                        <TextInput
-                            ref="passwordInput"
-                            v-model="form.password"
-                            type="password"
-                            class="block w-3/4"
-                            placeholder="Parola"
-                            autocomplete="current-password"
-                            @keyup.enter="logoutOtherBrowserSessions"
-                        />
-
-                        <InputError :message="form.errors.password" class="mt-2" />
-                    </div>
-                </template>
-
-                <template #footer>
-                    <SecondaryButton @click="closeModal">
-                        Anulează
-                    </SecondaryButton>
-
-                    <PrimaryButton
-                        class="ms-3"
-                        :class="{ 'opacity-25': form.processing }"
-                        :disabled="form.processing"
-                        @click="logoutOtherBrowserSessions"
-                    >
-                        Deconectează celelalte sesiuni
-                    </PrimaryButton>
-                </template>
-            </DialogModal>
-        </template>
-    </ActionSection>
+            </template>
+        </DialogModal>
+    </div>
 </template>

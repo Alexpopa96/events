@@ -67,7 +67,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
     <div class="flex flex-col gap-6">
         <div v-if="visibleCategories.length" class="flex flex-col gap-1 border-b border-ivt-line pb-5">
             <h4 class="mb-2 text-[12.5px] font-bold uppercase tracking-[0.07em] text-ivt-ink-soft">Tip serviciu</h4>
-            <div class="-mr-2 flex max-h-56 flex-col overflow-y-auto pr-2 [scrollbar-width:thin]">
+            <div class="-mx-1 flex max-h-56 flex-col overflow-y-auto pl-1 pr-3 [scrollbar-width:thin]">
                 <label
                     v-for="cat in visibleCategories"
                     :key="cat.slug"
@@ -77,7 +77,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
                         type="checkbox"
                         :checked="selectedCategories.includes(cat.slug)"
                         @change="toggleCategory(cat.slug)"
-                        class="h-[15px] w-[15px] cursor-pointer rounded border-ivt-line text-primary focus:ring-primary/40"
+                        class="h-[15px] w-[15px] flex-none cursor-pointer rounded border-ivt-line text-primary focus:ring-primary/40"
                     />
                     <component :is="categoryIcon(cat.slug)" class="h-4 w-4 flex-none text-primary" />
                     {{ cat.name }}
@@ -88,7 +88,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
 
         <div v-if="visibleEventTypes.length" class="flex flex-col gap-1 border-b border-ivt-line pb-5">
             <h4 class="mb-2 text-[12.5px] font-bold uppercase tracking-[0.07em] text-ivt-ink-soft">Tip eveniment</h4>
-            <div class="-mr-2 flex max-h-56 flex-col overflow-y-auto pr-2 [scrollbar-width:thin]">
+            <div class="-mx-1 flex max-h-56 flex-col overflow-y-auto pl-1 pr-3 [scrollbar-width:thin]">
                 <label
                     v-for="type in visibleEventTypes"
                     :key="type.value"
@@ -98,7 +98,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
                         type="checkbox"
                         :checked="selectedEventTypes.includes(type.value)"
                         @change="toggleEventType(type.value)"
-                        class="h-[15px] w-[15px] cursor-pointer rounded border-ivt-line text-primary focus:ring-primary/40"
+                        class="h-[15px] w-[15px] flex-none cursor-pointer rounded border-ivt-line text-primary focus:ring-primary/40"
                     />
                     {{ type.label }}
                     <span class="ml-auto text-xs text-ivt-ink-faint">{{ eventTypeCount(type.value) }}</span>
@@ -108,7 +108,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
 
         <div v-if="visibleCounties.length" class="flex flex-col gap-1 border-b border-ivt-line pb-5">
             <h4 class="mb-3 text-[12.5px] font-bold uppercase tracking-[0.07em] text-ivt-ink-soft">Locație</h4>
-            <div class="-mr-2 flex max-h-56 flex-col overflow-y-auto pr-2 [scrollbar-width:thin]">
+            <div class="-mx-1 flex max-h-56 flex-col overflow-y-auto pl-1 pr-3 [scrollbar-width:thin]">
                 <label
                     v-for="county in visibleCounties"
                     :key="county.id"
@@ -118,7 +118,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
                         type="checkbox"
                         :checked="selectedCounties.includes(county.id)"
                         @change="toggleCounty(county.id)"
-                        class="h-[15px] w-[15px] cursor-pointer rounded border-ivt-line text-primary focus:ring-primary/40"
+                        class="h-[15px] w-[15px] flex-none cursor-pointer rounded border-ivt-line text-primary focus:ring-primary/40"
                     />
                     {{ county.name }}
                     <span class="ml-auto text-xs text-ivt-ink-faint">{{ county.count }}</span>
@@ -155,7 +155,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
         <div class="flex flex-col gap-1 border-b border-ivt-line pb-5">
             <h4 class="mb-2 text-[12.5px] font-bold uppercase tracking-[0.07em] text-ivt-ink-soft">Rating minim</h4>
             <label class="flex cursor-pointer items-center gap-2.5 py-1.5 text-sm text-ivt-ink">
-                <input type="radio" name="rating" :checked="Number(rating) === 0" @change="setRating(0)" class="h-[15px] w-[15px] cursor-pointer text-primary focus:ring-primary/40" />
+                <input type="radio" name="rating" :checked="Number(rating) === 0" @change="setRating(0)" class="h-[15px] w-[15px] flex-none cursor-pointer text-primary focus:ring-primary/40" />
                 Toate
             </label>
             <label v-if="ratingCount(4) > 0 || Number(rating) === 4" class="flex cursor-pointer items-center gap-2.5 py-1.5 text-sm text-ivt-ink">
@@ -164,7 +164,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
                     name="rating"
                     :checked="Number(rating) === 4"
                     @change="setRating(4)"
-                    class="h-[15px] w-[15px] cursor-pointer text-primary focus:ring-primary/40"
+                    class="h-[15px] w-[15px] flex-none cursor-pointer text-primary focus:ring-primary/40"
                 />
                 <span class="text-[12px] tracking-widest text-primary">★★★★</span> 4.0+
                 <span class="ml-auto text-xs text-ivt-ink-faint">{{ ratingCount(4) }}</span>
@@ -175,7 +175,7 @@ const visibleCounties = computed(() => props.counties.filter((county) => county.
                     name="rating"
                     :checked="Number(rating) === 4.5"
                     @change="setRating(4.5)"
-                    class="h-[15px] w-[15px] cursor-pointer text-primary focus:ring-primary/40"
+                    class="h-[15px] w-[15px] flex-none cursor-pointer text-primary focus:ring-primary/40"
                 />
                 <span class="text-[12px] tracking-widest text-primary">★★★★★</span> 4.5+
                 <span class="ml-auto text-xs text-ivt-ink-faint">{{ ratingCount('4.5') }}</span>

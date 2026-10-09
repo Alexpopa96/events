@@ -51,9 +51,9 @@ const confirmUnpublish = () => {
 
 const statusMeta = {
     draft: { label: 'Ciornă', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
-    pending_review: { label: 'În verificare', class: 'bg-ivt-gold/20 text-ivt-gold' },
-    published: { label: 'Publicat', class: 'bg-emerald-100 text-emerald-700' },
-    rejected: { label: 'Respins', class: 'bg-rose-100 text-rose-700' },
+    pending_review: { label: 'În verificare', class: 'bg-ivt-violet/20 text-ivt-violet' },
+    published: { label: 'Publicat', class: 'bg-success-100 text-success-700' },
+    rejected: { label: 'Respins', class: 'bg-danger-100 text-danger-700' },
     archived: { label: 'Arhivat', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
 };
 
@@ -110,7 +110,7 @@ watch(() => form.errors, (errors) => {
             </div>
             <div class="min-w-0 flex-1">
                 <span class="inline-block rounded-full px-2.5 py-1 text-xs font-semibold" :class="status.class">{{ status.label }}</span>
-                <h2 class="mt-1.5 truncate font-serif text-xl sm:text-2xl text-ivt-ink">{{ listing.title || 'Anunț fără titlu' }}</h2>
+                <h2 class="mt-1.5 truncate font-display text-xl sm:text-2xl text-ivt-ink">{{ listing.title || 'Anunț fără titlu' }}</h2>
                 <div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ivt-ink-soft">
                     <span class="flex items-center gap-1"><EyeIcon class="w-3.5 h-3.5" /> {{ listing.views_count }} vizualizări</span>
                     <span class="flex items-center gap-1"><CalendarIcon class="w-3.5 h-3.5" /> creat pe {{ listing.created_at }}</span>
@@ -119,11 +119,11 @@ watch(() => form.errors, (errors) => {
             </div>
         </div>
 
-        <div v-if="listing.status === 'rejected' && listing.rejection_reason" class="flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 mb-5">
-            <ExclamationTriangleIcon class="w-5 h-5 text-rose-500 flex-none mt-0.5" />
+        <div v-if="listing.status === 'rejected' && listing.rejection_reason" class="flex items-start gap-3 rounded-2xl border border-danger-200 bg-danger-50 px-5 py-4 mb-5">
+            <ExclamationTriangleIcon class="w-5 h-5 text-danger-500 flex-none mt-0.5" />
             <div>
-                <p class="text-sm font-semibold text-rose-700">Anunțul a fost respins</p>
-                <p class="text-sm text-rose-600 mt-0.5">{{ listing.rejection_reason }}</p>
+                <p class="text-sm font-semibold text-danger-700">Anunțul a fost respins</p>
+                <p class="text-sm text-danger-600 mt-0.5">{{ listing.rejection_reason }}</p>
             </div>
         </div>
 
@@ -145,7 +145,7 @@ watch(() => form.errors, (errors) => {
                             >
                                 <component :is="tab.icon" class="w-4 h-4" />
                                 {{ tab.label }}
-                                <span v-if="tab.hasError" class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                <span v-if="tab.hasError" class="w-1.5 h-1.5 rounded-full bg-danger-500"></span>
                             </button>
                         </div>
                     </div>
@@ -185,7 +185,7 @@ watch(() => form.errors, (errors) => {
                                 type="button"
                                 :disabled="form.processing"
                                 @click="submitWithAction('submit')"
-                                class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright hover:shadow-glow-primary active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
+                                class="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet hover:shadow-glow-primary active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
                             >
                                 Trimite spre verificare
                             </button>
@@ -200,7 +200,7 @@ watch(() => form.errors, (errors) => {
                                 Retrage la ciornă
                             </button>
 
-                            <span v-if="form.recentlySuccessful" class="inline-flex items-center gap-1.5 text-sm text-emerald-600">
+                            <span v-if="form.recentlySuccessful" class="inline-flex items-center gap-1.5 text-sm text-success-600">
                                 <CheckCircleIcon class="h-4 w-4" /> Salvat.
                             </span>
                         </div>

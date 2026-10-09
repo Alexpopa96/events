@@ -45,10 +45,10 @@ const resolvedType = computed(() => {
                 :inputmode="inputmode"
                 :readonly="readonly"
                 :tabindex="readonly ? -1 : undefined"
-                class="w-full rounded-full border border-ivt-line bg-white py-3 pl-11 pr-4 text-sm text-ivt-ink placeholder:text-ivt-ink-faint transition-all duration-150 focus:border-ivt-gold focus:outline-none focus:ring-2 focus:ring-ivt-gold/20"
+                class="w-full rounded-full border border-ivt-line bg-white py-3 pl-11 pr-4 text-sm text-ivt-ink placeholder:text-ivt-ink-faint transition-all duration-150 focus:border-ivt-violet focus:outline-none focus:ring-2 focus:ring-ivt-violet/20"
                 :class="[
                     type === 'password' ? 'pr-11' : 'pr-4',
-                    { 'border-red-400 focus:border-red-400 focus:ring-red-400/20': error },
+                    { 'border-danger-400 focus:border-danger-400 focus:ring-danger-400/20': error },
                     { 'cursor-default bg-ivt-paper-2 text-ivt-ink-soft focus:bg-ivt-paper-2 focus:ring-0': readonly },
                 ]"
             />

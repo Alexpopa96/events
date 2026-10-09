@@ -46,24 +46,26 @@ const ratingCount = (value) => props.facets.rating?.[value] ?? 0;
 
 <template>
     <div class="flex flex-col gap-6">
-        <div v-if="categories.length" class="flex max-h-[230px] flex-col gap-1 overflow-y-auto border-b border-ivt-line pb-5">
-            <h4 class="sticky top-0 mb-3 bg-white text-[12.5px] font-bold uppercase tracking-[0.07em] text-ivt-ink-soft">Categorie</h4>
-            <label
-                v-for="cat in categories"
-                :key="cat.id"
-                class="flex items-center gap-2.5 py-1.5 text-sm text-ivt-ink"
-                :class="cat.count === 0 && !selectedCategories.includes(cat.id) ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'"
-            >
-                <input
-                    type="checkbox"
-                    :checked="selectedCategories.includes(cat.id)"
-                    :disabled="cat.count === 0 && !selectedCategories.includes(cat.id)"
-                    @change="toggleCategory(cat.id)"
-                    class="h-[15px] w-[15px] cursor-pointer rounded border-ivt-line text-ivt-wine focus:ring-ivt-wine/40 disabled:cursor-not-allowed"
-                />
-                {{ cat.name }}
-                <span class="ml-auto text-xs text-ivt-ink-faint">{{ cat.count }}</span>
-            </label>
+        <div v-if="categories.length" class="flex flex-col gap-1 border-b border-ivt-line pb-5">
+            <h4 class="mb-2 text-[12.5px] font-bold uppercase tracking-[0.07em] text-ivt-ink-soft">Categorie</h4>
+            <div class="-mx-1 flex max-h-56 flex-col overflow-y-auto pl-1 pr-3 [scrollbar-width:thin]">
+                <label
+                    v-for="cat in categories"
+                    :key="cat.id"
+                    class="flex items-center gap-2.5 py-1.5 text-sm text-ivt-ink"
+                    :class="cat.count === 0 && !selectedCategories.includes(cat.id) ? 'cursor-not-allowed opacity-40' : 'cursor-pointer'"
+                >
+                    <input
+                        type="checkbox"
+                        :checked="selectedCategories.includes(cat.id)"
+                        :disabled="cat.count === 0 && !selectedCategories.includes(cat.id)"
+                        @change="toggleCategory(cat.id)"
+                        class="h-[15px] w-[15px] flex-none cursor-pointer rounded border-ivt-line text-primary focus:ring-primary/40 disabled:cursor-not-allowed"
+                    />
+                    {{ cat.name }}
+                    <span class="ml-auto text-xs text-ivt-ink-faint">{{ cat.count }}</span>
+                </label>
+            </div>
         </div>
 
         <div v-if="counties.length" class="flex flex-col gap-1 border-b border-ivt-line pb-5">
@@ -79,7 +81,7 @@ const ratingCount = (value) => props.facets.rating?.[value] ?? 0;
                     :checked="selectedCounties.includes(county.id)"
                     :disabled="county.count === 0 && !selectedCounties.includes(county.id)"
                     @change="toggleCounty(county.id)"
-                    class="h-[15px] w-[15px] cursor-pointer rounded border-ivt-line text-ivt-wine focus:ring-ivt-wine/40 disabled:cursor-not-allowed"
+                    class="h-[15px] w-[15px] flex-none cursor-pointer rounded border-ivt-line text-primary focus:ring-primary/40 disabled:cursor-not-allowed"
                 />
                 {{ county.name }}
                 <span class="ml-auto text-xs text-ivt-ink-faint">{{ county.count }}</span>
@@ -95,7 +97,7 @@ const ratingCount = (value) => props.facets.rating?.[value] ?? 0;
                     min="0"
                     placeholder="Min"
                     @keyup.enter="emit('apply')"
-                    class="w-full rounded-[10px] border-ivt-line px-2.5 py-2 text-[13.5px] text-ivt-ink focus:border-ivt-gold focus:ring-ivt-gold/30"
+                    class="w-full rounded-[10px] border-ivt-line px-2.5 py-2 text-[13.5px] text-ivt-ink focus:border-ivt-violet focus:ring-ivt-violet/30"
                 />
                 <span class="text-[13px] text-ivt-ink-faint">–</span>
                 <input
@@ -104,7 +106,7 @@ const ratingCount = (value) => props.facets.rating?.[value] ?? 0;
                     min="0"
                     placeholder="Max"
                     @keyup.enter="emit('apply')"
-                    class="w-full rounded-[10px] border-ivt-line px-2.5 py-2 text-[13.5px] text-ivt-ink focus:border-ivt-gold focus:ring-ivt-gold/30"
+                    class="w-full rounded-[10px] border-ivt-line px-2.5 py-2 text-[13.5px] text-ivt-ink focus:border-ivt-violet focus:ring-ivt-violet/30"
                 />
             </div>
             <p v-if="facets.price?.min !== null && facets.price?.max !== null" class="text-[11.5px] text-ivt-ink-faint">
@@ -115,7 +117,7 @@ const ratingCount = (value) => props.facets.rating?.[value] ?? 0;
         <div class="flex flex-col gap-1 border-b border-ivt-line pb-5">
             <h4 class="mb-2 text-[12.5px] font-bold uppercase tracking-[0.07em] text-ivt-ink-soft">Rating minim</h4>
             <label class="flex cursor-pointer items-center gap-2.5 py-1.5 text-sm text-ivt-ink">
-                <input type="radio" name="rating" :checked="Number(rating) === 0" @change="setRating(0)" class="h-[15px] w-[15px] cursor-pointer text-ivt-wine focus:ring-ivt-wine/40" />
+                <input type="radio" name="rating" :checked="Number(rating) === 0" @change="setRating(0)" class="h-[15px] w-[15px] flex-none cursor-pointer text-primary focus:ring-primary/40" />
                 Toate
             </label>
             <label
@@ -128,9 +130,9 @@ const ratingCount = (value) => props.facets.rating?.[value] ?? 0;
                     :checked="Number(rating) === 4"
                     :disabled="ratingCount(4) === 0 && Number(rating) !== 4"
                     @change="setRating(4)"
-                    class="h-[15px] w-[15px] cursor-pointer text-ivt-wine focus:ring-ivt-wine/40 disabled:cursor-not-allowed"
+                    class="h-[15px] w-[15px] flex-none cursor-pointer text-primary focus:ring-primary/40 disabled:cursor-not-allowed"
                 />
-                <span class="text-[12px] tracking-widest text-ivt-gold">★★★★</span> 4.0+
+                <span class="text-[12px] tracking-widest text-ivt-violet">★★★★</span> 4.0+
                 <span class="ml-auto text-xs text-ivt-ink-faint">{{ ratingCount(4) }}</span>
             </label>
             <label
@@ -143,9 +145,9 @@ const ratingCount = (value) => props.facets.rating?.[value] ?? 0;
                     :checked="Number(rating) === 4.5"
                     :disabled="ratingCount('4.5') === 0 && Number(rating) !== 4.5"
                     @change="setRating(4.5)"
-                    class="h-[15px] w-[15px] cursor-pointer text-ivt-wine focus:ring-ivt-wine/40 disabled:cursor-not-allowed"
+                    class="h-[15px] w-[15px] flex-none cursor-pointer text-primary focus:ring-primary/40 disabled:cursor-not-allowed"
                 />
-                <span class="text-[12px] tracking-widest text-ivt-gold">★★★★★</span> 4.5+
+                <span class="text-[12px] tracking-widest text-ivt-violet">★★★★★</span> 4.5+
                 <span class="ml-auto text-xs text-ivt-ink-faint">{{ ratingCount('4.5') }}</span>
             </label>
         </div>

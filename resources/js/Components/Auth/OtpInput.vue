@@ -108,8 +108,8 @@ defineExpose({ focus: () => focusAt(0) });
                 :autofocus="autofocus && index === 0"
                 :disabled="disabled"
                 :aria-label="`Cifra ${index + 1} din ${length}`"
-                class="h-14 w-11 rounded-xl border border-ivt-line bg-white text-center font-mono text-2xl font-semibold text-ivt-wine focus:border-ivt-gold focus:outline-none focus:ring-2 focus:ring-ivt-gold/20 disabled:opacity-60 sm:h-16 sm:w-12"
-                :class="{ 'border-red-400 focus:border-red-400 focus:ring-red-400/20': error }"
+                class="h-14 w-11 rounded-xl border border-ivt-line bg-white text-center font-mono text-2xl font-semibold text-primary focus:border-ivt-violet focus:outline-none focus:ring-2 focus:ring-ivt-violet/20 disabled:opacity-60 sm:h-16 sm:w-12"
+                :class="{ 'border-danger-400 focus:border-danger-400 focus:ring-danger-400/20': error }"
                 @input="onInput(index, $event)"
                 @keydown="onKeydown(index, $event)"
                 @paste="onPaste(index, $event)"
@@ -117,6 +117,6 @@ defineExpose({ focus: () => focusAt(0) });
             />
         </div>
 
-        <p v-if="error" class="mt-2 px-1 text-center text-sm text-red-600">{{ error }}</p>
+        <p v-if="error" class="mt-2 px-1 text-center text-sm text-danger-600">{{ error }}</p>
     </div>
 </template>

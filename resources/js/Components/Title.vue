@@ -1,6 +1,6 @@
 <template>
     <div class="mb-5">
-        <h2 :class="$attrs.class" class="font-serif text-lg text-ivt-ink">{{ title }} <slot></slot></h2>
+        <h2 :class="$attrs.class" class="font-display text-lg text-ivt-ink">{{ title }} <slot></slot></h2>
     </div>
 </template>
 <script>

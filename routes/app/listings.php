@@ -20,6 +20,7 @@ use App\Http\Controllers\Notifications\ReadAll as NotificationsReadAll;
 use App\Http\Controllers\Providers\Index as ProvidersIndex;
 use App\Http\Controllers\Providers\Show as ProvidersShow;
 use App\Http\Controllers\Providers\ToggleFavorite as ProvidersToggleFavorite;
+use App\Http\Controllers\QuoteRequests\Browse as QuoteRequestsBrowse;
 use App\Http\Controllers\QuoteRequests\Create as QuoteRequestsCreate;
 use App\Http\Controllers\QuoteRequests\Index as QuoteRequestsIndex;
 use App\Http\Controllers\QuoteRequests\Offers\Accept as OffersAccept;
@@ -31,10 +32,14 @@ use App\Http\Controllers\QuoteRequests\Update as QuoteRequestsUpdate;
 use App\Http\Controllers\SavedSearches\Destroy as SavedSearchesDestroy;
 use App\Http\Controllers\SavedSearches\Index as SavedSearchesIndex;
 use App\Http\Controllers\SavedSearches\Store as SavedSearchesStore;
+use App\Http\Controllers\Subscriptions\Index as SubscriptionsIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::get('categorii', CategoriesIndex::class)->name('categories.index');
 Route::get('categorii/{category:slug}', CategoriesShow::class)->name('categories.show');
+
+Route::get('abonamente', SubscriptionsIndex::class)->name('subscriptions.index');
+Route::get('cereri-de-oferta', QuoteRequestsBrowse::class)->name('quote-requests.browse');
 
 Route::get('furnizori', ProvidersIndex::class)->name('providers.index');
 Route::get('furnizori/{providerProfile:slug}', ProvidersShow::class)->name('providers.show');

@@ -23,13 +23,13 @@ defineProps({
             <span
                 v-if="count !== null && max"
                 class="text-xs tabular-nums"
-                :class="count > max * 0.9 ? 'text-amber-600' : 'text-ivt-ink-soft/60'"
+                :class="count > max * 0.9 ? 'text-warning-600' : 'text-ivt-ink-soft/60'"
             >{{ count }}/{{ max }}</span>
         </div>
 
         <slot />
 
-        <p v-if="error" class="mt-1.5 flex items-center gap-1 text-sm text-red-600" role="alert">
+        <p v-if="error" class="mt-1.5 flex items-center gap-1 text-sm text-danger-600" role="alert">
             <ExclamationCircleIcon class="h-4 w-4 flex-none" /> {{ error }}
         </p>
         <p v-else-if="hint" class="mt-1.5 text-xs leading-relaxed text-ivt-ink-soft/80">{{ hint }}</p>

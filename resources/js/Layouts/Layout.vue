@@ -87,9 +87,9 @@ const sidebarOpen = ref(false);
                                 <ChevronRight v-if="i < breadcrumbs.length - 1" class="w-3 h-3" />
                             </span>
                         </nav>
-                        <h1 v-if="title" class="font-serif text-xl sm:text-2xl text-ivt-ink leading-tight">{{ title }}</h1>
+                        <h1 v-if="title" class="font-display text-xl sm:text-2xl text-ivt-ink leading-tight">{{ title }}</h1>
                     </div>
-                    <div class="h-px bg-gradient-to-r from-ivt-gold/50 via-ivt-gold/20 to-transparent"></div>
+                    <div class="h-px bg-gradient-to-r from-ivt-violet/50 via-ivt-violet/20 to-transparent"></div>
                 </header>
 
                 <main class="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">

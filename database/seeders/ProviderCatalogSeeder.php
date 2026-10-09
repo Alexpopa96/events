@@ -11,6 +11,7 @@ use App\Models\ProviderProfile;
 use App\Models\ProviderSubscription;
 use App\Models\QuoteRequest;
 use Database\Seeders\Concerns\SeedsLeadClients;
+use Database\Seeders\Concerns\SeedsListingPhotos;
 use App\Models\Review;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
@@ -21,6 +22,7 @@ use Illuminate\Support\Str;
 class ProviderCatalogSeeder extends Seeder
 {
     use SeedsLeadClients;
+    use SeedsListingPhotos;
 
     /**
      * Major cities the demo catalog is spread across. Keys are matched
@@ -194,6 +196,8 @@ class ProviderCatalogSeeder extends Seeder
                 'published_at' => $listingStatus === 'published' ? now()->subDays(random_int(1, 120)) : null,
             ]
         ));
+
+        $listings->each(fn (Listing $listing) => $this->attachGalleryPhotos($listing));
 
         if ($listingStatus === 'published') {
             $listings->each(fn (Listing $listing) => $this->seedReviews($listing, $profile));

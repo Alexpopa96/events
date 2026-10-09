@@ -119,7 +119,7 @@ const back = () => {
     step.value = 1;
 };
 
-const buttonClass = 'w-full rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(124,46,59,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ivt-wine/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0';
+const buttonClass = 'w-full rounded-full bg-gradient-to-b from-primary-bright to-primary px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(225,29,99,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0';
 </script>
 
 <template>
@@ -172,7 +172,7 @@ const buttonClass = 'w-full rounded-full bg-gradient-to-b from-ivt-wine-bright t
                 <button
                     type="button"
                     :disabled="busy || cooldown > 0"
-                    class="font-medium text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright disabled:cursor-not-allowed disabled:text-ivt-ink-faint"
+                    class="font-medium text-primary transition-colors duration-150 hover:text-primary-bright disabled:cursor-not-allowed disabled:text-ivt-ink-faint"
                     @click="sendCode"
                 >
                     {{ cooldown > 0 ? `Retrimite codul (${cooldown}s)` : 'Retrimite codul' }}

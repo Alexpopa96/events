@@ -79,7 +79,7 @@ const submit = () => {
     >
         <div
             v-if="status"
-            class="mb-6 rounded-xl bg-ivt-sage/10 px-4 py-3 text-sm font-medium text-ivt-sage"
+            class="mb-6 rounded-xl bg-ivt-teal/10 px-4 py-3 text-sm font-medium text-ivt-teal"
         >
             {{ status }}
         </div>
@@ -99,7 +99,7 @@ const submit = () => {
             <button
                 type="submit"
                 :disabled="checking || !identifier.trim()"
-                class="w-full rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(124,46,59,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ivt-wine/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                class="w-full rounded-full bg-gradient-to-b from-primary-bright to-primary px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(225,29,99,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
                 Continuă
             </button>
@@ -108,12 +108,12 @@ const submit = () => {
         <form v-else @submit.prevent="submit" class="space-y-4">
             <button
                 type="button"
-                class="flex w-full items-center gap-2 rounded-full border border-ivt-line bg-ivt-paper-2 px-4 py-3 text-left text-sm text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-gold"
+                class="flex w-full items-center gap-2 rounded-full border border-ivt-line bg-ivt-paper-2 px-4 py-3 text-left text-sm text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-violet"
                 @click="back"
             >
                 <ArrowLeftIcon class="h-4 w-4 shrink-0 text-ivt-ink-faint" />
                 <span class="truncate">{{ form.email }}</span>
-                <span class="ml-auto shrink-0 font-medium text-ivt-wine">Schimbă</span>
+                <span class="ml-auto shrink-0 font-medium text-primary">Schimbă</span>
             </button>
 
             <IconField
@@ -131,15 +131,14 @@ const submit = () => {
                     <input
                         v-model="form.remember"
                         type="checkbox"
-                        class="rounded border-ivt-line text-ivt-wine focus:ring-ivt-wine/30"
-                        style="accent-color: #7C2E3B;"
+                        class="rounded border-ivt-line text-primary focus:ring-primary/30"
                     />
                     Ține-mă minte
                 </label>
                 <Link
                     v-if="canResetPassword"
                     :href="route('password.request', { identifier: form.email })"
-                    class="font-medium text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright"
+                    class="font-medium text-primary transition-colors duration-150 hover:text-primary-bright"
                 >
                     Ai uitat parola?
                 </Link>
@@ -148,7 +147,7 @@ const submit = () => {
             <button
                 type="submit"
                 :disabled="form.processing"
-                class="w-full rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(124,46,59,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ivt-wine/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                class="w-full rounded-full bg-gradient-to-b from-primary-bright to-primary px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(225,29,99,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
                 Conectează-te
             </button>
@@ -156,7 +155,7 @@ const submit = () => {
 
         <p v-if="step === 1" class="mt-6 text-center text-sm text-ivt-ink-soft">
             Nu ai un cont?
-            <Link href="/register/client" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
+            <Link href="/register/client" class="font-semibold text-primary transition-colors duration-150 hover:text-primary-bright">
                 Înregistrează-te
             </Link>
         </p>
@@ -165,7 +164,7 @@ const submit = () => {
 
         <p class="mt-6 text-center text-xs text-ivt-ink-faint">
             Ești furnizor de servicii?
-            <Link href="/register" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
+            <Link href="/register" class="font-semibold text-primary transition-colors duration-150 hover:text-primary-bright">
                 Creează cont firmă
             </Link>
         </p>

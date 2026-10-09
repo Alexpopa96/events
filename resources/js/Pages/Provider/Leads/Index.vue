@@ -191,15 +191,15 @@ const statuses = (lead) => {
     if (thread?.unread) {
         out.push({ key: 'unread', label: `${thread.unread} ${thread.unread === 1 ? 'mesaj nou' : 'mesaje noi'}`, class: 'bg-primary text-white', icon: ChatBubbleLeftRightIcon });
     } else if (thread?.last_from === 'client') {
-        out.push({ key: 'reply', label: 'De răspuns', class: 'bg-amber-100 text-amber-700', icon: ChatBubbleLeftRightIcon });
+        out.push({ key: 'reply', label: 'De răspuns', class: 'bg-warning-100 text-warning-700', icon: ChatBubbleLeftRightIcon });
     } else if (thread?.last_from === 'me') {
         out.push({ key: 'waiting', label: 'Așteaptă răspuns', class: 'bg-ivt-paper-2 text-ivt-ink-soft', icon: ClockIcon });
     }
 
     if (lead.contacted) {
-        out.push({ key: 'contacted', label: 'Contactat', class: 'bg-emerald-100 text-emerald-700', icon: CheckCircleIcon });
+        out.push({ key: 'contacted', label: 'Contactat', class: 'bg-success-100 text-success-700', icon: CheckCircleIcon });
     } else if (!thread) {
-        out.push({ key: 'new', label: 'Nouă', class: 'bg-ivt-gold/15 text-ivt-gold', icon: SparklesIcon });
+        out.push({ key: 'new', label: 'Nouă', class: 'bg-ivt-violet/15 text-ivt-violet', icon: SparklesIcon });
     }
 
     if (lead.offer) {
@@ -213,8 +213,8 @@ const statuses = (lead) => {
 const offerStatusMeta = {
     sent: { key: 'offer-sent', label: 'Ofertă trimisă', class: 'bg-primary/10 text-primary', icon: CurrencyDollarIcon },
     viewed: { key: 'offer-viewed', label: 'Ofertă văzută', class: 'bg-primary/10 text-primary', icon: CurrencyDollarIcon },
-    accepted: { key: 'offer-accepted', label: 'Ofertă acceptată', class: 'bg-emerald-100 text-emerald-700', icon: CheckCircleIcon },
-    declined: { key: 'offer-declined', label: 'Ofertă refuzată', class: 'bg-rose-100 text-rose-700', icon: XMarkIcon },
+    accepted: { key: 'offer-accepted', label: 'Ofertă acceptată', class: 'bg-success-100 text-success-700', icon: CheckCircleIcon },
+    declined: { key: 'offer-declined', label: 'Ofertă refuzată', class: 'bg-danger-100 text-danger-700', icon: XMarkIcon },
     withdrawn: { key: 'offer-withdrawn', label: 'Ofertă retrasă', class: 'bg-ivt-paper-2 text-ivt-ink-soft', icon: XMarkIcon },
     expired: { key: 'offer-expired', label: 'Ofertă expirată', class: 'bg-ivt-paper-2 text-ivt-ink-soft', icon: ClockIcon },
 };
@@ -370,7 +370,7 @@ const markContacted = (lead) => {
                                 <span
                                     v-if="needsAttention(lead)"
                                     class="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full ring-2 ring-white"
-                                    :class="lead.thread?.unread ? 'bg-primary' : 'bg-ivt-gold-bright'"
+                                    :class="lead.thread?.unread ? 'bg-primary' : 'bg-ivt-accent-bright'"
                                 ></span>
                             </span>
                             <span class="min-w-0 flex-1">
@@ -418,7 +418,7 @@ const markContacted = (lead) => {
                                 {{ initials(current.name) }}
                             </span>
                             <div class="min-w-0 flex-1">
-                                <p class="truncate font-serif text-xl text-ivt-ink">{{ current.name }}</p>
+                                <p class="truncate font-display text-xl text-ivt-ink">{{ current.name }}</p>
                                 <p class="text-xs text-ivt-ink-soft">a cerut o ofertă · {{ current.created_at }}</p>
                             </div>
                             <span class="flex flex-none flex-wrap justify-end gap-1.5">
@@ -479,7 +479,7 @@ const markContacted = (lead) => {
                                     <p class="mt-1 text-2xl font-semibold tabular-nums text-ivt-ink">{{ current.phone }}</p>
                                     <a
                                         :href="`tel:${current.phone}`"
-                                        class="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright hover:shadow-glow-primary active:scale-[0.98]"
+                                        class="mt-4 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet hover:shadow-glow-primary active:scale-[0.98]"
                                     >
                                         <PhoneIcon class="h-4 w-4" /> Sună acum
                                     </a>
@@ -493,7 +493,7 @@ const markContacted = (lead) => {
                                 <p class="mt-1 break-all text-lg font-semibold text-ivt-ink">{{ current.email }}</p>
                                 <a
                                     :href="mailto(current)"
-                                    class="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright hover:shadow-glow-primary active:scale-[0.98]"
+                                    class="mt-4 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet hover:shadow-glow-primary active:scale-[0.98]"
                                 >
                                     <EnvelopeIcon class="h-4 w-4" /> Trimite email
                                 </a>
@@ -549,7 +549,7 @@ const markContacted = (lead) => {
                                 <template v-else-if="current.offer && !current.offer.editable">
                                     <div class="rounded-2xl border border-ivt-line bg-white p-5">
                                         <div class="flex items-center justify-between gap-3">
-                                            <span class="font-serif text-2xl text-ivt-ink">{{ current.offer.price.toLocaleString('ro-RO') }} lei</span>
+                                            <span class="font-display text-2xl text-ivt-ink">{{ current.offer.price.toLocaleString('ro-RO') }} lei</span>
                                             <span
                                                 class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
                                                 :class="offerStatusMeta[current.offer.status].class"
@@ -564,7 +564,7 @@ const markContacted = (lead) => {
                                             </li>
                                         </ul>
                                         <p v-if="current.offer.message" class="mt-3 whitespace-pre-line text-sm text-ivt-ink-soft">{{ current.offer.message }}</p>
-                                        <p v-if="current.offer.status === 'accepted'" class="mt-4 rounded-xl bg-emerald-50 px-3.5 py-2.5 text-sm text-emerald-700">
+                                        <p v-if="current.offer.status === 'accepted'" class="mt-4 rounded-xl bg-success-50 px-3.5 py-2.5 text-sm text-success-700">
                                             Clientul a acceptat oferta. Contactează-l cât mai repede.
                                         </p>
                                     </div>
@@ -581,7 +581,7 @@ const markContacted = (lead) => {
                                             >
                                                 <option v-for="listing in current.offer_listings" :key="listing.id" :value="listing.id">{{ listing.title }}</option>
                                             </select>
-                                            <p v-if="offerForm.errors.listing_id" class="mt-1 text-xs text-rose-600">{{ offerForm.errors.listing_id }}</p>
+                                            <p v-if="offerForm.errors.listing_id" class="mt-1 text-xs text-danger-600">{{ offerForm.errors.listing_id }}</p>
                                         </div>
                                         <div>
                                             <label for="offer-price" class="mb-1.5 block text-sm font-medium text-ivt-ink">Preț (lei)</label>
@@ -592,7 +592,7 @@ const markContacted = (lead) => {
                                                 min="1"
                                                 class="w-full rounded-xl border-ivt-line text-sm text-ivt-ink focus:border-primary focus:ring-primary"
                                             />
-                                            <p v-if="offerForm.errors.price" class="mt-1 text-xs text-rose-600">{{ offerForm.errors.price }}</p>
+                                            <p v-if="offerForm.errors.price" class="mt-1 text-xs text-danger-600">{{ offerForm.errors.price }}</p>
                                         </div>
                                     </div>
 
@@ -606,7 +606,7 @@ const markContacted = (lead) => {
                                             :max="current.event_date_iso || undefined"
                                             class="w-full rounded-xl border-ivt-line text-sm text-ivt-ink focus:border-primary focus:ring-primary sm:w-56"
                                         />
-                                        <p v-if="offerForm.errors.valid_until" class="mt-1 text-xs text-rose-600">{{ offerForm.errors.valid_until }}</p>
+                                        <p v-if="offerForm.errors.valid_until" class="mt-1 text-xs text-danger-600">{{ offerForm.errors.valid_until }}</p>
                                     </div>
 
                                     <div class="mt-4">
@@ -629,21 +629,21 @@ const markContacted = (lead) => {
                                             maxlength="1500"
                                             class="w-full rounded-xl border-ivt-line text-sm text-ivt-ink placeholder:text-ivt-ink-soft/50 focus:border-primary focus:ring-primary"
                                         ></textarea>
-                                        <p v-if="offerForm.errors.message" class="mt-1 text-xs text-rose-600">{{ offerForm.errors.message }}</p>
+                                        <p v-if="offerForm.errors.message" class="mt-1 text-xs text-danger-600">{{ offerForm.errors.message }}</p>
                                     </div>
 
                                     <div class="mt-5 flex flex-wrap items-center gap-3">
                                         <button
                                             type="submit"
                                             :disabled="offerForm.processing"
-                                            class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright disabled:cursor-not-allowed disabled:opacity-50"
+                                            class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet disabled:cursor-not-allowed disabled:opacity-50"
                                         >
                                             <CurrencyDollarIcon class="h-4 w-4" /> {{ current.offer ? 'Actualizează oferta' : 'Trimite oferta' }}
                                         </button>
                                         <button
                                             v-if="current.offer && current.offer.editable"
                                             type="button"
-                                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-rose-600 hover:text-rose-700"
+                                            class="inline-flex items-center gap-1.5 text-sm font-semibold text-danger-600 hover:text-danger-700"
                                             @click="offerToWithdraw = current.offer"
                                         >
                                             <TrashIcon class="h-4 w-4" /> Retrage oferta

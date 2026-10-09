@@ -64,7 +64,7 @@ const resend = () => {
         title="Introdu codul din email"
         :subtitle="`Ți-am trimis un cod de 6 cifre la ${email}. Este valabil ${validForMinutes} minute.`"
     >
-        <div v-if="codeSent" class="mb-6 rounded-xl bg-ivt-sage/10 px-4 py-3 text-sm font-medium text-ivt-sage">
+        <div v-if="codeSent" class="mb-6 rounded-xl bg-ivt-teal/10 px-4 py-3 text-sm font-medium text-ivt-teal">
             Ți-am trimis un cod nou. Verifică-ți emailul.
         </div>
 
@@ -80,8 +80,8 @@ const resend = () => {
                     autofocus
                     placeholder="••••••"
                     aria-label="Cod de autentificare"
-                    class="w-full rounded-2xl border border-ivt-line bg-white py-4 text-center font-mono text-3xl font-semibold tracking-[0.5em] text-ivt-wine placeholder:text-ivt-line focus:border-ivt-gold focus:outline-none focus:ring-2 focus:ring-ivt-gold/20"
-                    :class="{ 'border-red-400 focus:border-red-400 focus:ring-red-400/20': form.errors.code }"
+                    class="w-full rounded-2xl border border-ivt-line bg-white py-4 text-center font-mono text-3xl font-semibold tracking-[0.5em] text-primary placeholder:text-ivt-line focus:border-ivt-violet focus:outline-none focus:ring-2 focus:ring-ivt-violet/20"
+                    :class="{ 'border-danger-400 focus:border-danger-400 focus:ring-danger-400/20': form.errors.code }"
                 />
                 <InputError class="mt-1.5 px-1 text-center" :message="form.errors.code" />
             </div>
@@ -89,7 +89,7 @@ const resend = () => {
             <button
                 type="submit"
                 :disabled="form.processing || form.code.length !== 6"
-                class="w-full rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(124,46,59,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ivt-wine/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                class="w-full rounded-full bg-gradient-to-b from-primary-bright to-primary px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(225,29,99,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
                 Conectează-mă
             </button>
@@ -99,7 +99,7 @@ const resend = () => {
             Nu ai primit codul?
             <button
                 type="button"
-                class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright disabled:cursor-not-allowed disabled:text-ivt-ink-faint disabled:hover:text-ivt-ink-faint"
+                class="font-semibold text-primary transition-colors duration-150 hover:text-primary-bright disabled:cursor-not-allowed disabled:text-ivt-ink-faint disabled:hover:text-ivt-ink-faint"
                 :disabled="remaining > 0 || resendForm.processing"
                 @click="resend"
             >
@@ -108,7 +108,7 @@ const resend = () => {
         </div>
 
         <p class="mt-6 text-center text-xs text-ivt-ink-faint">
-            <Link :href="route('login')" class="font-medium text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">Înapoi la conectare</Link>
+            <Link :href="route('login')" class="font-medium text-primary transition-colors duration-150 hover:text-primary-bright">Înapoi la conectare</Link>
         </p>
     </GuestAuthLayout>
 </template>

@@ -15,6 +15,7 @@ import {
     UserCircleIcon,
 } from '@heroicons/vue/24/outline';
 import { StarIcon } from '@heroicons/vue/24/solid';
+import { ivt, primary } from '@/palette';
 
 const props = defineProps({
     profile: Object,
@@ -48,23 +49,23 @@ onMounted(() => {
 
 const statusMeta = {
     draft: { label: 'Ciornă', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
-    pending_review: { label: 'În verificare', class: 'bg-ivt-gold/20 text-ivt-gold' },
-    published: { label: 'Publicat', class: 'bg-emerald-100 text-emerald-700' },
-    rejected: { label: 'Respins', class: 'bg-rose-100 text-rose-700' },
+    pending_review: { label: 'În verificare', class: 'bg-ivt-violet/20 text-ivt-violet' },
+    published: { label: 'Publicat', class: 'bg-success-100 text-success-700' },
+    rejected: { label: 'Respins', class: 'bg-danger-100 text-danger-700' },
     archived: { label: 'Arhivat', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
 };
 
 const subscriptionStatusMeta = {
-    active: { label: 'Activ', class: 'bg-emerald-100 text-emerald-700' },
-    past_due: { label: 'Plată restantă', class: 'bg-rose-100 text-rose-700' },
+    active: { label: 'Activ', class: 'bg-success-100 text-success-700' },
+    past_due: { label: 'Plată restantă', class: 'bg-danger-100 text-danger-700' },
     canceled: { label: 'Anulat', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
     expired: { label: 'Expirat', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
 };
 
 const invoiceStatusMeta = {
-    paid: { label: 'Plătită', class: 'bg-emerald-100 text-emerald-700' },
-    pending: { label: 'În așteptare', class: 'bg-ivt-gold/20 text-ivt-gold' },
-    failed: { label: 'Eșuată', class: 'bg-rose-100 text-rose-700' },
+    paid: { label: 'Plătită', class: 'bg-success-100 text-success-700' },
+    pending: { label: 'În așteptare', class: 'bg-ivt-violet/20 text-ivt-violet' },
+    failed: { label: 'Eșuată', class: 'bg-danger-100 text-danger-700' },
     refunded: { label: 'Rambursată', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
 };
 
@@ -77,19 +78,19 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
             <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-ivt-paper-2 text-primary">
                 <BuildingStorefrontIcon class="h-6 w-6" />
             </span>
-            <h2 class="font-serif text-2xl text-ivt-ink mt-4 mb-2">Profilul tău e aproape gata</h2>
+            <h2 class="font-display text-2xl text-ivt-ink mt-4 mb-2">Profilul tău e aproape gata</h2>
             <p class="text-sm text-ivt-ink-soft">Nu am găsit încă un profil de companie asociat contului tău. Contactează-ne dacă vezi acest mesaj — ar trebui să fie creat automat la înregistrare.</p>
         </div>
 
         <template v-else>
             <div class="relative rounded-3xl mb-8 overflow-hidden">
-                <div class="absolute -top-16 -left-10 w-72 h-72 rounded-full bg-ivt-gold/10 blur-3xl pointer-events-none" aria-hidden="true"></div>
+                <div class="absolute -top-16 -left-10 w-72 h-72 rounded-full bg-ivt-violet/10 blur-3xl pointer-events-none" aria-hidden="true"></div>
 
                 <div class="relative flex flex-wrap items-start justify-between gap-5">
                     <div>
-                        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-ivt-gold mb-1">{{ profile.company_name }}</p>
-                        <h2 class="font-serif text-3xl sm:text-4xl text-ivt-ink leading-tight">Bună, {{ firstName }}</h2>
-                        <span class="mt-3 block h-0.5 w-16 rounded-full bg-gradient-to-r from-primary-bright to-ivt-gold-bright"></span>
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-ivt-violet mb-1">{{ profile.company_name }}</p>
+                        <h2 class="font-display text-3xl sm:text-4xl text-ivt-ink leading-tight">Bună, {{ firstName }}</h2>
+                        <span class="mt-3 block h-0.5 w-16 rounded-full bg-gradient-to-r from-primary-bright to-ivt-accent-bright"></span>
                     </div>
 
                     <div class="flex flex-wrap gap-3">
@@ -147,7 +148,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
 
             <!-- Trend chart -->
             <div class="bg-white border border-ivt-line rounded-2xl p-6 mb-8 shadow-sm shadow-ivt-ink/5 transition-shadow duration-200 hover:shadow-glow-primary">
-                <h3 class="font-serif text-lg text-ivt-ink mb-4">Evoluție — ultimele 30 de zile</h3>
+                <h3 class="font-display text-lg text-ivt-ink mb-4">Evoluție — ultimele 30 de zile</h3>
                 <TrendChart :data="trend" />
             </div>
 
@@ -155,7 +156,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                 <!-- Listing performance -->
                 <div class="lg:col-span-2 bg-white border border-ivt-line rounded-2xl p-6 shadow-sm shadow-ivt-ink/5">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-serif text-lg text-ivt-ink">Performanță anunțuri</h3>
+                        <h3 class="font-display text-lg text-ivt-ink">Performanță anunțuri</h3>
                         <span class="text-xs text-ivt-ink-soft">{{ listings.length }} total</span>
                     </div>
 
@@ -195,12 +196,12 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
 
                 <!-- Profile completion -->
                 <div class="bg-white border border-ivt-line rounded-2xl p-6 shadow-sm shadow-ivt-ink/5">
-                    <h3 class="font-serif text-lg text-ivt-ink mb-4">Scor profil</h3>
+                    <h3 class="font-display text-lg text-ivt-ink mb-4">Scor profil</h3>
 
                     <div class="flex items-center gap-5">
                         <div
                             class="relative w-20 h-20 rounded-full flex-none"
-                            :style="`background: conic-gradient(from -90deg, #047857, #F59E0B ${completionDeg}deg, #E6DFE7 0)`"
+                            :style="`background: conic-gradient(from -90deg, ${primary.DEFAULT}, ${ivt['accent-bright']} ${completionDeg}deg, ${ivt['paper-3']} 0)`"
                         >
                             <div class="absolute inset-1.5 rounded-full bg-white flex items-center justify-center">
                                 <span class="text-lg font-semibold text-ivt-ink tabular-nums">{{ profile.completion_score }}%</span>
@@ -215,7 +216,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                         <p class="text-xs font-medium text-ivt-ink-soft uppercase tracking-wide mb-2">De completat</p>
                         <ul class="space-y-1.5">
                             <li v-for="field in profile.missing_fields" :key="field" class="text-sm text-ivt-ink flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-ivt-gold"></span>
+                                <span class="w-1.5 h-1.5 rounded-full bg-ivt-violet"></span>
                                 {{ field }}
                             </li>
                         </ul>
@@ -227,7 +228,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                 <!-- Recent leads -->
                 <div class="bg-white border border-ivt-line rounded-2xl p-6 shadow-sm shadow-ivt-ink/5">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-serif text-lg text-ivt-ink">Cereri de ofertă recente</h3>
+                        <h3 class="font-display text-lg text-ivt-ink">Cereri de ofertă recente</h3>
                         <Link :href="route('provider.leads.index')" class="text-xs font-medium text-primary hover:underline">Vezi toate</Link>
                     </div>
 
@@ -240,7 +241,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                                         {{ lead.category }}
                                     </span>
                                 </div>
-                                <span v-if="lead.contacted" class="flex items-center gap-1 text-xs font-medium text-emerald-700 flex-none">
+                                <span v-if="lead.contacted" class="flex items-center gap-1 text-xs font-medium text-success-700 flex-none">
                                     <CheckCircleIcon class="w-4 h-4" /> Contactat
                                 </span>
                             </div>
@@ -256,9 +257,9 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                 <!-- Reviews & rating -->
                 <div class="bg-white border border-ivt-line rounded-2xl p-6 shadow-sm shadow-ivt-ink/5">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-serif text-lg text-ivt-ink">Recenzii</h3>
+                        <h3 class="font-display text-lg text-ivt-ink">Recenzii</h3>
                         <div v-if="reviews.average_rating" class="flex items-center gap-1 text-sm font-semibold text-ivt-ink">
-                            <StarIcon class="w-4 h-4 text-ivt-gold" />
+                            <StarIcon class="w-4 h-4 text-ivt-accent-bright" />
                             {{ reviews.average_rating }}
                             <span class="text-xs font-normal text-ivt-ink-soft">({{ reviews.count }})</span>
                         </div>
@@ -276,7 +277,7 @@ const completionDeg = computed(() => Math.round((props.profile?.completion_score
                                         v-for="n in 5"
                                         :key="n"
                                         class="w-3.5 h-3.5"
-                                        :class="n <= review.rating ? 'text-ivt-gold' : 'text-ivt-paper-3'"
+                                        :class="n <= review.rating ? 'text-ivt-violet' : 'text-ivt-paper-3'"
                                     />
                                 </span>
                             </div>

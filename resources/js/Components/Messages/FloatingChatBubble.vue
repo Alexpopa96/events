@@ -40,7 +40,7 @@ const initials = (name) => (name || '?')
     >
         <div v-if="visible" class="group fixed bottom-24 right-4 z-40 lg:bottom-6 lg:right-6">
             <!-- Hover label (desktop) -->
-            <span class="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-2xl bg-ink px-3.5 py-2 text-xs text-white opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 lg:block">
+            <span class="pointer-events-none absolute right-full top-1/2 mr-3 hidden -translate-y-1/2 whitespace-nowrap rounded-2xl bg-ivt-ink px-3.5 py-2 text-xs text-white opacity-0 shadow-xl transition-opacity duration-200 group-hover:opacity-100 lg:block">
                 <span class="block font-semibold">{{ chat.name }}</span>
                 <span class="block text-white/70">Continuă conversația</span>
             </span>
@@ -53,10 +53,10 @@ const initials = (name) => (name || '?')
                 <img v-if="chat.logoUrl" :src="chat.logoUrl" alt="" class="h-full w-full rounded-full object-cover" />
                 <span v-else class="text-base font-semibold">{{ initials(chat.name) }}</span>
 
-                <span class="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-primary shadow-md ring-1 ring-line">
+                <span class="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-primary shadow-md ring-1 ring-ivt-line">
                     <ChatBubbleLeftRightIcon class="h-3.5 w-3.5" />
                 </span>
-                <span v-if="unread" class="absolute -left-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ink px-1.5 text-[11px] font-semibold text-white ring-2 ring-white">
+                <span v-if="unread" class="absolute -left-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-ivt-ink px-1.5 text-[11px] font-semibold text-white ring-2 ring-white">
                     {{ unread > 99 ? '99+' : unread }}
                 </span>
             </Link>
@@ -65,7 +65,7 @@ const initials = (name) => (name || '?')
                 type="button"
                 @click="forget"
                 aria-label="Ascunde bula de conversație"
-                class="absolute -right-1 -top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-ink-soft opacity-0 shadow-md ring-1 ring-line transition-opacity duration-150 hover:text-primary focus:opacity-100 group-hover:opacity-100"
+                class="absolute -right-1 -top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-ivt-ink-soft opacity-0 shadow-md ring-1 ring-ivt-line transition-opacity duration-150 hover:text-primary focus:opacity-100 group-hover:opacity-100"
             >
                 <XMarkIcon class="h-3.5 w-3.5" />
             </button>

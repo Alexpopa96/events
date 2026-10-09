@@ -5,8 +5,8 @@ import { CalendarDaysIcon } from '@heroicons/vue/24/solid';
 const props = defineProps({
     size: { type: String, default: 'md' }, // 'sm' | 'md' | 'lg'
     dark: { type: Boolean, default: false }, // use on dark backgrounds (e.g. provider sidebar hero, footers)
-    // 'brand' (default, emerald marketplace look) | 'invita' (paper/wine/gold
-    // mockup look used only on the public SiteHeader/SiteFooter)
+    // 'brand' (default, filled gradient mark) | 'invita' (same mark with a
+    // gradient wordmark, used on the public SiteHeader/SiteFooter)
     variant: { type: String, default: 'brand' },
 });
 
@@ -20,26 +20,26 @@ const sizing = computed(() => sizes[props.size] ?? sizes.md);
 </script>
 
 <template>
-    <span v-if="variant === 'invita'" class="inline-flex items-center gap-2">
+    <span v-if="variant === 'invita'" class="group inline-flex items-center gap-2">
         <span
-            class="flex flex-none items-center justify-center rounded-full border text-ivt-wine"
-            :class="[sizing.box, dark ? 'border-ivt-gold-bright/50 text-ivt-gold-bright' : 'border-ivt-gold']"
-        >
-            <CalendarDaysIcon :class="sizing.icon" />
-        </span>
-        <span class="font-serif tracking-tight" :class="[sizing.text, dark ? 'text-ivt-on-dark' : 'text-ivt-ink']">
-            Event<span :class="dark ? 'text-ivt-gold-bright' : 'text-ivt-wine'">Hub</span>
-        </span>
-    </span>
-    <span v-else class="inline-flex items-center gap-2">
-        <span
-            class="flex flex-none items-center justify-center bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-sm shadow-brand-500/30"
+            class="flex flex-none -rotate-6 items-center justify-center bg-brand text-white shadow-glow-primary transition-transform duration-300 group-hover:rotate-0 group-hover:scale-110"
             :class="sizing.box"
         >
             <CalendarDaysIcon :class="sizing.icon" />
         </span>
-        <span class="font-serif tracking-tight" :class="[sizing.text, dark ? 'text-white' : 'text-ink']">
-            Event<span class="text-brand-500">Hub</span>
+        <span class="font-display font-bold tracking-tight" :class="[sizing.text, dark ? 'text-ivt-on-dark' : 'text-ivt-ink']">
+            Event<span :class="dark ? 'text-ivt-violet-bright' : 'text-gradient'">Hub</span>
+        </span>
+    </span>
+    <span v-else class="inline-flex items-center gap-2">
+        <span
+            class="flex flex-none items-center justify-center bg-brand text-white shadow-sm shadow-primary/30"
+            :class="sizing.box"
+        >
+            <CalendarDaysIcon :class="sizing.icon" />
+        </span>
+        <span class="font-display font-bold tracking-tight" :class="[sizing.text, dark ? 'text-white' : 'text-ivt-ink']">
+            Event<span :class="dark ? 'text-ivt-violet-bright' : 'text-primary'">Hub</span>
         </span>
     </span>
 </template>

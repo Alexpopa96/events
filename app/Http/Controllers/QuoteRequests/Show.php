@@ -54,6 +54,7 @@ class Show extends Controller
                 'id' => $quoteRequest->id,
                 'category_id' => $quoteRequest->category_id,
                 'category' => $quoteRequest->category->name,
+                'category_slug' => $quoteRequest->category->slug,
                 'title' => $quoteRequest->title ?: $quoteRequest->category->name,
                 'message' => $quoteRequest->message,
                 'event_type' => $quoteRequest->event_type,

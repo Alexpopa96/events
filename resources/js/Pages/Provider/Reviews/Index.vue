@@ -64,7 +64,7 @@ const confirmDelete = () => {
     <ProviderLayout title="Recenzii">
         <div class="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-ivt-line bg-white p-5 shadow-sm shadow-ivt-ink/5">
             <div class="flex items-center gap-4">
-                <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 font-serif text-2xl font-semibold text-primary">
+                <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 font-display text-2xl font-semibold text-primary">
                     {{ summary.rating ?? '—' }}
                 </span>
                 <div>
@@ -135,7 +135,7 @@ const confirmDelete = () => {
                         <p class="text-xs font-semibold text-ivt-ink">Răspunsul tău <span class="font-normal text-ivt-ink-soft">· {{ review.provider_replied_at }}</span></p>
                         <div class="flex gap-3 text-xs font-semibold">
                             <button type="button" class="text-primary hover:text-ivt-ink" @click="startReply(review)">Editează</button>
-                            <button type="button" class="text-rose-600 hover:text-rose-700" @click="replyToDelete = review">Șterge</button>
+                            <button type="button" class="text-danger-600 hover:text-danger-700" @click="replyToDelete = review">Șterge</button>
                         </div>
                     </div>
                     <p class="mt-1.5 whitespace-pre-line text-sm text-ivt-ink-soft">{{ review.provider_reply }}</p>
@@ -152,7 +152,7 @@ const confirmDelete = () => {
                         placeholder="Mulțumește-i clientului și răspunde politicos..."
                         class="w-full rounded-2xl border-ivt-line text-sm text-ivt-ink placeholder:text-ivt-ink-soft/50 focus:border-primary focus:ring-primary"
                     ></textarea>
-                    <p v-if="form.errors.reply" class="mt-1 text-xs text-rose-600">{{ form.errors.reply }}</p>
+                    <p v-if="form.errors.reply" class="mt-1 text-xs text-danger-600">{{ form.errors.reply }}</p>
                     <div class="mt-3 flex items-center justify-between gap-3">
                         <span class="text-xs text-ivt-ink-soft">{{ form.reply.length }}/1000</span>
                         <div class="flex gap-2">
@@ -160,7 +160,7 @@ const confirmDelete = () => {
                             <button
                                 type="submit"
                                 :disabled="form.processing || !form.reply.trim()"
-                                class="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-bright disabled:cursor-not-allowed disabled:opacity-50"
+                                class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:brightness-110 hover:shadow-glow-violet disabled:cursor-not-allowed disabled:opacity-50"
                             >Publică răspunsul</button>
                         </div>
                     </div>
@@ -169,7 +169,7 @@ const confirmDelete = () => {
                 <div v-else-if="!review.provider_reply" class="mt-4 flex flex-wrap items-center gap-3">
                     <button
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:bg-primary-bright"
+                        class="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:brightness-110 hover:shadow-glow-violet"
                         @click="startReply(review)"
                     >
                         <ChatBubbleLeftEllipsisIcon class="h-4 w-4" /> Răspunde

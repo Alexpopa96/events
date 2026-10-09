@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { ChartBarIcon } from '@heroicons/vue/24/outline';
+import { chart, ivt } from '@/palette';
 
 const props = defineProps({
     data: {
@@ -10,9 +11,9 @@ const props = defineProps({
 });
 
 const series = [
-    { key: 'views', label: 'Vizualizări', color: '#047857' },
-    { key: 'phone_clicks', label: 'Click-uri telefon', color: '#F59E0B' },
-    { key: 'whatsapp_clicks', label: 'Click-uri WhatsApp', color: '#10B981' },
+    { key: 'views', label: 'Vizualizări', color: chart[0] },
+    { key: 'phone_clicks', label: 'Click-uri telefon', color: chart[1] },
+    { key: 'whatsapp_clicks', label: 'Click-uri WhatsApp', color: chart[2] },
 ];
 
 const width = 720;
@@ -128,7 +129,7 @@ const tooltipStyle = computed(() => {
                 :x2="width - padding.right"
                 :y1="yFor(tick)"
                 :y2="yFor(tick)"
-                stroke="#E6DFE7"
+                :stroke="ivt['paper-3']"
                 stroke-width="1"
             />
 
@@ -139,7 +140,7 @@ const tooltipStyle = computed(() => {
                 :x="padding.left - 8"
                 :y="yFor(tick) + 3"
                 text-anchor="end"
-                class="fill-ink-soft"
+                class="fill-ivt-ink-soft"
                 font-size="10"
             >{{ tick }}</text>
 
@@ -150,7 +151,7 @@ const tooltipStyle = computed(() => {
                 :x="xFor(index)"
                 :y="height - 6"
                 text-anchor="middle"
-                class="fill-ink-soft"
+                class="fill-ivt-ink-soft"
                 font-size="10"
             >{{ data[index]?.date }}</text>
 
@@ -173,7 +174,7 @@ const tooltipStyle = computed(() => {
                     :x2="hoverX"
                     :y1="padding.top"
                     :y2="height - padding.bottom"
-                    stroke="#B7AFC0"
+                    :stroke="ivt['ink-faint']"
                     stroke-width="1"
                 />
                 <circle
@@ -183,7 +184,7 @@ const tooltipStyle = computed(() => {
                     :cy="yFor(hoverPoint[s.key])"
                     r="4"
                     :fill="s.color"
-                    stroke="#FAF8FB"
+                    :stroke="ivt.paper"
                     stroke-width="2"
                 />
             </template>

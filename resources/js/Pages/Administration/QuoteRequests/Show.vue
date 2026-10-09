@@ -100,10 +100,10 @@ const history = computed(() => {
     ];
 
     if (props.quoteRequest.approved_at) {
-        items.push({ label: 'Aprobată', date: props.quoteRequest.approved_at, icon: CheckCircle2, tone: 'text-emerald-600 bg-emerald-50' });
+        items.push({ label: 'Aprobată', date: props.quoteRequest.approved_at, icon: CheckCircle2, tone: 'text-success-600 bg-success-50' });
     }
     if (props.quoteRequest.rejected_at) {
-        items.push({ label: 'Respinsă', date: props.quoteRequest.rejected_at, reason: props.quoteRequest.rejection_reason, icon: XCircle, tone: 'text-rose-600 bg-rose-50' });
+        items.push({ label: 'Respinsă', date: props.quoteRequest.rejected_at, reason: props.quoteRequest.rejection_reason, icon: XCircle, tone: 'text-danger-600 bg-danger-50' });
     }
 
     return items;
@@ -116,7 +116,7 @@ const history = computed(() => {
         <div class="space-y-6">
             <!-- Header -->
             <div class="relative overflow-hidden rounded-3xl border border-ivt-line bg-white shadow-sm shadow-ivt-ink/5">
-                <div class="h-1.5 bg-gradient-to-r from-primary-bright via-primary to-ivt-gold"></div>
+                <div class="h-1.5 bg-gradient-to-r from-primary-bright via-primary to-ivt-violet"></div>
                 <div class="flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
                     <div class="flex items-start gap-4 min-w-0">
                         <Link
@@ -131,7 +131,7 @@ const history = computed(() => {
                         </span>
                         <div class="min-w-0">
                             <div class="flex items-center gap-2 flex-wrap">
-                                <h2 class="font-serif text-xl sm:text-2xl text-ivt-ink break-words">{{ quoteRequest.title }}</h2>
+                                <h2 class="font-display text-xl sm:text-2xl text-ivt-ink break-words">{{ quoteRequest.title }}</h2>
                                 <StatusBadge :status="quoteRequest.status" />
                             </div>
                             <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ivt-ink-soft">
@@ -148,7 +148,7 @@ const history = computed(() => {
                             type="button"
                             :disabled="processing"
                             @click="showApproveModal = true"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-primary hover:bg-primary-bright shadow-sm shadow-primary/25 transition-colors disabled:opacity-50"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand hover:brightness-110 hover:shadow-glow-violet shadow-sm shadow-primary/25 transition-colors disabled:opacity-50"
                         >
                             <CheckCircle2 class="w-4 h-4" /> Aprobă
                         </button>
@@ -157,7 +157,7 @@ const history = computed(() => {
                             type="button"
                             :disabled="processing"
                             @click="showRejectModal = true"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors disabled:opacity-50"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-danger-600 bg-danger-50 hover:bg-danger-100 transition-colors disabled:opacity-50"
                         >
                             <XCircle class="w-4 h-4" /> Respinge
                         </button>
@@ -167,14 +167,14 @@ const history = computed(() => {
                 <!-- Status notice -->
                 <div
                     v-if="quoteRequest.status === 'pending_review'"
-                    class="flex items-start gap-3 border-t border-amber-100 bg-amber-50/70 px-5 py-3 sm:px-6 text-sm text-amber-700"
+                    class="flex items-start gap-3 border-t border-warning-100 bg-warning-50/70 px-5 py-3 sm:px-6 text-sm text-warning-700"
                 >
                     <AlertTriangle class="w-4 h-4 mt-0.5 flex-none" />
                     Cererea așteaptă moderare. După aprobare devine vizibilă furnizorilor potriviți.
                 </div>
                 <div
                     v-else-if="quoteRequest.status === 'rejected'"
-                    class="flex items-start gap-3 border-t border-rose-100 bg-rose-50/70 px-5 py-3 sm:px-6 text-sm text-rose-700"
+                    class="flex items-start gap-3 border-t border-danger-100 bg-danger-50/70 px-5 py-3 sm:px-6 text-sm text-danger-700"
                 >
                     <XCircle class="w-4 h-4 mt-0.5 flex-none" />
                     <p>
@@ -223,7 +223,7 @@ const history = computed(() => {
                                 :key="pref"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-ivt-paper-2 text-ivt-ink"
                             >
-                                <CheckCircle2 class="w-3.5 h-3.5 text-ivt-gold" /> {{ pref }}
+                                <CheckCircle2 class="w-3.5 h-3.5 text-ivt-violet" /> {{ pref }}
                             </span>
                         </div>
                     </div>
@@ -255,7 +255,7 @@ const history = computed(() => {
                         <div class="mt-4 space-y-2">
                             <a
                                 :href="`mailto:${quoteRequest.email}`"
-                                class="group flex items-center gap-3 rounded-xl border border-ivt-line px-3 py-2.5 text-sm text-ivt-ink-soft transition-colors hover:border-ivt-gold hover:text-primary"
+                                class="group flex items-center gap-3 rounded-xl border border-ivt-line px-3 py-2.5 text-sm text-ivt-ink-soft transition-colors hover:border-ivt-violet hover:text-primary"
                             >
                                 <Mail class="w-4 h-4 flex-none" />
                                 <span class="min-w-0 flex-1 truncate">{{ quoteRequest.email }}</span>
@@ -263,7 +263,7 @@ const history = computed(() => {
                             </a>
                             <a
                                 :href="`tel:${quoteRequest.phone}`"
-                                class="group flex items-center gap-3 rounded-xl border border-ivt-line px-3 py-2.5 text-sm text-ivt-ink-soft transition-colors hover:border-ivt-gold hover:text-primary"
+                                class="group flex items-center gap-3 rounded-xl border border-ivt-line px-3 py-2.5 text-sm text-ivt-ink-soft transition-colors hover:border-ivt-violet hover:text-primary"
                             >
                                 <Phone class="w-4 h-4 flex-none" />
                                 <span class="min-w-0 flex-1 truncate">{{ quoteRequest.phone }}</span>
@@ -327,7 +327,7 @@ const history = computed(() => {
             title="Respinge cererea"
             description="Motivul va fi trimis clientului prin email."
             confirm-label="Respinge"
-            confirm-class="bg-rose-600 hover:bg-rose-700"
+            confirm-class="bg-danger-600 hover:bg-danger-700"
             :processing="processing"
             @close="showRejectModal = false"
             @confirm="reject"

@@ -28,8 +28,8 @@ const active = computed(() => nav.value?.plan_status === 'active');
             </span>
             <span class="min-w-0 flex-1">
                 <span class="block text-sm font-semibold text-ivt-ink truncate">{{ nav.company_name }}</span>
-                <span v-if="nav.plan_name" class="mt-0.5 flex items-center gap-1.5 text-xs" :class="active ? 'text-ivt-ink-soft' : 'text-rose-600'">
-                    <span class="w-1.5 h-1.5 rounded-full flex-none" :class="active ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+                <span v-if="nav.plan_name" class="mt-0.5 flex items-center gap-1.5 text-xs" :class="active ? 'text-ivt-ink-soft' : 'text-danger-600'">
+                    <span class="w-1.5 h-1.5 rounded-full flex-none" :class="active ? 'bg-success-500' : 'bg-danger-500'"></span>
                     <span class="truncate">Plan {{ nav.plan_name }}</span>
                 </span>
             </span>
@@ -38,7 +38,7 @@ const active = computed(() => nav.value?.plan_status === 'active');
         <Link
             :href="route('provider.listings.create')"
             @click="$emit('navigate')"
-            class="flex items-center justify-center gap-2 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white shadow-glow-primary transition-all duration-200 hover:bg-primary-bright hover:-translate-y-0.5 active:translate-y-0"
+            class="flex items-center justify-center gap-2 w-full rounded-full bg-brand px-4 py-3 text-sm font-semibold text-white shadow-glow-primary transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet hover:-translate-y-0.5 active:translate-y-0"
         >
             <PlusIcon class="w-4 h-4" /> Anunț nou
         </Link>

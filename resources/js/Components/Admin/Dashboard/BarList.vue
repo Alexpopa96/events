@@ -1,10 +1,11 @@
 <script setup>
 import { computed } from 'vue';
+import { ivt } from '@/palette';
 
 const props = defineProps({
     // [{ label, value }]
     items: { type: Array, required: true },
-    color: { type: String, default: '#1F3A2C' },
+    color: { type: String, default: ivt['ink-2'] },
 });
 
 const max = computed(() => Math.max(...props.items.map((i) => i.value), 1));

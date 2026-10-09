@@ -93,11 +93,11 @@ const confirmDestroy = () => {
             <div class="h-1.5 min-w-[8rem] flex-1 overflow-hidden rounded-full bg-ivt-paper-2">
                 <div
                     class="h-full rounded-full transition-all duration-500"
-                    :class="quotaReached ? 'bg-rose-500' : 'bg-gradient-to-r from-primary-bright to-ivt-gold-bright'"
+                    :class="quotaReached ? 'bg-danger-500' : 'bg-gradient-to-r from-primary-bright to-ivt-accent-bright'"
                     :style="`width: ${Math.min(100, (quota.used / quota.max) * 100)}%`"
                 ></div>
             </div>
-            <p class="text-xs" :class="quotaReached ? 'font-medium text-rose-600' : 'text-ivt-ink-soft'">
+            <p class="text-xs" :class="quotaReached ? 'font-medium text-danger-600' : 'text-ivt-ink-soft'">
                 {{ quota.used }} / {{ quota.max }} din planul {{ quota.plan_name }}
             </p>
             <Link v-if="quotaReached" :href="route('provider.subscription.index')" class="text-xs font-semibold text-primary hover:underline">Mărește planul</Link>
@@ -110,7 +110,7 @@ const confirmDestroy = () => {
                 :key="filter.value"
                 @click="activeFilter = filter.value"
                 class="flex-none inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-150"
-                :class="activeFilter === filter.value ? 'bg-primary text-white shadow-sm shadow-primary/25' : 'bg-white border border-ivt-line text-ivt-ink-soft hover:text-ivt-ink hover:border-ivt-gold/60'"
+                :class="activeFilter === filter.value ? 'bg-primary text-white shadow-sm shadow-primary/25' : 'bg-white border border-ivt-line text-ivt-ink-soft hover:text-ivt-ink hover:border-ivt-violet/60'"
             >
                 <component :is="filter.icon" class="h-3.5 w-3.5" />
                 {{ filter.label }}
@@ -173,7 +173,7 @@ const confirmDestroy = () => {
             <p class="text-sm text-ivt-ink-soft mb-5">Creează primul tău anunț ca să apari în fața clienților.</p>
             <Link
                 :href="route('provider.listings.create')"
-                class="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright hover:shadow-md hover:shadow-primary/30"
+                class="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet hover:shadow-md hover:shadow-primary/30"
             >
                 <PlusIcon class="w-4 h-4" /> Creează primul tău anunț
             </Link>

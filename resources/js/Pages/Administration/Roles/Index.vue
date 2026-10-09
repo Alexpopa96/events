@@ -29,7 +29,7 @@
                     </select>
                     <Link
                         href="/administration/roles/create"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:bg-primary-bright whitespace-nowrap"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:brightness-110 hover:shadow-glow-violet whitespace-nowrap"
                     >
                         <Plus class="w-4 h-4" />
                         Adaugă rol

@@ -25,7 +25,7 @@ defineProps({
         type: String,
         default: 'Contul meu',
     },
-    // Skip the centered max-w-7xl/padding wrapper so the page's own
+    // Skip the centered max-w-[1600px]/padding wrapper so the page's own
     // sections (e.g. the homepage body, with its full-bleed footer) can
     // manage their own width and background edge-to-edge.
     fullBleed: {
@@ -58,18 +58,18 @@ const logout = () => router.post(route('logout'));
 <template>
     <Head :title="title" />
 
-    <div class="min-h-screen bg-paper text-ink">
+    <div class="min-h-screen bg-ivt-paper text-ivt-ink">
         <SiteHeader />
 
         <!-- Page heading -->
-        <header v-if="$slots.header" class="border-b border-line bg-white/70 backdrop-blur">
-            <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <header v-if="$slots.header" class="border-b border-ivt-line bg-white/70 backdrop-blur">
+            <div class="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
                 <slot name="header" />
             </div>
         </header>
 
         <!-- Page content -->
-        <main :class="fullBleed ? '' : 'mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8'">
+        <main :class="fullBleed ? '' : 'mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8'">
             <slot />
         </main>
 
@@ -78,14 +78,14 @@ const logout = () => router.post(route('logout'));
         <FloatingChatBubble />
 
         <!-- Mobile bottom app nav -->
-        <nav class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
+        <nav class="fixed inset-x-0 bottom-0 z-40 border-t border-ivt-line bg-white/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
             <div class="mx-auto flex max-w-md items-center justify-between px-3 pt-2">
                 <Link
                     v-for="item in primaryNav.slice(0, 2)"
                     :key="item.label"
                     :href="item.href"
                     class="flex flex-1 flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150"
-                    :class="item.current() ? 'text-primary-bright' : 'text-ink-soft'"
+                    :class="item.current() ? 'text-primary-bright' : 'text-ivt-ink-soft'"
                 >
                     <component :is="item.current() ? item.iconActive : item.icon" class="h-6 w-6" />
                     {{ item.label }}
@@ -96,7 +96,7 @@ const logout = () => router.post(route('logout'));
                     :href="route('quote-requests.create')"
                     class="relative -top-5 flex flex-1 flex-col items-center"
                 >
-                    <span class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-bright text-white shadow-glow-primary ring-4 ring-paper transition-transform duration-150 active:scale-95">
+                    <span class="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-bright text-white shadow-glow-primary ring-4 ring-ivt-paper transition-transform duration-150 active:scale-95">
                         <PlusIcon class="h-6 w-6" />
                     </span>
                 </Link>
@@ -106,7 +106,7 @@ const logout = () => router.post(route('logout'));
                     :key="item.label"
                     :href="item.href"
                     class="flex flex-1 flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150"
-                    :class="item.current() ? 'text-primary-bright' : 'text-ink-soft'"
+                    :class="item.current() ? 'text-primary-bright' : 'text-ivt-ink-soft'"
                 >
                     <component :is="item.current() ? item.iconActive : item.icon" class="h-6 w-6" />
                     {{ item.label }}
@@ -116,7 +116,7 @@ const logout = () => router.post(route('logout'));
                     type="button"
                     @click="accountSheetOpen = true"
                     class="flex flex-1 flex-col items-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors duration-150"
-                    :class="accountSheetOpen || route().current('profile.*') ? 'text-primary-bright' : 'text-ink-soft'"
+                    :class="accountSheetOpen || route().current('profile.*') ? 'text-primary-bright' : 'text-ivt-ink-soft'"
                 >
                     <UserIcon class="h-6 w-6" />
                     Cont
@@ -134,7 +134,7 @@ const logout = () => router.post(route('logout'));
             leave-to-class="opacity-0"
         >
             <div v-if="accountSheetOpen" class="fixed inset-0 z-50 lg:hidden" @click="accountSheetOpen = false">
-                <div class="absolute inset-0 bg-ink/40" />
+                <div class="absolute inset-0 bg-ivt-ink/40" />
             </div>
         </transition>
         <transition
@@ -147,21 +147,21 @@ const logout = () => router.post(route('logout'));
         >
             <div
                 v-if="accountSheetOpen"
-                class="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-white p-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] shadow-[0_-16px_40px_-16px_rgba(33,28,39,0.25)] lg:hidden"
+                class="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl bg-white p-5 pb-[calc(env(safe-area-inset-bottom)+1.25rem)] shadow-[0_-16px_40px_-16px_rgba(26,20,51,0.25)] lg:hidden"
             >
-                <div class="mx-auto mb-4 h-1 w-10 rounded-full bg-line" />
+                <div class="mx-auto mb-4 h-1 w-10 rounded-full bg-ivt-line" />
 
                 <template v-if="!user">
                     <div class="flex items-center justify-between">
-                        <p class="text-sm font-medium text-ink">Contul tău</p>
-                        <button type="button" @click="accountSheetOpen = false" class="p-1 text-ink-soft">
+                        <p class="text-sm font-medium text-ivt-ink">Contul tău</p>
+                        <button type="button" @click="accountSheetOpen = false" class="p-1 text-ivt-ink-soft">
                             <XMarkIcon class="h-5 w-5" />
                         </button>
                     </div>
-                    <p class="mt-2 text-sm text-ink-soft">Autentifică-te pentru cereri de ofertă și favorite.</p>
+                    <p class="mt-2 text-sm text-ivt-ink-soft">Autentifică-te pentru cereri de ofertă și favorite.</p>
                     <div class="mt-4 flex gap-2">
                         <Link href="/login" class="flex-1 rounded-xl bg-primary px-4 py-2.5 text-center text-sm font-semibold text-white" @click="accountSheetOpen = false">Autentificare</Link>
-                        <Link href="/register/client" class="flex-1 rounded-xl border border-line px-4 py-2.5 text-center text-sm font-semibold text-ink" @click="accountSheetOpen = false">Cont nou</Link>
+                        <Link href="/register/client" class="flex-1 rounded-xl border border-ivt-line px-4 py-2.5 text-center text-sm font-semibold text-ivt-ink" @click="accountSheetOpen = false">Cont nou</Link>
                     </div>
                 </template>
                 <template v-else>
@@ -171,11 +171,11 @@ const logout = () => router.post(route('logout'));
                                 {{ initials(user.name) }}
                             </span>
                             <div class="min-w-0">
-                                <p class="truncate text-sm font-medium text-ink">{{ user.name }}</p>
-                                <p class="truncate text-xs text-ink-soft">{{ user.email }}</p>
+                                <p class="truncate text-sm font-medium text-ivt-ink">{{ user.name }}</p>
+                                <p class="truncate text-xs text-ivt-ink-soft">{{ user.email }}</p>
                             </div>
                         </div>
-                        <button type="button" @click="accountSheetOpen = false" class="p-1 text-ink-soft">
+                        <button type="button" @click="accountSheetOpen = false" class="p-1 text-ivt-ink-soft">
                             <XMarkIcon class="h-5 w-5" />
                         </button>
                     </div>
@@ -183,15 +183,15 @@ const logout = () => router.post(route('logout'));
                     <div class="mt-5 space-y-1">
                         <Link
                             :href="route('profile.show')"
-                            class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ink transition hover:bg-paper"
+                            class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-ivt-ink transition hover:bg-ivt-paper"
                             @click="accountSheetOpen = false"
                         >
-                            <UserCircleIcon class="h-5 w-5 text-ink-soft" /> Profil
+                            <UserCircleIcon class="h-5 w-5 text-ivt-ink-soft" /> Profil
                         </Link>
                         <button
                             type="button"
                             @click="logout"
-                            class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-rose-600 transition hover:bg-rose-50"
+                            class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-danger-600 transition hover:bg-danger-50"
                         >
                             <ArrowRightStartOnRectangleIcon class="h-5 w-5" /> Deconectare
                         </button>

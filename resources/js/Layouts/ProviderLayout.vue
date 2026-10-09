@@ -105,7 +105,7 @@ const drawerOpen = ref(false);
                 leave-to-class="-translate-x-full"
                 appear
             >
-                <aside class="absolute inset-y-0 left-0 w-[19rem] max-w-[85vw] bg-white p-5 flex flex-col shadow-[0_24px_60px_-12px_rgba(33,28,39,0.35)]">
+                <aside class="absolute inset-y-0 left-0 w-[19rem] max-w-[85vw] bg-white p-5 flex flex-col shadow-[0_24px_60px_-12px_rgba(26,20,51,0.35)]">
                     <div class="flex items-center justify-between mb-6">
                         <Logo variant="invita" />
                         <button @click="drawerOpen = false" class="p-1.5 rounded-full text-ivt-ink-soft hover:bg-ivt-paper" aria-label="Închide meniul"><XMarkIcon class="w-5 h-5" /></button>
@@ -156,10 +156,10 @@ const drawerOpen = ref(false);
                                 <HomeIcon v-if="crumb.home" class="w-3.5 h-3.5" />
                                 {{ crumb.label }}
                             </Link>
-                            <span v-else class="truncate font-medium text-ivt-gold" aria-current="page">{{ crumb.label }}</span>
+                            <span v-else class="truncate font-medium text-ivt-violet" aria-current="page">{{ crumb.label }}</span>
                         </template>
                     </nav>
-                    <h1 class="font-serif text-lg sm:text-xl text-ivt-ink leading-tight truncate">{{ title }}</h1>
+                    <h1 class="font-display text-lg sm:text-xl text-ivt-ink leading-tight truncate">{{ title }}</h1>
                 </div>
 
                 <div class="ml-auto flex flex-none items-center gap-2">

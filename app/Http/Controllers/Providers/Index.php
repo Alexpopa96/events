@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Providers;
 use App\Http\Controllers\Controller;
 use App\Models\Listing;
 use App\Models\ProviderProfile;
+use App\Support\Search\FuzzySearch;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -192,9 +193,7 @@ class Index extends Controller
     {
         return ProviderProfile::query()
             ->where('status', 'active')
-            ->when($filters['q'] ?? null, fn ($query, $q) => $query->where(function (Builder $query) use ($q) {
-                $query->where('company_name', 'like', "%{$q}%")->orWhere('description', 'like', "%{$q}%");
-            }))
+            ->when($filters['q'] ?? null, fn ($query, $q) => FuzzySearch::apply($query, $q, ['company_name', 'description', 'locality.name']))
             ->when(! in_array('category', $excluding) && ! empty($filters['category_ids']), fn ($query) => $query->whereHas(
                 'listings',
                 fn ($query) => $query->where('status', 'published')->whereIn('category_id', $filters['category_ids'])

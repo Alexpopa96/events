@@ -2,6 +2,7 @@
 
 namespace App\Support\Listings;
 
+use App\Support\Search\FuzzySearch;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListingQueryScope
@@ -15,9 +16,9 @@ class ListingQueryScope
     public static function apply(Builder $query, ListingFilters $filters, array $except = []): Builder
     {
         return $query
-            ->when($filters->q, fn (Builder $q, string $term) => $q->where(function (Builder $q) use ($term) {
-                $q->where('title', 'like', "%{$term}%")->orWhere('description', 'like', "%{$term}%");
-            }))
+            ->when($filters->q, fn (Builder $q, string $term) => FuzzySearch::apply(
+                $q, $term, ['title', 'description', 'category.name', 'providerProfile.company_name', 'locality.name']
+            ))
             ->when($filters->availableOn, fn (Builder $q, string $date) => $q->whereDoesntHave(
                 'providerProfile.availabilityBlocks', fn (Builder $q) => $q->whereDate('date', $date)
             ))

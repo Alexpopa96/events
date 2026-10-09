@@ -14,6 +14,15 @@ import {
     XMarkIcon,
     BookmarkIcon,
     MagnifyingGlassIcon,
+    Squares2X2Icon,
+    BuildingStorefrontIcon,
+    MapIcon,
+    DocumentTextIcon,
+    SparklesIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    PlusIcon,
+    MegaphoneIcon,
 } from '@heroicons/vue/24/outline';
 import Logo from '@/Components/Logo.vue';
 import PushNotificationToggle from '@/Components/PushNotificationToggle.vue';
@@ -36,17 +45,29 @@ const closeAccountMenu = () => {
 };
 
 const navLinks = [
-    { label: 'Categorii', href: () => route('categories.index'), current: () => route().current('categories.*') },
-    { label: 'Furnizori', href: () => route('providers.index'), current: () => route().current('providers.*') },
-    { label: 'Hartă', href: () => route('listings.map'), current: () => route().current('listings.map') },
-    { label: 'Cereri de ofertă', href: () => '/#cereri' },
-    { label: 'Abonamente', href: () => '/#abonamente', hideForClient: true },
+    { label: 'Categorii', icon: Squares2X2Icon, href: () => route('categories.index'), current: () => route().current('categories.*') },
+    { label: 'Anunțuri', icon: MegaphoneIcon, href: () => route('listings.index'), current: () => route().current('listings.*') && !route().current('listings.map') },
+    { label: 'Furnizori', icon: BuildingStorefrontIcon, href: () => route('providers.index'), current: () => route().current('providers.*') },
+    { label: 'Hartă', icon: MapIcon, href: () => route('listings.map'), current: () => route().current('listings.map') },
+    {
+        label: 'Cereri de ofertă',
+        icon: DocumentTextIcon,
+        href: () => {
+            if (page.props.auth.isProvider) return route('provider.leads.index');
+            if (can.value.submitQuoteRequest) return route('quote-requests.index');
+            return route('quote-requests.browse');
+        },
+        current: () => route().current('provider.leads.*') || route().current('quote-requests.*'),
+    },
+    { label: 'Abonamente', icon: SparklesIcon, href: () => route('subscriptions.index'), current: () => route().current('subscriptions.*'), hideForClient: true },
 ];
 
 const isClient = computed(() => !!user.value && !page.props.auth.isProvider);
 const visibleNavLinks = computed(() => navLinks.filter((item) => !(item.hideForClient && isClient.value)));
 
 const postAdHref = computed(() => (can.value.submitQuoteRequest ? route('quote-requests.create') : '/register/client'));
+
+const badge = (count) => (count > 99 ? '99+' : count);
 
 const initials = (name) => (name || '')
     .split(' ')
@@ -60,122 +81,156 @@ const logout = () => router.post(route('logout'));
 const searchOpen = ref(false);
 const isMac = typeof navigator !== 'undefined' && /Mac/.test(navigator.platform);
 
+// Compact the bar and lift it with a shadow once the page is scrolled.
+const scrolled = ref(false);
+const onScroll = () => {
+    scrolled.value = window.scrollY > 8;
+};
+
 const onKeydown = (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         searchOpen.value = true;
     }
+    if (event.key === 'Escape') closeAccountMenu();
 };
-onMounted(() => window.addEventListener('keydown', onKeydown));
-onUnmounted(() => window.removeEventListener('keydown', onKeydown));
+
+let removeNavigateListener;
+onMounted(() => {
+    window.addEventListener('keydown', onKeydown);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    removeNavigateListener = router.on('navigate', () => {
+        accountMenuOpen.value = false;
+        mobileMenuOpen.value = false;
+    });
+});
+onUnmounted(() => {
+    window.removeEventListener('keydown', onKeydown);
+    window.removeEventListener('scroll', onScroll);
+    removeNavigateListener?.();
+});
 </script>
 
 <template>
-    <header class="sticky top-0 z-50 border-b border-ivt-line bg-white/88 font-invita backdrop-blur-md">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="flex h-20 items-center justify-between py-3">
-                <Link href="/">
-                    <Logo variant="invita" />
-                </Link>
+    <header
+        class="sticky top-0 z-50 border-b border-ivt-line font-invita transition-[background-color,box-shadow] duration-300"
+        :class="scrolled
+            ? 'bg-white/80 shadow-[0_10px_30px_-18px_rgba(26,20,51,0.25)] backdrop-blur-xl backdrop-saturate-150'
+            : 'bg-white/95 shadow-[0_1px_2px_rgba(26,20,51,0.04)] backdrop-blur-md'"
+    >
+        <div class="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+            <div
+                class="flex items-center justify-between gap-4 transition-[height] duration-300"
+                :class="scrolled ? 'h-16' : 'h-20'"
+            >
+                <div class="flex min-w-0 items-center gap-8">
+                    <Link href="/" class="flex-none rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
+                        <Logo variant="invita" />
+                    </Link>
 
-                <nav class="hidden lg:flex items-center gap-8 text-[14.5px] font-medium text-ivt-ink-soft">
-                    <template v-for="item in visibleNavLinks" :key="item.label">
-                        <Link
-                            v-if="item.current"
-                            :href="item.href()"
-                            :class="item.current() ? 'text-ivt-ink' : 'transition-colors duration-150 hover:text-ivt-ink'"
-                        >
-                            {{ item.label }}
-                        </Link>
-                        <a v-else :href="item.href()" class="transition-colors duration-150 hover:text-ivt-ink">{{ item.label }}</a>
-                    </template>
-                </nav>
+                    <nav class="hidden items-center gap-1 rounded-full border border-ivt-line bg-ivt-paper-2/60 p-1 text-[14px] font-medium text-ivt-ink-soft lg:flex">
+                        <template v-for="item in visibleNavLinks" :key="item.label">
+                            <Link
+                                v-if="item.current"
+                                :href="item.href()"
+                                class="rounded-full px-4 py-1.5 transition-all duration-200"
+                                :class="item.current()
+                                    ? 'bg-white text-ivt-ink shadow-sm shadow-ivt-ink/10 ring-1 ring-ivt-line'
+                                    : 'hover:bg-white/70 hover:text-ivt-ink'"
+                                :aria-current="item.current() ? 'page' : undefined"
+                            >
+                                {{ item.label }}
+                            </Link>
+                            <a
+                                v-else
+                                :href="item.href()"
+                                class="rounded-full px-4 py-1.5 transition-all duration-200 hover:bg-white/70 hover:text-ivt-ink"
+                            >{{ item.label }}</a>
+                        </template>
+                    </nav>
+                </div>
 
-                <div class="flex items-center gap-1 lg:gap-3">
+                <div class="flex flex-none items-center gap-1.5 lg:gap-2">
+                    <!-- Search: field-like pill on desktop, icon on mobile -->
                     <button
                         type="button"
-                        title="Caută"
                         @click="searchOpen = true"
-                        class="hidden h-10 items-center gap-2 rounded-xl px-3 text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine sm:flex"
+                        class="group hidden h-10 w-56 items-center gap-2.5 rounded-full border border-ivt-line bg-white pl-3.5 pr-1.5 text-sm text-ivt-ink-faint transition-all duration-200 hover:border-primary/30 hover:shadow-sm xl:flex 2xl:w-72"
                     >
-                        <MagnifyingGlassIcon class="h-5 w-5" />
-                        <span class="hidden text-xs text-ivt-ink-soft/70 lg:inline">{{ isMac ? '⌘K' : 'Ctrl+K' }}</span>
+                        <MagnifyingGlassIcon class="h-[18px] w-[18px] text-ivt-ink-soft transition-colors group-hover:text-primary" />
+                        <span class="flex-1 truncate text-left">Caută furnizori, servicii…</span>
+                        <kbd class="rounded-full border border-ivt-line bg-ivt-paper-2 px-2 py-0.5 font-invita text-[11px] font-medium text-ivt-ink-soft">{{ isMac ? '⌘K' : 'Ctrl K' }}</kbd>
                     </button>
                     <button
                         type="button"
                         title="Caută"
+                        aria-label="Caută"
                         @click="searchOpen = true"
-                        class="flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine sm:hidden"
+                        class="icon-btn flex xl:hidden"
                     >
-                        <MagnifyingGlassIcon class="h-5 w-5" />
+                        <MagnifyingGlassIcon class="h-[22px] w-[22px]" />
                     </button>
-                    <div v-if="user" class="flex items-center gap-1">
-                        <Link
-                            :href="route('favorites.index')"
-                            title="Favorite"
-                            class="nav-favorites flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine"
-                        >
-                            <HeartIcon class="h-6 w-6" />
+
+                    <template v-if="user">
+                        <Link :href="route('favorites.index')" title="Favorite" aria-label="Favorite" class="nav-favorites icon-btn hidden sm:flex">
+                            <HeartIcon class="h-[22px] w-[22px]" />
                         </Link>
                         <Link
                             v-if="can.submitQuoteRequest"
                             :href="route('messages.index')"
                             title="Mesaje"
-                            class="relative flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine"
+                            aria-label="Mesaje"
+                            class="icon-btn relative hidden sm:flex"
                         >
-                            <ChatBubbleLeftRightIcon class="h-6 w-6" />
-                            <span
-                                v-if="unreadMessages"
-                                class="absolute right-0.5 top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-ivt-wine px-1 text-[10px] font-semibold text-white ring-2 ring-white"
-                            >{{ unreadMessages > 99 ? '99+' : unreadMessages }}</span>
+                            <ChatBubbleLeftRightIcon class="h-[22px] w-[22px]" />
+                            <span v-if="unreadMessages" class="badge">{{ badge(unreadMessages) }}</span>
                         </Link>
                         <span
                             v-else
                             title="În curând"
-                            class="relative flex h-10 w-10 cursor-not-allowed items-center justify-center rounded-xl text-ivt-ink-soft/40"
+                            class="relative hidden h-10 w-10 cursor-not-allowed items-center justify-center rounded-full text-ivt-ink-soft/40 sm:flex"
                         >
-                            <ChatBubbleLeftRightIcon class="h-6 w-6" />
+                            <ChatBubbleLeftRightIcon class="h-[22px] w-[22px]" />
                             <LockClosedIcon class="absolute right-1.5 top-1.5 h-3 w-3 text-ivt-ink-soft/50" />
                         </span>
-                        <Link
-                            :href="route('notifications.index')"
-                            title="Notificări"
-                            class="relative flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine"
-                        >
-                            <BellIcon class="h-6 w-6" />
-                            <span
-                                v-if="unreadNotifications"
-                                class="absolute right-0.5 top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-ivt-wine px-1 text-[10px] font-semibold text-white ring-2 ring-white"
-                            >{{ unreadNotifications > 99 ? '99+' : unreadNotifications }}</span>
+                        <Link :href="route('notifications.index')" title="Notificări" aria-label="Notificări" class="icon-btn relative flex">
+                            <BellIcon class="h-[22px] w-[22px]" />
+                            <span v-if="unreadNotifications" class="badge">{{ badge(unreadNotifications) }}</span>
                         </Link>
-                        <div class="relative hidden lg:block">
+
+                        <div class="relative ml-1 hidden lg:block">
                             <button
                                 type="button"
                                 title="Contul meu"
                                 aria-haspopup="true"
                                 :aria-expanded="accountMenuOpen"
                                 @click="accountMenuOpen = !accountMenuOpen"
-                                @keyup.esc="closeAccountMenu"
-                                class="flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine"
+                                class="flex h-10 items-center gap-1.5 rounded-full border border-ivt-line bg-white py-1 pl-1 pr-2.5 transition-all duration-200 hover:border-primary/30 hover:shadow-sm"
+                                :class="{ 'border-primary/40 shadow-sm': accountMenuOpen }"
                             >
-                                <UserCircleIcon class="h-6 w-6" />
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-ivt-ink-2 to-ivt-ink text-xs font-semibold text-ivt-on-dark">
+                                    {{ initials(user.name) }}
+                                </span>
+                                <ChevronDownIcon class="h-4 w-4 text-ivt-ink-soft transition-transform duration-200" :class="{ 'rotate-180': accountMenuOpen }" />
                             </button>
 
-                            <div v-if="accountMenuOpen" class="fixed inset-0 z-30" @click="closeAccountMenu" @keyup.esc="closeAccountMenu" />
+                            <div v-if="accountMenuOpen" class="fixed inset-0 z-30" @click="closeAccountMenu" />
 
                             <transition
-                                enter-active-class="transition ease-out duration-150"
-                                enter-from-class="opacity-0 -translate-y-1"
-                                enter-to-class="opacity-100 translate-y-0"
+                                enter-active-class="transition ease-out duration-200"
+                                enter-from-class="opacity-0 -translate-y-1 scale-[0.97]"
+                                enter-to-class="opacity-100 translate-y-0 scale-100"
                                 leave-active-class="transition ease-in duration-100"
-                                leave-from-class="opacity-100"
-                                leave-to-class="opacity-0"
+                                leave-from-class="opacity-100 scale-100"
+                                leave-to-class="opacity-0 scale-[0.97]"
                             >
-                                <div v-if="accountMenuOpen" @keyup.esc="closeAccountMenu" class="absolute right-0 z-40 mt-2.5 w-72 rounded-2xl border border-ivt-line bg-white p-2 shadow-xl shadow-ivt-ink/10 ring-1 ring-black/[0.03]">
-                                    <div class="absolute -top-1.5 right-3 h-3 w-3 rotate-45 border-l border-t border-ivt-line bg-white" />
-
-                                    <div class="flex items-center gap-3 rounded-xl px-2.5 py-3">
-                                        <span class="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-gradient-to-br from-ivt-ink-2 to-ivt-ink text-sm font-semibold text-ivt-on-dark shadow-sm shadow-ivt-ink/30">
+                                <div
+                                    v-if="accountMenuOpen"
+                                    class="absolute right-0 z-40 mt-3 w-80 origin-top-right overflow-hidden rounded-3xl border border-ivt-line bg-white/95 shadow-ivt-deep backdrop-blur-xl"
+                                >
+                                    <div class="flex items-center gap-3 bg-gradient-to-br from-ivt-paper-2 to-white px-4 py-4">
+                                        <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-ivt-ink-2 to-ivt-ink text-sm font-semibold text-ivt-on-dark shadow-sm shadow-ivt-ink/30">
                                             {{ initials(user.name) }}
                                         </span>
                                         <div class="min-w-0">
@@ -184,65 +239,79 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown));
                                         </div>
                                     </div>
 
-                                    <div class="my-1 h-px bg-ivt-line" />
-
-                                    <nav class="flex flex-col gap-0.5">
-                                        <Link :href="route('profile.show')" class="group flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-ink" @click="accountMenuOpen = false">
-                                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-ivt-paper-2 text-ivt-ink-soft transition-colors duration-150 group-hover:bg-white group-hover:text-ivt-wine">
-                                                <UserCircleIcon class="h-5 w-5" />
-                                            </span>
-                                            Profil
+                                    <nav class="flex flex-col gap-0.5 p-2">
+                                        <Link :href="route('profile.show')" class="menu-item group" @click="closeAccountMenu">
+                                            <span class="menu-icon"><UserCircleIcon class="h-5 w-5" /></span>
+                                            <span class="flex-1">Profil</span>
+                                            <ChevronRightIcon class="menu-chevron" />
                                         </Link>
-                                        <Link v-if="can.submitQuoteRequest" :href="route('quote-requests.index')" class="group flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-ink" @click="accountMenuOpen = false">
-                                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-ivt-paper-2 text-ivt-ink-soft transition-colors duration-150 group-hover:bg-white group-hover:text-ivt-wine">
-                                                <ClipboardDocumentListIcon class="h-5 w-5" />
-                                            </span>
-                                            Cererile mele
+                                        <Link v-if="can.submitQuoteRequest" :href="route('quote-requests.index')" class="menu-item group" @click="closeAccountMenu">
+                                            <span class="menu-icon"><ClipboardDocumentListIcon class="h-5 w-5" /></span>
+                                            <span class="flex-1">Cererile mele</span>
+                                            <ChevronRightIcon class="menu-chevron" />
                                         </Link>
-                                        <Link v-if="can.saveSearch" :href="route('saved-searches.index')" class="group flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-ink" @click="accountMenuOpen = false">
-                                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-ivt-paper-2 text-ivt-ink-soft transition-colors duration-150 group-hover:bg-white group-hover:text-ivt-wine">
-                                                <BookmarkIcon class="h-5 w-5" />
-                                            </span>
-                                            Căutări salvate
+                                        <Link :href="route('favorites.index')" class="menu-item group" @click="closeAccountMenu">
+                                            <span class="menu-icon"><HeartIcon class="h-5 w-5" /></span>
+                                            <span class="flex-1">Favorite</span>
+                                            <ChevronRightIcon class="menu-chevron" />
                                         </Link>
-                                        <PushNotificationToggle v-if="user" />
+                                        <Link v-if="can.submitQuoteRequest" :href="route('messages.index')" class="menu-item group" @click="closeAccountMenu">
+                                            <span class="menu-icon"><ChatBubbleLeftRightIcon class="h-5 w-5" /></span>
+                                            <span class="flex-1">Mesajele mele</span>
+                                            <span v-if="unreadMessages" class="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-bold tabular-nums text-white">{{ badge(unreadMessages) }}</span>
+                                            <ChevronRightIcon class="menu-chevron" />
+                                        </Link>
+                                        <Link :href="route('notifications.index')" class="menu-item group" @click="closeAccountMenu">
+                                            <span class="menu-icon"><BellIcon class="h-5 w-5" /></span>
+                                            <span class="flex-1">Notificări</span>
+                                            <span v-if="unreadNotifications" class="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-bold tabular-nums text-white">{{ badge(unreadNotifications) }}</span>
+                                            <ChevronRightIcon class="menu-chevron" />
+                                        </Link>
+                                        <Link v-if="can.saveSearch" :href="route('saved-searches.index')" class="menu-item group" @click="closeAccountMenu">
+                                            <span class="menu-icon"><BookmarkIcon class="h-5 w-5" /></span>
+                                            <span class="flex-1">Căutări salvate</span>
+                                            <ChevronRightIcon class="menu-chevron" />
+                                        </Link>
+                                        <PushNotificationToggle />
                                     </nav>
 
-                                    <div class="my-1 h-px bg-ivt-line" />
-
-                                    <button type="button" @click="logout" class="group flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium text-ivt-wine transition-colors duration-150 hover:bg-ivt-wine/10">
-                                        <span class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-ivt-wine/10 text-ivt-wine transition-colors duration-150 group-hover:bg-ivt-wine/15">
-                                            <ArrowRightStartOnRectangleIcon class="h-5 w-5" />
-                                        </span>
-                                        Deconectare
-                                    </button>
+                                    <div class="border-t border-ivt-line p-2">
+                                        <button type="button" @click="logout" class="group flex w-full items-center gap-3 rounded-2xl px-2.5 py-2 text-sm font-medium text-primary transition-colors duration-150 hover:bg-primary/10">
+                                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors duration-150 group-hover:bg-primary/15">
+                                                <ArrowRightStartOnRectangleIcon class="h-5 w-5" />
+                                            </span>
+                                            Deconectare
+                                        </button>
+                                    </div>
                                 </div>
                             </transition>
                         </div>
-                    </div>
-
-                    <Link
-                        :href="postAdHref"
-                        class="hidden rounded-full bg-gradient-to-b from-ivt-ink-2 to-ivt-ink px-5 py-2.5 text-sm font-semibold text-ivt-paper transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(22,40,31,0.4)] lg:inline-block"
-                    >
-                        Postează anunț
-                    </Link>
+                    </template>
 
                     <Link
                         v-if="!user"
                         href="/login"
-                        class="hidden rounded-full border border-ivt-line px-5 py-2 text-sm font-semibold text-ivt-ink transition-colors duration-150 hover:border-ivt-gold hover:text-ivt-wine lg:inline-block"
+                        class="hidden rounded-full px-4 py-2 text-sm font-semibold text-ivt-ink transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-primary lg:inline-block"
                     >
                         Autentificare
+                    </Link>
+
+                    <Link
+                        :href="postAdHref"
+                        class="ml-1 hidden items-center gap-1.5 rounded-full bg-gradient-to-b from-ivt-ink-2 to-ivt-ink py-2.5 pl-3.5 pr-5 text-sm font-semibold text-ivt-paper shadow-[0_8px_20px_-10px_rgba(26,20,51,0.6)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(26,20,51,0.5)] lg:inline-flex"
+                    >
+                        <PlusIcon class="h-4 w-4 stroke-[2.5]" />
+                        Postează anunț
                     </Link>
 
                     <button
                         type="button"
                         title="Meniu"
+                        aria-label="Deschide meniul"
                         aria-haspopup="true"
                         :aria-expanded="mobileMenuOpen"
                         @click="mobileMenuOpen = true"
-                        class="flex h-10 w-10 items-center justify-center rounded-xl text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-wine lg:hidden"
+                        class="icon-btn flex lg:hidden"
                     >
                         <Bars3Icon class="h-6 w-6" />
                     </button>
@@ -255,80 +324,134 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown));
             <Dialog as="div" class="relative z-50 lg:hidden" @close="mobileMenuOpen = false">
                 <TransitionChild
                     as="template"
-                    enter="ease-out duration-200" enter-from="opacity-0" enter-to="opacity-100"
-                    leave="ease-in duration-150" leave-from="opacity-100" leave-to="opacity-0"
+                    enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100"
+                    leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0"
                 >
-                    <div class="fixed inset-0 bg-ivt-ink/40" />
+                    <div class="fixed inset-0 bg-ivt-ink/30 backdrop-blur-sm" />
                 </TransitionChild>
 
                 <div class="fixed inset-0 flex justify-end">
                     <TransitionChild
                         as="template"
-                        enter="ease-out duration-200" enter-from="translate-x-full" enter-to="translate-x-0"
-                        leave="ease-in duration-150" leave-from="translate-x-0" leave-to="translate-x-full"
+                        enter="ease-[cubic-bezier(0.22,1,0.36,1)] duration-300" enter-from="translate-x-full" enter-to="translate-x-0"
+                        leave="ease-in duration-200" leave-from="translate-x-0" leave-to="translate-x-full"
                     >
-                        <DialogPanel class="flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white font-invita shadow-xl shadow-ivt-ink/10">
-                            <div class="flex flex-none items-center justify-between border-b border-ivt-line px-5 py-4">
+                        <DialogPanel class="flex h-full w-full max-w-sm flex-col overflow-y-auto bg-white font-invita shadow-ivt-deep sm:rounded-l-3xl">
+                            <div class="flex flex-none items-center justify-between px-5 py-4">
                                 <Logo variant="invita" />
-                                <button type="button" @click="mobileMenuOpen = false" class="text-ivt-ink-soft hover:text-ivt-ink">
+                                <button
+                                    type="button"
+                                    aria-label="Închide meniul"
+                                    @click="mobileMenuOpen = false"
+                                    class="flex h-10 w-10 items-center justify-center rounded-full bg-ivt-paper-2 text-ivt-ink-soft transition-colors hover:bg-ivt-paper-3 hover:text-ivt-ink"
+                                >
                                     <XMarkIcon class="h-5 w-5" />
                                 </button>
                             </div>
 
-                            <nav class="flex flex-1 flex-col gap-1 px-3 py-4 text-sm font-medium text-ivt-ink">
-                                <template v-for="item in visibleNavLinks" :key="item.label">
-                                    <Link
-                                        v-if="item.current"
-                                        :href="item.href()"
-                                        @click="mobileMenuOpen = false"
-                                        class="rounded-xl px-3 py-2.5 transition-colors duration-150"
-                                        :class="item.current() ? 'bg-ivt-paper-2 text-ivt-wine' : 'hover:bg-ivt-paper-2'"
-                                    >
-                                        {{ item.label }}
+                            <div class="flex flex-1 flex-col gap-5 px-4 pb-4">
+                                <!-- Account card -->
+                                <div v-if="user" class="rounded-3xl bg-gradient-to-br from-ivt-ink-2 to-ivt-ink p-4 text-ivt-on-dark">
+                                    <Link :href="route('profile.show')" class="flex items-center gap-3">
+                                        <span class="flex h-12 w-12 flex-none items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold ring-1 ring-white/15">
+                                            {{ initials(user.name) }}
+                                        </span>
+                                        <div class="min-w-0 flex-1">
+                                            <p class="truncate text-sm font-semibold text-white">{{ user.name }}</p>
+                                            <p class="truncate text-xs text-ivt-on-dark-dim">{{ user.email }}</p>
+                                        </div>
+                                        <ChevronRightIcon class="h-4 w-4 text-ivt-on-dark-dim" />
                                     </Link>
-                                    <a v-else :href="item.href()" @click="mobileMenuOpen = false" class="rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-ivt-paper-2">
-                                        {{ item.label }}
-                                    </a>
-                                </template>
 
-                                <div class="my-2 h-px bg-ivt-line" />
+                                    <div class="mt-4 grid grid-cols-3 gap-2">
+                                        <Link :href="route('favorites.index')" class="quick-action">
+                                            <HeartIcon class="h-5 w-5" />
+                                            Favorite
+                                        </Link>
+                                        <Link v-if="can.submitQuoteRequest" :href="route('messages.index')" class="quick-action relative">
+                                            <ChatBubbleLeftRightIcon class="h-5 w-5" />
+                                            Mesaje
+                                            <span v-if="unreadMessages" class="badge !ring-ivt-ink">{{ badge(unreadMessages) }}</span>
+                                        </Link>
+                                        <span v-else class="quick-action relative cursor-not-allowed opacity-50" title="În curând">
+                                            <ChatBubbleLeftRightIcon class="h-5 w-5" />
+                                            Mesaje
+                                            <LockClosedIcon class="absolute right-2 top-2 h-3 w-3" />
+                                        </span>
+                                        <Link :href="route('notifications.index')" class="quick-action relative">
+                                            <BellIcon class="h-5 w-5" />
+                                            Notificări
+                                            <span v-if="unreadNotifications" class="badge !ring-ivt-ink">{{ badge(unreadNotifications) }}</span>
+                                        </Link>
+                                    </div>
+                                </div>
 
-                                <template v-if="user">
-                                    <Link :href="route('profile.show')" @click="mobileMenuOpen = false" class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-ivt-paper-2">
-                                        <UserCircleIcon class="h-5 w-5 text-ivt-ink-soft" />
-                                        Profil
-                                    </Link>
-                                    <Link v-if="can.submitQuoteRequest" :href="route('quote-requests.index')" @click="mobileMenuOpen = false" class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-ivt-paper-2">
-                                        <ClipboardDocumentListIcon class="h-5 w-5 text-ivt-ink-soft" />
-                                        Cererile mele
-                                    </Link>
-                                    <Link :href="route('favorites.index')" @click="mobileMenuOpen = false" class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-ivt-paper-2">
-                                        <HeartIcon class="h-5 w-5 text-ivt-ink-soft" />
-                                        Favorite
-                                    </Link>
-                                    <Link v-if="can.saveSearch" :href="route('saved-searches.index')" @click="mobileMenuOpen = false" class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-ivt-paper-2">
-                                        <BookmarkIcon class="h-5 w-5 text-ivt-ink-soft" />
-                                        Căutări salvate
-                                    </Link>
-                                    <PushNotificationToggle />
-                                    <button type="button" @click="logout" class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-ivt-wine transition-colors duration-150 hover:bg-ivt-wine/10">
-                                        <ArrowRightStartOnRectangleIcon class="h-5 w-5" />
-                                        Deconectare
-                                    </button>
-                                </template>
-                                <Link v-else href="/login" @click="mobileMenuOpen = false" class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-ivt-paper-2">
-                                    <UserCircleIcon class="h-5 w-5 text-ivt-ink-soft" />
-                                    Autentificare
-                                </Link>
-                            </nav>
+                                <!-- Main navigation -->
+                                <div>
+                                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ivt-ink-faint">Explorează</p>
+                                    <nav class="flex flex-col gap-0.5 text-[15px] font-medium text-ivt-ink">
+                                        <template v-for="item in visibleNavLinks" :key="item.label">
+                                            <component
+                                                :is="item.current ? Link : 'a'"
+                                                :href="item.href()"
+                                                @click="mobileMenuOpen = false"
+                                                class="group flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors duration-150"
+                                                :class="item.current?.() ? 'bg-ivt-paper-2 text-primary' : 'hover:bg-ivt-paper-2'"
+                                            >
+                                                <span
+                                                    class="flex h-9 w-9 flex-none items-center justify-center rounded-xl transition-colors"
+                                                    :class="item.current?.() ? 'bg-white text-primary shadow-sm' : 'bg-ivt-paper-2 text-ivt-ink-soft group-hover:bg-white'"
+                                                >
+                                                    <component :is="item.icon" class="h-5 w-5" />
+                                                </span>
+                                                <span class="flex-1">{{ item.label }}</span>
+                                                <ChevronRightIcon class="h-4 w-4 text-ivt-ink-faint" />
+                                            </component>
+                                        </template>
+                                    </nav>
+                                </div>
 
-                            <div class="flex-none border-t border-ivt-line p-4" style="padding-bottom: max(1rem, env(safe-area-inset-bottom))">
+                                <!-- Account links -->
+                                <div v-if="user">
+                                    <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-ivt-ink-faint">Contul meu</p>
+                                    <nav class="flex flex-col gap-0.5">
+                                        <Link v-if="can.submitQuoteRequest" :href="route('quote-requests.index')" class="menu-item group">
+                                            <span class="menu-icon"><ClipboardDocumentListIcon class="h-5 w-5" /></span>
+                                            <span class="flex-1">Cererile mele</span>
+                                            <ChevronRightIcon class="menu-chevron" />
+                                        </Link>
+                                        <Link v-if="can.saveSearch" :href="route('saved-searches.index')" class="menu-item group">
+                                            <span class="menu-icon"><BookmarkIcon class="h-5 w-5" /></span>
+                                            <span class="flex-1">Căutări salvate</span>
+                                            <ChevronRightIcon class="menu-chevron" />
+                                        </Link>
+                                        <PushNotificationToggle />
+                                        <button type="button" @click="logout" class="group mt-1 flex w-full items-center gap-3 rounded-2xl px-2.5 py-2 text-left text-sm font-medium text-primary transition-colors duration-150 hover:bg-primary/10">
+                                            <span class="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-primary/10">
+                                                <ArrowRightStartOnRectangleIcon class="h-5 w-5" />
+                                            </span>
+                                            Deconectare
+                                        </button>
+                                    </nav>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-none flex-col gap-2 border-t border-ivt-line p-4" style="padding-bottom: max(1rem, env(safe-area-inset-bottom))">
                                 <Link
                                     :href="postAdHref"
                                     @click="mobileMenuOpen = false"
-                                    class="block w-full rounded-full bg-gradient-to-b from-ivt-ink-2 to-ivt-ink px-4 py-3 text-center text-sm font-semibold text-ivt-paper transition-colors"
+                                    class="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-ivt-ink-2 to-ivt-ink px-4 py-3 text-sm font-semibold text-ivt-paper shadow-[0_8px_20px_-10px_rgba(26,20,51,0.6)]"
                                 >
+                                    <PlusIcon class="h-4 w-4 stroke-[2.5]" />
                                     Postează anunț
+                                </Link>
+                                <Link
+                                    v-if="!user"
+                                    href="/login"
+                                    @click="mobileMenuOpen = false"
+                                    class="block w-full rounded-full border border-ivt-line px-4 py-3 text-center text-sm font-semibold text-ivt-ink transition-colors hover:border-ivt-violet hover:text-primary"
+                                >
+                                    Autentificare
                                 </Link>
                             </div>
                         </DialogPanel>
@@ -340,3 +463,24 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown));
         <GlobalSearch v-model:show="searchOpen" />
     </header>
 </template>
+
+<style scoped>
+.icon-btn {
+    @apply h-10 w-10 items-center justify-center rounded-full text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-primary;
+}
+.badge {
+    @apply absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-white ring-2 ring-white;
+}
+.menu-item {
+    @apply flex items-center gap-3 rounded-2xl px-2.5 py-2 text-sm font-medium text-ivt-ink-soft transition-colors duration-150 hover:bg-ivt-paper-2 hover:text-ivt-ink;
+}
+.menu-icon {
+    @apply flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-ivt-paper-2 text-ivt-ink-soft transition-colors duration-150 group-hover:bg-white group-hover:text-primary;
+}
+.menu-chevron {
+    @apply h-4 w-4 -translate-x-1 text-ivt-ink-faint opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100;
+}
+.quick-action {
+    @apply flex flex-col items-center gap-1.5 rounded-2xl bg-white/[0.07] px-2 py-3 text-xs font-medium text-ivt-on-dark ring-1 ring-white/10 transition-colors hover:bg-white/[0.12];
+}
+</style>

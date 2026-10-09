@@ -12,6 +12,8 @@ const props = defineProps({
     // How many years past the minimum the year picker offers.
     yearSpan: { type: Number, default: 10 },
     buttonClass: { type: [String, Array, Object], default: '' },
+    // 'YYYY-MM-DD' days to flag as busy; they stay selectable.
+    busyDates: { type: Array, default: () => [] },
 });
 
 // 'YYYY-MM-DD' string (or '') so it drops straight into the backend payload.
@@ -42,6 +44,8 @@ const label = computed(() => {
     return `${d} ${MONTHS[m - 1]} ${y}`;
 });
 
+const busySet = computed(() => new Set(props.busyDates));
+
 const years = computed(() => Array.from({ length: props.yearSpan + 1 }, (_, i) => minYear.value + i));
 
 const cells = computed(() => {
@@ -50,7 +54,7 @@ const cells = computed(() => {
     const result = Array.from({ length: offset }, () => null);
     for (let day = 1; day <= daysInMonth; day++) {
         const iso = toIso(viewYear.value, viewMonth.value, day);
-        result.push({ day, iso, disabled: iso < minIso.value });
+        result.push({ day, iso, disabled: iso < minIso.value, busy: busySet.value.has(iso) });
     }
     return result;
 });
@@ -124,7 +128,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="relative">
-        <CalendarDaysIcon class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ivt-wine" />
+        <CalendarDaysIcon class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
         <button
             :id="id"
             type="button"
@@ -157,7 +161,7 @@ onBeforeUnmount(() => {
                     aria-modal="true"
                     :aria-label="title"
                     tabindex="-1"
-                    class="date-pop relative w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-[0_40px_90px_-30px_rgba(33,28,39,0.55),0_0_0_1px_rgba(33,28,39,0.06)] outline-none"
+                    class="date-pop relative w-full max-w-sm overflow-hidden rounded-3xl bg-white shadow-[0_40px_90px_-30px_rgba(26,20,51,0.55),0_0_0_1px_rgba(26,20,51,0.06)] outline-none"
                 >
                     <div class="flex items-center justify-between gap-3 px-5 pt-5">
                         <h2 class="text-[17px] font-semibold tracking-tight text-ivt-ink">{{ title }}</h2>
@@ -211,15 +215,17 @@ onBeforeUnmount(() => {
                                         v-else
                                         type="button"
                                         :disabled="cell.disabled"
-                                        class="mx-auto grid h-10 w-10 place-items-center rounded-full text-[14px] transition-colors"
+                                        class="relative mx-auto grid h-10 w-10 place-items-center rounded-full text-[14px] transition-colors"
                                         :class="[
-                                            cell.iso === model ? 'bg-ivt-gold font-semibold text-white shadow-sm' : 'text-ivt-ink hover:bg-ivt-paper-2',
-                                            cell.iso === todayIso && cell.iso !== model ? 'ring-1 ring-inset ring-ivt-gold/60' : '',
+                                            cell.iso === model ? 'bg-ivt-violet font-semibold text-white shadow-sm' : 'text-ivt-ink hover:bg-ivt-paper-2',
+                                            cell.busy && !cell.disabled && cell.iso !== model ? 'text-ivt-ink-faint line-through' : '',
+                                            cell.iso === todayIso && cell.iso !== model ? 'ring-1 ring-inset ring-ivt-violet/60' : '',
                                             cell.disabled ? 'cursor-not-allowed text-ivt-ink-faint/50 hover:bg-transparent' : '',
                                         ]"
                                         @click="pickDay(cell)"
                                     >
                                         {{ cell.day }}
+                                        <span v-if="cell.busy && !cell.disabled" class="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full" :class="cell.iso === model ? 'bg-white' : 'bg-danger-500'" />
                                     </button>
                                 </template>
                             </div>
@@ -234,7 +240,7 @@ onBeforeUnmount(() => {
                                 :disabled="monthDisabled(index)"
                                 class="rounded-xl py-3 text-[14px] capitalize transition-colors"
                                 :class="[
-                                    index === viewMonth ? 'bg-ivt-gold font-semibold text-white' : 'text-ivt-ink hover:bg-ivt-paper-2',
+                                    index === viewMonth ? 'bg-ivt-violet font-semibold text-white' : 'text-ivt-ink hover:bg-ivt-paper-2',
                                     monthDisabled(index) ? 'cursor-not-allowed text-ivt-ink-faint/50 hover:bg-transparent' : '',
                                 ]"
                                 @click="pickMonth(index)"
@@ -251,7 +257,7 @@ onBeforeUnmount(() => {
                                 type="button"
                                 :data-selected="year === viewYear"
                                 class="rounded-xl py-3 text-[14px] transition-colors"
-                                :class="year === viewYear ? 'bg-ivt-gold font-semibold text-white' : 'text-ivt-ink hover:bg-ivt-paper-2'"
+                                :class="year === viewYear ? 'bg-ivt-violet font-semibold text-white' : 'text-ivt-ink hover:bg-ivt-paper-2'"
                                 @click="pickYear(year)"
                             >
                                 {{ year }}
@@ -259,8 +265,12 @@ onBeforeUnmount(() => {
                         </div>
                     </div>
 
+                    <div v-if="busyDates.length && mode === 'days'" class="flex items-center gap-1.5 px-5 pb-3 text-[12px] text-ivt-ink-soft">
+                        <span class="h-1.5 w-1.5 rounded-full bg-danger-500" /> Zi ocupată
+                    </div>
+
                     <div class="flex items-center justify-between border-t border-ivt-line bg-ivt-paper-2/60 px-5 py-2.5 text-[12.5px]">
-                        <button type="button" class="font-semibold text-ivt-ink-soft transition-colors hover:text-ivt-wine disabled:opacity-40 disabled:hover:text-ivt-ink-soft" :disabled="!model" @click="clear">Șterge data</button>
+                        <button type="button" class="font-semibold text-ivt-ink-soft transition-colors hover:text-primary disabled:opacity-40 disabled:hover:text-ivt-ink-soft" :disabled="!model" @click="clear">Șterge data</button>
                         <span class="text-ivt-ink-faint">{{ label || 'Nicio dată aleasă' }}</span>
                     </div>
                 </div>

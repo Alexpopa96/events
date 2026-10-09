@@ -8,7 +8,7 @@ defineProps({
 
 <template>
     <div v-show="message">
-        <p class="flex items-center gap-1 text-sm text-red-600" role="alert">
+        <p class="flex items-center gap-1 text-sm text-danger-600" role="alert">
             <ExclamationCircleIcon class="h-4 w-4 flex-none" /> {{ message }}
         </p>
     </div>

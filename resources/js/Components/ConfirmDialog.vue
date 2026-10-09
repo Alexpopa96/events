@@ -42,14 +42,14 @@ const close = () => {
                         <span
                             class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl"
                             :class="{
-                                'bg-rose-50 text-rose-600': variant === 'danger',
+                                'bg-danger-50 text-danger-600': variant === 'danger',
                                 'bg-primary/10 text-primary': variant !== 'danger',
                             }"
                         >
                             <ExclamationTriangleIcon class="h-6 w-6" />
                         </span>
 
-                        <h2 class="mt-4 font-serif text-lg text-ivt-ink">{{ title }}</h2>
+                        <h2 class="mt-4 font-display text-lg text-ivt-ink">{{ title }}</h2>
                         <p v-if="message" class="mt-2 text-sm leading-relaxed text-ivt-ink-soft">{{ message }}</p>
 
                         <div class="mt-6 flex gap-3">
@@ -67,7 +67,7 @@ const close = () => {
                                 @click="emit('confirm')"
                                 class="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition-colors disabled:pointer-events-none disabled:opacity-60"
                                 :class="{
-                                    'bg-rose-600 hover:bg-rose-700': variant === 'danger',
+                                    'bg-danger-600 hover:bg-danger-700': variant === 'danger',
                                     'bg-primary hover:bg-primary-bright': variant !== 'danger',
                                 }"
                             >

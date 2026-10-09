@@ -108,14 +108,14 @@ const similarCategories = computed(() => {
             <section class="relative overflow-hidden border-b border-ivt-line bg-ivt-paper-2 py-12 sm:py-14">
                 <div
                     class="pointer-events-none absolute inset-x-[-10%] -top-[30%] h-[130%]"
-                    style="background: radial-gradient(50% 60% at 15% 0%, rgba(168,127,46,0.10), transparent 60%), radial-gradient(45% 45% at 95% 10%, rgba(124,46,59,0.08), transparent 60%);"
+                    style="background: radial-gradient(50% 60% at 15% 0%, rgba(124,58,237,0.10), transparent 60%), radial-gradient(45% 45% at 95% 10%, rgba(225,29,99,0.08), transparent 60%);"
                 />
 
-                <div class="relative mx-auto max-w-7xl px-6 lg:px-8">
+                <div class="relative mx-auto max-w-[1600px] px-6 lg:px-8">
                     <p class="mb-5 flex items-center gap-2 text-[13px] text-ivt-ink-faint">
-                        <Link :href="route('home')" class="text-ivt-ink-soft transition-colors hover:text-ivt-wine">Acasă</Link>
+                        <Link :href="route('home')" class="text-ivt-ink-soft transition-colors hover:text-primary">Acasă</Link>
                         <span>›</span>
-                        <Link :href="route('categories.index')" class="text-ivt-ink-soft transition-colors hover:text-ivt-wine">Categorii</Link>
+                        <Link :href="route('categories.index')" class="text-ivt-ink-soft transition-colors hover:text-primary">Categorii</Link>
                         <span>›</span>
                         <span>{{ category.name }}</span>
                     </p>
@@ -123,13 +123,13 @@ const similarCategories = computed(() => {
                     <div class="flex flex-wrap items-start justify-between gap-5">
                         <div class="flex items-start gap-[18px]">
                             <div class="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-gradient-to-br from-ivt-ink-2 to-ivt-ink">
-                                <component :is="categoryIcon(category.slug)" class="h-7 w-7 text-ivt-gold-bright" stroke-width="1.4" />
+                                <component :is="categoryIcon(category.slug)" class="h-7 w-7 text-ivt-accent-bright" stroke-width="1.4" />
                             </div>
                             <div>
-                                <p class="flex items-center gap-2.5 text-xs font-bold uppercase tracking-[0.18em] text-ivt-wine">
-                                    <span class="inline-block h-px w-[22px] bg-ivt-gold" /> Furnizori
+                                <p class="flex items-center gap-2.5 text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                                    <span class="inline-block h-px w-[22px] bg-ivt-violet" /> Furnizori
                                 </p>
-                                <h1 class="mt-2 font-serif text-[clamp(30px,3.6vw,44px)] font-medium leading-[1.05] tracking-[-0.01em] text-ivt-ink">{{ category.name }}</h1>
+                                <h1 class="mt-2 font-display text-[clamp(30px,3.6vw,44px)] font-medium leading-[1.05] tracking-[-0.01em] text-ivt-ink">{{ category.name }}</h1>
                                 <p class="mt-2.5 max-w-[520px] text-[15.5px] leading-relaxed text-ivt-ink-soft">
                                     {{ category.description || `Compară portofolii, prețuri și recenzii pentru furnizori de ${category.name.toLowerCase()}, apoi contactează direct pe cel potrivit.` }}
                                 </p>
@@ -138,15 +138,15 @@ const similarCategories = computed(() => {
 
                         <div class="hidden flex-wrap gap-7 sm:flex">
                             <div class="text-right">
-                                <b class="block font-serif text-[22px] font-semibold text-ivt-ink">{{ stats.listingsCount }}</b>
+                                <b class="block font-display text-[22px] font-semibold text-ivt-ink">{{ stats.listingsCount }}</b>
                                 <span class="text-xs text-ivt-ink-faint">furnizori</span>
                             </div>
                             <div class="text-right">
-                                <b class="block font-serif text-[22px] font-semibold text-ivt-ink">{{ stats.avgRating ?? '—' }}</b>
+                                <b class="block font-display text-[22px] font-semibold text-ivt-ink">{{ stats.avgRating ?? '—' }}</b>
                                 <span class="text-xs text-ivt-ink-faint">rating mediu</span>
                             </div>
                             <div class="text-right">
-                                <b class="block font-serif text-[22px] font-semibold text-ivt-ink">{{ stats.reviewsCount }}</b>
+                                <b class="block font-display text-[22px] font-semibold text-ivt-ink">{{ stats.reviewsCount }}</b>
                                 <span class="text-xs text-ivt-ink-faint">recenzii</span>
                             </div>
                         </div>
@@ -171,7 +171,7 @@ const similarCategories = computed(() => {
                             Filtre
                             <span
                                 v-if="activeFilterCount"
-                                class="flex h-5 min-w-5 items-center justify-center rounded-full bg-ivt-wine px-1 text-[11px] font-bold text-white"
+                                class="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-bold text-white"
                             >{{ activeFilterCount }}</span>
                         </button>
                     </div>
@@ -180,13 +180,13 @@ const similarCategories = computed(() => {
 
             <!-- LISTING -->
             <section class="py-14 pb-[110px]">
-                <div class="mx-auto grid max-w-7xl grid-cols-1 gap-9 px-6 lg:grid-cols-[272px_1fr] lg:px-8">
+                <div class="mx-auto grid max-w-[1600px] grid-cols-1 gap-9 px-6 lg:grid-cols-[272px_1fr] lg:px-8">
 
                     <!-- FILTERS -->
                     <aside class="hidden flex-col gap-6 self-start rounded-[18px] border border-ivt-line bg-white p-6 lg:sticky lg:top-24 lg:flex">
                         <div class="flex items-center justify-between">
                             <h3 class="text-base font-semibold">Filtre</h3>
-                            <button type="button" @click="resetFilters" class="text-[12.5px] font-semibold text-ivt-wine hover:underline">Resetează</button>
+                            <button type="button" @click="resetFilters" class="text-[12.5px] font-semibold text-primary hover:underline">Resetează</button>
                         </div>
 
                         <CategoryFilterPanel
@@ -203,7 +203,7 @@ const similarCategories = computed(() => {
                         <button
                             type="button"
                             @click="applyFilters()"
-                            class="mt-1 w-full rounded-full bg-gradient-to-b from-ivt-ink-2 to-ivt-ink px-5 py-3 text-sm font-semibold text-ivt-paper transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(22,40,31,0.4)]"
+                            class="mt-1 w-full rounded-full bg-gradient-to-b from-ivt-ink-2 to-ivt-ink px-5 py-3 text-sm font-semibold text-ivt-paper transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(26,20,51,0.4)]"
                         >
                             Aplică filtrele
                         </button>
@@ -215,7 +215,7 @@ const similarCategories = computed(() => {
                         <!-- RECOMMENDED -->
                         <div v-if="recommended.length" class="mb-11">
                             <div class="mb-[18px] flex flex-wrap items-center gap-2.5">
-                                <h3 class="font-serif text-[18px] font-medium">Recomandate în {{ category.name.toLowerCase() }}</h3>
+                                <h3 class="font-display text-[18px] font-medium">Recomandate în {{ category.name.toLowerCase() }}</h3>
                                 <span class="text-xs text-ivt-ink-faint">cele mai bine cotate</span>
                             </div>
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -225,15 +225,15 @@ const similarCategories = computed(() => {
                                     :href="route('listings.show', item.slug)"
                                     class="group relative flex flex-col gap-2.5 overflow-hidden rounded-2xl bg-gradient-to-br from-ivt-ink-2 to-ivt-ink p-5 text-ivt-on-dark transition-all duration-300 hover:-translate-y-1.5 hover:shadow-ivt-deep"
                                 >
-                                    <span class="pointer-events-none absolute -right-[60px] -top-[80px] h-[160px] w-[160px] rounded-full" style="background: radial-gradient(circle, rgba(201,162,79,0.2), transparent 70%);" />
-                                    <span v-if="item.is_featured" class="relative w-fit rounded-full border border-ivt-gold/50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ivt-gold-bright">Premium</span>
-                                    <h4 class="relative font-serif text-[19px] font-medium text-ivt-on-dark">{{ item.title }}</h4>
+                                    <span class="pointer-events-none absolute -right-[60px] -top-[80px] h-[160px] w-[160px] rounded-full" style="background: radial-gradient(circle, rgba(124,58,237,0.2), transparent 70%);" />
+                                    <span v-if="item.is_featured" class="relative w-fit rounded-full border border-ivt-violet/50 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.08em] text-ivt-accent-bright">Premium</span>
+                                    <h4 class="relative font-display text-[19px] font-medium text-ivt-on-dark">{{ item.title }}</h4>
                                     <p v-if="location(item)" class="relative flex items-center gap-1 text-[12.5px] text-ivt-on-dark-dim">
                                         <MapPinIcon class="h-3.5 w-3.5 flex-none" /> {{ location(item) }}
                                     </p>
                                     <div class="relative mt-auto flex items-center justify-between border-t border-white/10 pt-3">
                                         <span class="text-[13px] font-semibold text-ivt-on-dark">{{ formatListingPrice(item) }}</span>
-                                        <span v-if="item.rating" class="flex items-center gap-1 text-xs text-ivt-gold-bright">
+                                        <span v-if="item.rating" class="flex items-center gap-1 text-xs text-ivt-accent-bright">
                                             <StarIcon class="h-3.5 w-3.5" /> {{ item.rating }}
                                         </span>
                                     </div>
@@ -246,7 +246,7 @@ const similarCategories = computed(() => {
                             <select
                                 :value="sort"
                                 @change="setSort"
-                                class="rounded-full border-ivt-line bg-white py-2.5 pl-4 pr-9 text-[13.5px] font-semibold text-ivt-ink focus:border-ivt-gold focus:ring-ivt-gold/30"
+                                class="rounded-full border-ivt-line bg-white py-2.5 pl-4 pr-9 text-[13.5px] font-semibold text-ivt-ink focus:border-ivt-violet focus:ring-ivt-violet/30"
                             >
                                 <option v-for="option in sortOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
                             </select>
@@ -264,10 +264,10 @@ const similarCategories = computed(() => {
                         </div>
 
                         <div v-else class="flex flex-col items-center justify-center rounded-2xl border border-ivt-line bg-white px-5 py-16 text-center">
-                            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-ivt-paper-2 text-ivt-wine">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-ivt-paper-2 text-primary">
                                 <FaceFrownIcon class="h-6 w-6" />
                             </span>
-                            <p class="mt-3 font-serif text-[20px] italic text-ivt-ink">Niciun furnizor nu corespunde filtrelor tale</p>
+                            <p class="mt-3 font-display text-[20px] text-ivt-ink">Niciun furnizor nu corespunde filtrelor tale</p>
                             <p class="mt-1.5 max-w-sm text-sm text-ivt-ink-soft">Încearcă să lărgești bugetul, să elimini o locație sau să resetezi filtrele.</p>
                         </div>
 
@@ -278,7 +278,7 @@ const similarCategories = computed(() => {
                                     type="button"
                                     :disabled="!link.url"
                                     @click="link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true, only: ['listings', 'filters', 'favoriteListingIds'] })"
-                                    class="min-w-[2.375rem] rounded-[10px] border border-ivt-line px-3 py-2 text-[13.5px] font-semibold text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-gold hover:text-ivt-wine"
+                                    class="min-w-[2.375rem] rounded-[10px] border border-ivt-line px-3 py-2 text-[13.5px] font-semibold text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-violet hover:text-primary"
                                     :class="[
                                         link.active && 'border-ivt-ink bg-ivt-ink text-ivt-paper hover:border-ivt-ink hover:text-ivt-paper',
                                         !link.url && 'cursor-not-allowed opacity-30 hover:border-ivt-line hover:text-ivt-ink-soft',
@@ -294,14 +294,14 @@ const similarCategories = computed(() => {
 
             <!-- SIMILAR CATEGORIES -->
             <section v-if="similarCategories.length" class="pb-[100px]">
-                <div class="mx-auto max-w-7xl px-6 lg:px-8">
-                    <h3 class="mb-5 font-serif text-xl font-medium">Alte categorii care te-ar putea interesa</h3>
+                <div class="mx-auto max-w-[1600px] px-6 lg:px-8">
+                    <h3 class="mb-5 font-display text-xl font-medium">Alte categorii care te-ar putea interesa</h3>
                     <div class="flex flex-wrap gap-2.5">
                         <Link
                             v-for="cat in similarCategories"
                             :key="cat.id"
                             :href="route('categories.show', cat.slug)"
-                            class="rounded-full border border-ivt-line px-[18px] py-2.5 text-[13.5px] font-semibold text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-gold hover:text-ivt-wine"
+                            class="rounded-full border border-ivt-line px-[18px] py-2.5 text-[13.5px] font-semibold text-ivt-ink-soft transition-colors duration-150 hover:border-ivt-violet hover:text-primary"
                         >
                             {{ cat.name }}
                         </Link>
@@ -358,7 +358,7 @@ const similarCategories = computed(() => {
                         </div>
 
                         <div class="flex items-center gap-3 border-t border-ivt-line px-6 py-4">
-                            <button type="button" @click="resetFilters" class="text-[13px] font-semibold text-ivt-wine hover:underline">Resetează</button>
+                            <button type="button" @click="resetFilters" class="text-[13px] font-semibold text-primary hover:underline">Resetează</button>
                             <button
                                 type="button"
                                 @click="applyFilters(); showMobileFilters = false"

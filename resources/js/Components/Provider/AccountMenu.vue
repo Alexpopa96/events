@@ -61,7 +61,7 @@ const initials = (name) => (name || '')
             <div
                 v-if="open"
                 role="menu"
-                class="absolute z-40 bg-white border border-ivt-line rounded-2xl shadow-[0_12px_32px_-8px_rgba(33,28,39,0.2)] p-1.5"
+                class="absolute z-40 bg-white border border-ivt-line rounded-2xl shadow-[0_12px_32px_-8px_rgba(26,20,51,0.2)] p-1.5"
                 :class="header ? 'top-full mt-2 right-0 w-64' : 'bottom-full mb-2 left-0 right-0'"
             >
                 <div v-if="header" class="px-3 py-2 mb-1 border-b border-ivt-line">
@@ -89,7 +89,7 @@ const initials = (name) => (name || '')
                 <button
                     type="button"
                     @click="logout"
-                    class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-rose-600 hover:bg-rose-50 transition"
+                    class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-danger-600 hover:bg-danger-50 transition"
                 >
                     <ArrowRightStartOnRectangleIcon class="w-4 h-4" /> Deconectare
                 </button>

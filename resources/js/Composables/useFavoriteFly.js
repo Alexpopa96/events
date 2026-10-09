@@ -1,3 +1,5 @@
+import { ivt, primary } from '@/palette';
+
 /**
  * Fly-to-favorites animation.
  * Flies a circular clone of the listing image (or a heart icon) from the
@@ -38,7 +40,7 @@ export function useFavoriteFly() {
             pointerEvents: 'none',
             zIndex: '99999',
             boxShadow: '0 6px 20px rgba(0,0,0,.22)',
-            border: '2px solid #7C2E3B',
+            border: `2px solid ${primary.DEFAULT}`,
             background: '#fff',
             top: '0',
             left: '0',
@@ -51,8 +53,8 @@ export function useFavoriteFly() {
             img.src = imageUrl;
             el.appendChild(img);
         } else {
-            el.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#F6E9EB;">
-                <svg viewBox="0 0 24 24" fill="#7C2E3B" style="width:20px;height:20px;"><path d="${HEART_PATH}" /></svg>
+            el.innerHTML = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${ivt.sand};">
+                <svg viewBox="0 0 24 24" fill="${primary.DEFAULT}" style="width:20px;height:20px;"><path d="${HEART_PATH}" /></svg>
             </div>`;
         }
 

@@ -88,7 +88,7 @@ const moderate = (review, action) => {
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-2.5">
                                 <p class="text-sm font-semibold text-ivt-ink">{{ review.author }}</p>
-                                <span class="inline-flex items-center gap-1 rounded-full bg-ivt-gold/15 px-2 py-0.5 text-xs font-semibold text-ivt-gold">
+                                <span class="inline-flex items-center gap-1 rounded-full bg-ivt-violet/15 px-2 py-0.5 text-xs font-semibold text-ivt-violet">
                                     <Star class="h-3 w-3 fill-current" /> {{ review.rating }}/5
                                 </span>
                                 <StatusBadge :status="review.status" />
@@ -103,7 +103,7 @@ const moderate = (review, action) => {
                                 v-if="review.status !== 'approved'"
                                 type="button"
                                 :disabled="busyId === review.id"
-                                class="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-primary-bright disabled:opacity-50"
+                                class="inline-flex items-center gap-1.5 rounded-xl bg-brand px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:brightness-110 hover:shadow-glow-violet disabled:opacity-50"
                                 @click="moderate(review, 'approve')"
                             >
                                 <Check class="h-3.5 w-3.5" /> Aprobă
@@ -112,7 +112,7 @@ const moderate = (review, action) => {
                                 v-if="review.status !== 'rejected'"
                                 type="button"
                                 :disabled="busyId === review.id"
-                                class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-rose-600 ring-1 ring-rose-200 transition-colors hover:bg-rose-50 disabled:opacity-50"
+                                class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-danger-600 ring-1 ring-danger-200 transition-colors hover:bg-danger-50 disabled:opacity-50"
                                 @click="moderate(review, 'reject')"
                             >
                                 <X class="h-3.5 w-3.5" /> Respinge

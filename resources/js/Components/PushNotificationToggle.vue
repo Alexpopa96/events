@@ -27,7 +27,7 @@ const toggle = () => (status.value === 'subscribed' ? unsubscribe() : subscribe(
         >
             <span
                 v-if="!compact"
-                class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-ivt-paper-2 text-ivt-ink-soft transition-colors duration-150 group-hover:bg-white group-hover:text-ivt-wine"
+                class="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-ivt-paper-2 text-ivt-ink-soft transition-colors duration-150 group-hover:bg-white group-hover:text-primary"
             >
                 <BellIcon v-if="status !== 'subscribed'" class="h-5 w-5" />
                 <BellSlashIcon v-else class="h-5 w-5" />
@@ -38,6 +38,6 @@ const toggle = () => (status.value === 'subscribed' ? unsubscribe() : subscribe(
         <p v-else-if="!compact" class="px-2.5 py-2 text-xs text-ivt-ink-soft">
             Notificările push sunt blocate din setările browserului.
         </p>
-        <p v-if="error" class="px-2.5 text-xs text-rose-600">{{ error }}</p>
+        <p v-if="error" class="px-2.5 text-xs text-danger-600">{{ error }}</p>
     </div>
 </template>

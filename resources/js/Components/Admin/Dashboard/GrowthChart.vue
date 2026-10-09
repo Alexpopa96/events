@@ -70,7 +70,7 @@ const totals = computed(() => props.growth.series.map((s) => ({ key: s.key, tota
                     <span class="font-semibold text-ivt-ink">{{ t.total }}</span>
                 </li>
             </ul>
-            <button type="button" @click="showTable = !showTable" class="text-xs font-medium text-ivt-wine hover:text-ivt-ink transition-colors">
+            <button type="button" @click="showTable = !showTable" class="text-xs font-medium text-primary hover:text-ivt-ink transition-colors">
                 {{ showTable ? 'Vezi graficul' : 'Vezi ca tabel' }}
             </button>
         </div>

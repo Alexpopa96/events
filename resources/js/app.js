@@ -1,5 +1,7 @@
 import './bootstrap';
 import '../css/app.css';
+import { primary } from './palette';
+import directives from './directives';
 
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
@@ -20,13 +22,14 @@ createInertiaApp({
         const inertiaApp =   createApp({render: () => h(App, props)})
             .use(plugin)
             .use(Toast)
+            .use(directives)
             .component('useToast', useToast)
             .use(ZiggyVue);
             inertiaApp.config.globalProperties.$toast = useToast();
             inertiaApp.mount(el);
     },
     progress: {
-        color: '#059669',
+        color: primary.DEFAULT,
     },
 });
 

@@ -100,11 +100,11 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                             <input type="file" accept="image/*" class="hidden" @change="onFile('logo', $event)" />
                         </label>
                         <div class="min-w-0 flex-1 pt-3">
-                            <p class="truncate font-serif text-xl sm:text-2xl text-ivt-ink">{{ form.company_name || 'Numele companiei' }}</p>
+                            <p class="truncate font-display text-xl sm:text-2xl text-ivt-ink">{{ form.company_name || 'Numele companiei' }}</p>
                             <p class="text-xs text-ivt-ink-soft mt-0.5">Logo: PNG sau JPG, max 2MB · Copertă: max 4MB</p>
                         </div>
                     </div>
-                    <p v-if="form.errors.logo || form.errors.cover" class="px-6 pb-4 text-sm text-red-500">{{ form.errors.logo || form.errors.cover }}</p>
+                    <p v-if="form.errors.logo || form.errors.cover" class="px-6 pb-4 text-sm text-danger-500">{{ form.errors.logo || form.errors.cover }}</p>
                 </div>
 
                 <div class="divide-y divide-ivt-line rounded-2xl border border-ivt-line bg-white shadow-sm shadow-ivt-ink/5">
@@ -120,12 +120,12 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                         <div>
                             <label :class="labelClass">Nume companie</label>
                             <input v-model="form.company_name" type="text" :class="inputClass" />
-                            <p v-if="form.errors.company_name" class="mt-1.5 text-sm text-red-500">{{ form.errors.company_name }}</p>
+                            <p v-if="form.errors.company_name" class="mt-1.5 text-sm text-danger-500">{{ form.errors.company_name }}</p>
                         </div>
                         <div>
                             <label :class="labelClass">Descriere</label>
                             <textarea v-model="form.description" rows="5" :class="inputClass" placeholder="Ce te diferențiază, ce include serviciul tău..."></textarea>
-                            <p v-if="form.errors.description" class="mt-1.5 text-sm text-red-500">{{ form.errors.description }}</p>
+                            <p v-if="form.errors.description" class="mt-1.5 text-sm text-danger-500">{{ form.errors.description }}</p>
                         </div>
                     </div>
                     </div>
@@ -145,7 +145,7 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                                 <PhoneIcon class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ivt-ink-soft/60" />
                                 <input v-model="form.phone" type="tel" placeholder="Ex. 0722 123 456" :class="iconInputClass" />
                             </div>
-                            <p v-if="form.errors.phone" class="mt-1.5 text-sm text-red-500">{{ form.errors.phone }}</p>
+                            <p v-if="form.errors.phone" class="mt-1.5 text-sm text-danger-500">{{ form.errors.phone }}</p>
                         </div>
                         <div>
                             <label :class="labelClass">WhatsApp</label>
@@ -153,7 +153,7 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                                 <ChatBubbleOvalLeftEllipsisIcon class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ivt-ink-soft/60" />
                                 <input v-model="form.whatsapp" type="tel" placeholder="Ex. 0722 123 456" :class="iconInputClass" />
                             </div>
-                            <p v-if="form.errors.whatsapp" class="mt-1.5 text-sm text-red-500">{{ form.errors.whatsapp }}</p>
+                            <p v-if="form.errors.whatsapp" class="mt-1.5 text-sm text-danger-500">{{ form.errors.whatsapp }}</p>
                         </div>
                         <div>
                             <label :class="labelClass">Email de contact</label>
@@ -161,7 +161,7 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                                 <EnvelopeIcon class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ivt-ink-soft/60" />
                                 <input v-model="form.email" type="email" :class="iconInputClass" />
                             </div>
-                            <p v-if="form.errors.email" class="mt-1.5 text-sm text-red-500">{{ form.errors.email }}</p>
+                            <p v-if="form.errors.email" class="mt-1.5 text-sm text-danger-500">{{ form.errors.email }}</p>
                         </div>
                         <div>
                             <label :class="labelClass">Website</label>
@@ -169,7 +169,7 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                                 <GlobeAltIcon class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ivt-ink-soft/60" />
                                 <input v-model="form.website" type="text" placeholder="https://" :class="iconInputClass" />
                             </div>
-                            <p v-if="form.errors.website" class="mt-1.5 text-sm text-red-500">{{ form.errors.website }}</p>
+                            <p v-if="form.errors.website" class="mt-1.5 text-sm text-danger-500">{{ form.errors.website }}</p>
                         </div>
                     </div>
                     </div>
@@ -210,7 +210,7 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                         <div v-for="network in [{ key: 'facebook', label: 'Facebook' }, { key: 'instagram', label: 'Instagram' }, { key: 'tiktok', label: 'TikTok' }]" :key="network.key">
                             <label :class="labelClass">{{ network.label }}</label>
                             <input v-model="form[network.key]" type="text" :placeholder="`${network.label} URL`" :class="inputClass" />
-                            <p v-if="form.errors[network.key]" class="mt-1.5 text-sm text-red-500">{{ form.errors[network.key] }}</p>
+                            <p v-if="form.errors[network.key]" class="mt-1.5 text-sm text-danger-500">{{ form.errors[network.key] }}</p>
                         </div>
                     </div>
                     </div>
@@ -218,11 +218,11 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                 </div>
 
                 <!-- Sticky action bar -->
-                <div class="sticky bottom-[4.5rem] lg:bottom-3 z-10 flex items-center gap-3 rounded-2xl border border-ivt-line bg-white/90 px-5 py-3.5 shadow-[0_8px_30px_-10px_rgba(33,28,39,0.2)] backdrop-blur-xl">
+                <div class="sticky bottom-[4.5rem] lg:bottom-3 z-10 flex items-center gap-3 rounded-2xl border border-ivt-line bg-white/90 px-5 py-3.5 shadow-[0_8px_30px_-10px_rgba(26,20,51,0.2)] backdrop-blur-xl">
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright hover:shadow-glow-primary active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
+                        class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet hover:shadow-glow-primary active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
                     >
                         <svg v-if="form.processing" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
@@ -230,7 +230,7 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                         </svg>
                         Salvează profilul
                     </button>
-                    <span v-if="form.recentlySuccessful" class="inline-flex items-center gap-1.5 text-sm text-emerald-600">
+                    <span v-if="form.recentlySuccessful" class="inline-flex items-center gap-1.5 text-sm text-success-600">
                         <CheckCircleIcon class="h-4 w-4" /> Salvat.
                     </span>
                 </div>
@@ -241,7 +241,7 @@ const sectionIconClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex 
                 <p class="text-sm font-semibold text-ivt-ink">Completitudinea profilului</p>
                 <p class="mt-3 text-3xl font-semibold tabular-nums text-ivt-ink">{{ score }}%</p>
                 <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-ivt-paper-2">
-                    <div class="h-full rounded-full bg-gradient-to-r from-primary-bright to-ivt-gold-bright transition-all duration-500" :style="`width: ${score}%`"></div>
+                    <div class="h-full rounded-full bg-gradient-to-r from-primary-bright to-ivt-accent-bright transition-all duration-500" :style="`width: ${score}%`"></div>
                 </div>
                 <p class="mt-3 text-xs leading-relaxed text-ivt-ink-soft">
                     {{ score >= 100 ? 'Profilul tău e complet.' : 'Un profil complet, cu logo, copertă și date de contact, inspiră mai multă încredere clienților.' }}

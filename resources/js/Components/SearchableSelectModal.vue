@@ -25,22 +25,22 @@ const themes = {
         ink: 'text-ivt-ink',
         soft: 'text-ivt-ink-soft',
         close: 'bg-ivt-paper-2 text-ivt-ink-soft hover:bg-ivt-paper-3 hover:text-ivt-ink',
-        input: 'bg-ivt-paper-2 text-ivt-ink placeholder:text-ivt-ink-faint focus:bg-white focus:ring-ivt-gold/50',
+        input: 'bg-ivt-paper-2 text-ivt-ink placeholder:text-ivt-ink-faint focus:bg-white focus:ring-ivt-violet/50',
         active: 'bg-ivt-paper-2',
-        mark: 'bg-ivt-gold-bright/25 text-ivt-ink',
-        check: 'bg-ivt-gold text-white',
+        mark: 'bg-ivt-accent-bright/25 text-ivt-ink',
+        check: 'bg-ivt-violet text-white',
         footer: 'border-ivt-line bg-ivt-paper-2/60 text-ivt-ink-soft',
     },
     brand: {
         backdrop: 'bg-ivt-ink/40',
         ink: 'text-ivt-ink',
         soft: 'text-ivt-ink-soft',
-        close: 'bg-gray-100 text-ivt-ink-soft hover:bg-gray-200 hover:text-ivt-ink',
-        input: 'bg-gray-100/80 text-ivt-ink placeholder:text-ivt-ink-soft/70 focus:bg-white focus:ring-primary/60',
-        active: 'bg-gray-100',
+        close: 'bg-ivt-paper-2 text-ivt-ink-soft hover:bg-ivt-paper-3 hover:text-ivt-ink',
+        input: 'bg-ivt-paper-2/80 text-ivt-ink placeholder:text-ivt-ink-soft/70 focus:bg-white focus:ring-primary/60',
+        active: 'bg-ivt-paper-2',
         mark: 'bg-primary/10 text-primary',
         check: 'bg-primary text-white',
-        footer: 'border-gray-100 bg-gray-50/70 text-ivt-ink-soft',
+        footer: 'border-ivt-line bg-ivt-paper-2/70 text-ivt-ink-soft',
     },
 };
 
@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
                     :aria-label="title"
                     ref="panel"
                     tabindex="-1"
-                    class="modal-pop relative w-full max-w-md overflow-hidden rounded-3xl outline-none bg-white shadow-[0_40px_90px_-30px_rgba(33,28,39,0.55),0_0_0_1px_rgba(33,28,39,0.06)]"
+                    class="modal-pop relative w-full max-w-md overflow-hidden rounded-3xl outline-none bg-white shadow-[0_40px_90px_-30px_rgba(26,20,51,0.55),0_0_0_1px_rgba(26,20,51,0.06)]"
                 >
                     <div class="flex items-center gap-3 px-5 pt-5" :class="searchable ? '' : 'pb-3'">
                         <div class="min-w-0 flex-1">
@@ -266,7 +266,7 @@ onBeforeUnmount(() => {
     padding: 0.05rem 0.35rem;
     border-radius: 0.375rem;
     background: white;
-    box-shadow: 0 0 0 1px rgba(33, 28, 39, 0.12), 0 1px 0 rgba(33, 28, 39, 0.08);
+    box-shadow: 0 0 0 1px rgba(26,20,51,0.12), 0 1px 0 rgba(26,20,51,0.08);
     text-align: center;
     font-family: inherit;
     font-size: 11px;

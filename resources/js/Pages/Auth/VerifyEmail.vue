@@ -26,11 +26,11 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
             <AuthenticationCardLogo />
         </template>
 
-        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+        <div class="mb-4 text-sm text-ivt-ink-soft dark:text-ivt-ink-faint">
             Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.
         </div>
 
-        <div v-if="verificationLinkSent" class="mb-4 font-medium text-sm text-green-600 dark:text-green-400">
+        <div v-if="verificationLinkSent" class="mb-4 font-medium text-sm text-success-600 dark:text-success-400">
             Un nou link de verificare a fost trimis pe adresa de email din setările profilului.
         </div>
 
@@ -43,7 +43,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                 <div>
                     <Link
                         :href="route('profile.show')"
-                        class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                        class="underline text-sm text-ivt-ink-soft dark:text-ivt-ink-faint hover:text-ivt-ink dark:hover:text-ivt-on-dark rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-bright dark:focus:ring-offset-ivt-ink-2"
                     >
                         Edit Profile</Link>
 
@@ -51,7 +51,7 @@ const verificationLinkSent = computed(() => props.status === 'verification-link-
                         :href="route('logout')"
                         method="post"
                         as="button"
-                        class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 ms-2"
+                        class="underline text-sm text-ivt-ink-soft dark:text-ivt-ink-faint hover:text-ivt-ink dark:hover:text-ivt-on-dark rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-bright dark:focus:ring-offset-ivt-ink-2 ms-2"
                     >
                         Log Out
                     </Link>

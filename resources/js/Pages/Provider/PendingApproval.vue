@@ -16,15 +16,15 @@ const logout = () => router.post(route('logout'));
     <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-ivt-paper px-4 py-10">
         <div class="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
             <div class="absolute -top-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-primary/10 blur-3xl animate-float-slow"></div>
-            <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-ivt-gold/20 blur-3xl animate-float-slower"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-ivt-violet/20 blur-3xl animate-float-slower"></div>
         </div>
 
-        <div class="relative w-full max-w-md rounded-[2rem] bg-white px-6 py-10 text-center shadow-[0_24px_60px_-20px_rgba(33,28,39,0.25)] sm:px-9">
+        <div class="relative w-full max-w-md rounded-[2rem] bg-white px-6 py-10 text-center shadow-[0_24px_60px_-20px_rgba(26,20,51,0.25)] sm:px-9">
             <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary-bright to-primary text-white shadow-sm shadow-primary/25">
                 <ClockIcon class="h-7 w-7" />
             </div>
 
-            <h1 class="mt-6 font-serif text-2xl text-ivt-ink">
+            <h1 class="mt-6 font-display text-2xl text-ivt-ink">
                 <template v-if="status === 'rejected'">Cererea ta nu a fost aprobată</template>
                 <template v-else-if="status === 'suspended'">Contul tău a fost suspendat</template>
                 <template v-else>Contul tău este în curs de validare</template>

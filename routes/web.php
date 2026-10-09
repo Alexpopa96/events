@@ -6,7 +6,6 @@ use App\Models\County;
 use App\Models\Listing;
 use App\Models\ProviderProfile;
 use App\Models\QuoteRequest;
-use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Support\DashboardMetrics;
 use Illuminate\Foundation\Application;
@@ -144,7 +143,7 @@ function homepageProps(): array
         'quoteRequests' => QuoteRequest::where('status', 'open')
             ->with(['category:id,name'])
             ->latest()
-            ->take(3)
+            ->take(1)
             ->get()
             ->map(fn (QuoteRequest $quoteRequest) => [
                 'id' => $quoteRequest->id,
@@ -153,17 +152,6 @@ function homepageProps(): array
                 'category' => $quoteRequest->category?->name,
                 'county' => $quoteRequest->county,
                 'budget_range' => $quoteRequest->budget_range,
-            ]),
-        'subscriptionPlans' => SubscriptionPlan::where('is_active', true)
-            ->orderBy('position')
-            ->get()
-            ->map(fn (SubscriptionPlan $plan) => [
-                'name' => $plan->name,
-                'slug' => $plan->slug,
-                'description' => $plan->description,
-                'price' => (float) $plan->price,
-                'currency' => $plan->currency,
-                'features' => $plan->features ?? [],
             ]),
     ];
 }

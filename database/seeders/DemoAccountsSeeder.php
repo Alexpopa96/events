@@ -11,12 +11,15 @@ use App\Models\ProviderProfile;
 use App\Models\ProviderSubscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use Database\Seeders\Concerns\SeedsListingPhotos;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class DemoAccountsSeeder extends Seeder
 {
+    use SeedsListingPhotos;
+
     /**
      * City used by the demo merchant. Matched against the county and
      * locality names imported by LocalitySeeder.
@@ -180,7 +183,7 @@ class DemoAccountsSeeder extends Seeder
 
         $status = $data['status'] ?? 'published';
 
-        Listing::firstOrCreate(
+        $listing = Listing::firstOrCreate(
             ['slug' => Str::slug($profile->company_name.' '.$data['title'])],
             [
                 'provider_profile_id' => $profile->id,
@@ -201,6 +204,8 @@ class DemoAccountsSeeder extends Seeder
                 'published_at' => $status === 'published' ? now()->subDays(random_int(2, 60)) : null,
             ]
         );
+
+        $this->attachGalleryPhotos($listing);
     }
 
     private function resolveLocation(string $key): array

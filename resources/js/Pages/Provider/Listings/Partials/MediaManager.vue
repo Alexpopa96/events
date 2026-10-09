@@ -156,8 +156,8 @@ function onDragEnd() {
                 <div class="h-full bg-primary transition-all duration-150" :style="{ width: uploadForm.progress.percentage + '%' }"></div>
             </div>
         </div>
-        <p v-if="uploadForm.errors.photos" class="mt-2 text-sm text-red-500">{{ uploadForm.errors.photos }}</p>
-        <p v-if="uploadForm.errors.videos" class="mt-2 text-sm text-red-500">{{ uploadForm.errors.videos }}</p>
+        <p v-if="uploadForm.errors.photos" class="mt-2 text-sm text-danger-500">{{ uploadForm.errors.photos }}</p>
+        <p v-if="uploadForm.errors.videos" class="mt-2 text-sm text-danger-500">{{ uploadForm.errors.videos }}</p>
 
         <div v-if="localMedia.length" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-5">
             <div
@@ -177,7 +177,7 @@ function onDragEnd() {
                     <VideoCameraIcon class="w-3 h-3" /> Video
                 </span>
 
-                <span v-if="item.is_cover" class="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-ivt-gold text-white text-[11px] font-semibold px-2 py-0.5 shadow-sm">
+                <span v-if="item.is_cover" class="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-ivt-violet text-white text-[11px] font-semibold px-2 py-0.5 shadow-sm">
                     <StarIconSolid class="w-3 h-3" /> Principală
                 </span>
 
@@ -187,7 +187,7 @@ function onDragEnd() {
                         type="button"
                         @click.stop="setCover(item)"
                         title="Fă fotografia principală"
-                        class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft transition-colors duration-150 hover:text-ivt-gold"
+                        class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft transition-colors duration-150 hover:text-ivt-violet"
                     >
                         <StarIcon class="w-4 h-4" />
                     </button>
@@ -195,7 +195,7 @@ function onDragEnd() {
                         type="button"
                         @click.stop="destroy(item)"
                         title="Șterge"
-                        class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft transition-colors duration-150 hover:text-rose-600"
+                        class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft transition-colors duration-150 hover:text-danger-600"
                     >
                         <TrashIcon class="w-4 h-4" />
                     </button>

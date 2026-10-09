@@ -36,9 +36,9 @@ const nav = computed(() => page.props.providerNav);
 
 const statusMeta = {
     draft: { label: 'Ciornă', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
-    pending_review: { label: 'În verificare', class: 'bg-ivt-gold/15 text-ivt-gold' },
-    published: { label: 'Publicat', class: 'bg-emerald-100 text-emerald-700' },
-    rejected: { label: 'Respins', class: 'bg-rose-100 text-rose-700' },
+    pending_review: { label: 'În verificare', class: 'bg-ivt-violet/15 text-ivt-violet' },
+    published: { label: 'Publicat', class: 'bg-success-100 text-success-700' },
+    rejected: { label: 'Respins', class: 'bg-danger-100 text-danger-700' },
     archived: { label: 'Arhivat', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
 };
 
@@ -132,14 +132,14 @@ const savePrice = () => {
                     <EllipsisHorizontalIcon class="h-5 w-5" />
                 </button>
                 <div v-if="menuOpen" class="fixed inset-0 z-20" @click="menuOpen = false"></div>
-                <div v-if="menuOpen" role="menu" class="absolute right-0 top-full z-30 mt-1 w-44 rounded-2xl border border-ivt-line bg-white p-1.5 shadow-[0_12px_32px_-8px_rgba(33,28,39,0.2)]">
+                <div v-if="menuOpen" role="menu" class="absolute right-0 top-full z-30 mt-1 w-44 rounded-2xl border border-ivt-line bg-white p-1.5 shadow-[0_12px_32px_-8px_rgba(26,20,51,0.2)]">
                     <Link :href="route('provider.listings.edit', listing.id)" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-ivt-ink-soft transition hover:bg-ivt-paper-2 hover:text-ivt-ink">
                         <PencilSquareIcon class="h-4 w-4" /> Editează
                     </Link>
                     <button type="button" :disabled="duplicating" @click="duplicate" class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-ivt-ink-soft transition hover:bg-ivt-paper-2 hover:text-ivt-ink disabled:opacity-50">
                         <DocumentDuplicateIcon class="h-4 w-4" /> Duplică
                     </button>
-                    <button type="button" @click="menuOpen = false; emit('delete', listing)" class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-rose-600 transition hover:bg-rose-50">
+                    <button type="button" @click="menuOpen = false; emit('delete', listing)" class="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-danger-600 transition hover:bg-danger-50">
                         <TrashIcon class="h-4 w-4" /> Șterge
                     </button>
                 </div>
@@ -192,7 +192,7 @@ const savePrice = () => {
                     </template>
                 </div>
                 <div class="flex gap-2">
-                    <button type="button" :disabled="savingPrice" class="rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-primary-bright disabled:opacity-50" @click="savePrice">
+                    <button type="button" :disabled="savingPrice" class="rounded-full bg-brand px-3.5 py-1.5 text-xs font-semibold text-white transition-colors hover:brightness-110 hover:shadow-glow-violet disabled:opacity-50" @click="savePrice">
                         Salvează
                     </button>
                     <button type="button" class="rounded-full px-3.5 py-1.5 text-xs font-medium text-ivt-ink-soft hover:bg-white" @click="editingPrice = false">

@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useForm } from '@inertiajs/vue3';
 import { EnvelopeIcon } from '@heroicons/vue/24/outline';
 import ActionMessage from '@/Components/ActionMessage.vue';
-import FormSection from '@/Components/FormSection.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
@@ -93,18 +92,10 @@ const updateProfileInformation = () => {
 </script>
 
 <template>
-    <FormSection @submitted="updateProfileInformation">
-        <template #title>
-            Informații profil
-        </template>
-
-        <template #description>
-            Actualizează numele și adresa de email a contului tău.
-        </template>
-
-        <template #form>
+    <form @submit.prevent="updateProfileInformation">
+        <div class="grid max-w-xl grid-cols-6 gap-5">
             <!-- Name -->
-            <div class="col-span-6 sm:col-span-4">
+            <div class="col-span-6">
                 <InputLabel for="name" value="Nume" />
                 <TextInput
                     id="name"
@@ -118,7 +109,7 @@ const updateProfileInformation = () => {
             </div>
 
             <!-- Email -->
-            <div class="col-span-6 sm:col-span-4">
+            <div class="col-span-6">
                 <InputLabel for="email" value="Email" />
                 <TextInput
                     id="email"
@@ -161,7 +152,7 @@ const updateProfileInformation = () => {
                             placeholder="••••••"
                             aria-label="Cod de verificare"
                             class="w-full rounded-2xl border-2 border-transparent bg-white py-3.5 text-center font-mono text-2xl font-semibold tracking-[0.5em] text-primary placeholder:text-ivt-ink-soft/30 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10"
-                            :class="{ '!border-red-400 !bg-red-50/60': form.errors.email_change_code }"
+                            :class="{ '!border-danger-400 !bg-danger-50/60': form.errors.email_change_code }"
                         />
                         <InputError class="mt-2" :message="form.errors.email_change_code" />
                         <p class="mt-2 text-xs text-ivt-ink-soft">Apoi apasă „Salvează” ca să schimbi adresa.</p>
@@ -182,9 +173,9 @@ const updateProfileInformation = () => {
                     </div>
                 </div>
             </div>
-        </template>
+        </div>
 
-        <template #actions>
+        <div class="mt-6 flex items-center justify-end gap-3 border-t border-ivt-line pt-5">
             <ActionMessage :on="form.recentlySuccessful" class="me-3">
                 Salvat.
             </ActionMessage>
@@ -192,6 +183,6 @@ const updateProfileInformation = () => {
             <PrimaryButton :disabled="!canSave">
                 Salvează
             </PrimaryButton>
-        </template>
-    </FormSection>
+        </div>
+    </form>
 </template>

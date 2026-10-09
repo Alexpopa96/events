@@ -21,8 +21,8 @@ const setFilter = (filter) => router.get(route('provider.offers.index'), { filte
 const statusMeta = {
     sent: { label: 'Trimisă', class: 'bg-primary/10 text-primary', icon: CurrencyDollarIcon },
     viewed: { label: 'Văzută', class: 'bg-primary/10 text-primary', icon: CurrencyDollarIcon },
-    accepted: { label: 'Acceptată', class: 'bg-emerald-100 text-emerald-700', icon: CheckCircleIcon },
-    declined: { label: 'Refuzată', class: 'bg-rose-100 text-rose-700', icon: XCircleIcon },
+    accepted: { label: 'Acceptată', class: 'bg-success-100 text-success-700', icon: CheckCircleIcon },
+    declined: { label: 'Refuzată', class: 'bg-danger-100 text-danger-700', icon: XCircleIcon },
     withdrawn: { label: 'Retrasă', class: 'bg-ivt-paper-2 text-ivt-ink-soft', icon: XCircleIcon },
     expired: { label: 'Expirată', class: 'bg-ivt-paper-2 text-ivt-ink-soft', icon: ClockIcon },
 };
@@ -55,7 +55,7 @@ const statusMeta = {
             </span>
             <p class="mt-3 text-sm font-medium text-ivt-ink">Nicio ofertă aici</p>
             <p class="mt-1 max-w-sm text-sm text-ivt-ink-soft">Trimite oferte direct din „Cereri clienți”, la cererea care te interesează.</p>
-            <Link :href="route('provider.leads.index')" class="mt-4 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 hover:bg-primary-bright">
+            <Link :href="route('provider.leads.index')" class="mt-4 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 hover:brightness-110 hover:shadow-glow-violet">
                 Vezi cererile clienților
             </Link>
         </div>
@@ -73,7 +73,7 @@ const statusMeta = {
                 </div>
 
                 <div class="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                    <span class="font-serif text-2xl text-ivt-ink">{{ offer.price.toLocaleString('ro-RO') }} lei</span>
+                    <span class="font-display text-2xl text-ivt-ink">{{ offer.price.toLocaleString('ro-RO') }} lei</span>
                     <span class="text-xs text-ivt-ink-soft">valabilă până la {{ offer.valid_until }}</span>
                     <span v-if="offer.listing" class="text-xs text-ivt-ink-soft">· din anunțul „{{ offer.listing.title }}”</span>
                 </div>
@@ -84,12 +84,12 @@ const statusMeta = {
 
                 <p v-if="offer.decline_reason" class="mt-3 text-sm text-ivt-ink-soft">Motiv refuz: {{ offer.decline_reason }}</p>
 
-                <div v-if="offer.client" class="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3">
-                    <p class="text-sm font-semibold text-emerald-800">{{ offer.client.name }}</p>
-                    <a v-if="offer.client.phone" :href="`tel:${offer.client.phone}`" class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 hover:text-emerald-900">
+                <div v-if="offer.client" class="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-success-50 px-4 py-3">
+                    <p class="text-sm font-semibold text-success-800">{{ offer.client.name }}</p>
+                    <a v-if="offer.client.phone" :href="`tel:${offer.client.phone}`" class="inline-flex items-center gap-1.5 text-sm font-semibold text-success-700 hover:text-success-900">
                         <PhoneIcon class="h-4 w-4" /> {{ offer.client.phone }}
                     </a>
-                    <a :href="`mailto:${offer.client.email}`" class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 hover:text-emerald-900">
+                    <a :href="`mailto:${offer.client.email}`" class="inline-flex items-center gap-1.5 text-sm font-semibold text-success-700 hover:text-success-900">
                         <EnvelopeIcon class="h-4 w-4" /> {{ offer.client.email }}
                     </a>
                 </div>

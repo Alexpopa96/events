@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import Layout from '@/Layouts/Layout.vue';
+import { chart, statusColors } from '@/palette';
 import Sparkline from '@/Components/Admin/Dashboard/Sparkline.vue';
 import GrowthChart from '@/Components/Admin/Dashboard/GrowthChart.vue';
 import StatusBar from '@/Components/Admin/Dashboard/StatusBar.vue';
@@ -37,24 +38,24 @@ const props = defineProps({
 
 const page = usePage();
 
-// Categorical slots from the validated data-viz palette (identity), not brand colors.
+// Series colours are the palette's categorical slots, in order.
 const SERIES = {
-    users: { label: 'Utilizatori', color: '#2a78d6' },
-    providers: { label: 'Furnizori', color: '#eb6834' },
-    quote_requests: { label: 'Cereri de ofertă', color: '#1baf7a' },
-    listings: { label: 'Anunțuri publicate', color: '#4a3aa7' },
+    users: { label: 'Utilizatori', color: chart[0] },
+    providers: { label: 'Furnizori', color: chart[1] },
+    quote_requests: { label: 'Cereri de ofertă', color: chart[2] },
+    listings: { label: 'Anunțuri publicate', color: chart[3] },
 };
 
 const kpiIcons = { users: Users, providers: Store, quote_requests: MessageSquare, listings: FileText };
 const kpiTint = {
-    users: 'bg-[#2a78d6]/10 text-[#2a78d6]',
-    providers: 'bg-[#eb6834]/10 text-[#c2491a]',
-    quote_requests: 'bg-[#1baf7a]/10 text-[#0f7f57]',
-    listings: 'bg-[#4a3aa7]/10 text-[#4a3aa7]',
+    users: 'bg-primary/10 text-primary',
+    providers: 'bg-ivt-violet/10 text-ivt-violet',
+    quote_requests: 'bg-ivt-teal/15 text-ivt-ink-2',
+    listings: 'bg-ivt-ink-2/10 text-ivt-ink-2',
 };
 
-const providerColors = { active: '#1f8a4c', pending: '#c98500', suspended: '#8a9186', rejected: '#e34948' };
-const quoteColors = { open: '#1f8a4c', pending_review: '#c98500', closed: '#8a9186', rejected: '#e34948' };
+const providerColors = { active: statusColors.positive, pending: statusColors.pending, suspended: statusColors.neutral, rejected: statusColors.negative };
+const quoteColors = { open: statusColors.positive, pending_review: statusColors.pending, closed: statusColors.neutral, rejected: statusColors.negative };
 
 const rangeOptions = [
     { value: 7, label: '7 zile' },
@@ -68,11 +69,11 @@ const setRange = (value) => {
 
 const activityIcons = { user: UserPlus, provider: Store, quote_request: Inbox, listing: FileText, review: Star };
 const activityTint = {
-    user: 'bg-[#2a78d6]/10 text-[#2a78d6]',
-    provider: 'bg-[#eb6834]/10 text-[#c2491a]',
-    quote_request: 'bg-[#1baf7a]/10 text-[#0f7f57]',
-    listing: 'bg-[#4a3aa7]/10 text-[#4a3aa7]',
-    review: 'bg-ivt-gold/10 text-ivt-gold',
+    user: 'bg-primary/10 text-primary',
+    provider: 'bg-ivt-violet/10 text-ivt-violet',
+    quote_request: 'bg-ivt-teal/15 text-ivt-ink-2',
+    listing: 'bg-ivt-ink-2/10 text-ivt-ink-2',
+    review: 'bg-ivt-violet/10 text-ivt-violet',
 };
 
 const timeAgo = (iso) => {
@@ -110,7 +111,7 @@ const reject = (provider) => {
             <!-- Header -->
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h2 class="font-serif text-2xl text-ivt-ink">Bună, {{ page.props.auth.user.name.split(' ')[0] }} 👋</h2>
+                    <h2 class="font-display text-2xl text-ivt-ink">Bună, {{ page.props.auth.user.name.split(' ')[0] }} 👋</h2>
                     <p class="text-sm text-ivt-ink-soft mt-1">Iată o privire de ansamblu asupra platformei.</p>
                 </div>
                 <div class="inline-flex rounded-xl border border-ivt-line bg-white p-1 shadow-sm shadow-ivt-ink/5" role="group" aria-label="Interval de timp">
@@ -134,14 +135,14 @@ const reject = (provider) => {
                         v-for="item in attention.filter((a) => a.value)"
                         :key="item.label"
                         :href="item.href"
-                        class="group inline-flex items-center gap-3 rounded-2xl border border-ivt-gold/30 bg-ivt-gold/10 pl-3 pr-4 py-2.5 transition-colors hover:bg-ivt-gold/15"
+                        class="group inline-flex items-center gap-3 rounded-2xl border border-ivt-violet/30 bg-ivt-violet/10 pl-3 pr-4 py-2.5 transition-colors hover:bg-ivt-violet/15"
                     >
-                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-white text-ivt-gold"><Clock class="w-4 h-4" /></span>
+                        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-white text-ivt-violet"><Clock class="w-4 h-4" /></span>
                         <span class="text-sm text-ivt-ink"><span class="font-semibold">{{ item.value }}</span> {{ item.label.toLowerCase() }}</span>
                         <ArrowUpRight class="w-4 h-4 text-ivt-ink-soft/50 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </Link>
                 </template>
-                <div v-else class="inline-flex items-center gap-2.5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-800">
+                <div v-else class="inline-flex items-center gap-2.5 rounded-2xl border border-success-200 bg-success-50 px-4 py-2.5 text-sm text-success-800">
                     <CircleCheck class="w-4 h-4" /> Nimic de moderat acum. Ești la zi.
                 </div>
             </div>
@@ -162,7 +163,7 @@ const reject = (provider) => {
                         </span>
                         <span
                             class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
-                            :class="kpi.change === null ? 'bg-ivt-paper-2 text-ivt-ink-soft' : kpi.change >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'"
+                            :class="kpi.change === null ? 'bg-ivt-paper-2 text-ivt-ink-soft' : kpi.change >= 0 ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'"
                         >
                             <template v-if="kpi.change === null">+{{ kpi.value }} noi</template>
                             <template v-else>
@@ -204,7 +205,7 @@ const reject = (provider) => {
                 <section v-if="topCategories.length" class="rounded-2xl border border-ivt-line bg-white p-5 shadow-sm shadow-ivt-ink/5">
                     <h3 class="text-sm font-semibold text-ivt-ink">Categorii cerute</h3>
                     <p class="text-xs text-ivt-ink-soft mt-0.5 mb-4">Cele mai multe cereri, ultimele {{ range }} zile</p>
-                    <BarList :items="topCategories" color="#1baf7a" />
+                    <BarList :items="topCategories" :color="chart[2]" />
                 </section>
                 <section v-else-if="quoteStatus.length" class="rounded-2xl border border-dashed border-ivt-line bg-white/60 p-5 flex items-center justify-center text-sm text-ivt-ink-faint">
                     Nicio cerere în ultimele {{ range }} zile.
@@ -260,8 +261,8 @@ const reject = (provider) => {
                             <p class="text-sm font-medium text-ivt-ink truncate">{{ provider.company_name }}</p>
                             <p class="text-xs text-ivt-ink-soft truncate">{{ provider.user?.name }} · {{ provider.user?.email }}</p>
                             <div class="flex items-center gap-2 mt-2.5">
-                                <button type="button" @click="approve(provider)" class="px-3 py-1.5 text-xs font-semibold text-white bg-primary rounded-lg hover:bg-primary-bright transition-colors">Aprobă</button>
-                                <button type="button" @click="reject(provider)" class="px-3 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 rounded-lg hover:bg-rose-100 transition-colors">Respinge</button>
+                                <button type="button" @click="approve(provider)" class="px-3 py-1.5 text-xs font-semibold text-white bg-brand rounded-lg hover:brightness-110 hover:shadow-glow-violet transition-colors">Aprobă</button>
+                                <button type="button" @click="reject(provider)" class="px-3 py-1.5 text-xs font-semibold text-danger-600 bg-danger-50 rounded-lg hover:bg-danger-100 transition-colors">Respinge</button>
                             </div>
                         </li>
                     </ul>

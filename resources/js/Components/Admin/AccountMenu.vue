@@ -16,7 +16,7 @@ const exitImpersonate = () => router.post('/exitimpersonate');
             v-if="page.props.impersonate"
             type="button"
             @click="exitImpersonate"
-            class="w-full flex items-center justify-center gap-2 mb-3 px-3 py-2 rounded-2xl text-xs font-semibold text-white bg-ivt-gold hover:bg-ivt-gold-bright shadow-sm shadow-ivt-gold/30 transition-colors"
+            class="w-full flex items-center justify-center gap-2 mb-3 px-3 py-2 rounded-2xl text-xs font-semibold text-white bg-brand hover:brightness-110 shadow-sm shadow-primary/30 transition-colors"
         >
             <ArrowLeftToLine class="w-4 h-4" /> Ieși din impersonare
         </button>
@@ -63,7 +63,7 @@ const exitImpersonate = () => router.post('/exitimpersonate');
                     <button
                         type="button"
                         @click="logout"
-                        class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-rose-600 hover:bg-rose-50 transition"
+                        class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-danger-600 hover:bg-danger-50 transition"
                     >
                         <LogOut class="w-4 h-4" /> Deconectare
                     </button>

@@ -34,7 +34,7 @@ const submit = () => {
     >
         <div
             v-if="prefill.email || prefill.phone"
-            class="mb-6 rounded-xl bg-ivt-sage/10 px-4 py-3 text-sm font-medium text-ivt-sage"
+            class="mb-6 rounded-xl bg-ivt-teal/10 px-4 py-3 text-sm font-medium text-ivt-teal"
         >
             Nu am găsit niciun cont cu {{ prefill.email ? 'această adresă de email' : 'acest număr de telefon' }}. Completează datele de mai jos pentru a-ți crea unul.
         </div>
@@ -94,7 +94,7 @@ const submit = () => {
             <button
                 type="submit"
                 :disabled="form.processing"
-                class="w-full rounded-full bg-gradient-to-b from-ivt-wine-bright to-ivt-wine px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(124,46,59,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-ivt-wine/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                class="w-full rounded-full bg-gradient-to-b from-primary-bright to-primary px-4 py-3 text-sm font-semibold text-ivt-paper transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_-12px_rgba(225,29,99,0.4)] active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
                 Creează cont
             </button>
@@ -102,7 +102,7 @@ const submit = () => {
 
         <p class="mt-6 text-center text-sm text-ivt-ink-soft">
             Ai deja un cont?
-            <Link href="/login" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
+            <Link href="/login" class="font-semibold text-primary transition-colors duration-150 hover:text-primary-bright">
                 Conectează-te
             </Link>
         </p>
@@ -111,7 +111,7 @@ const submit = () => {
 
         <p class="mt-6 text-center text-xs text-ivt-ink-faint">
             Ești furnizor de servicii?
-            <Link href="/register" class="font-semibold text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright">
+            <Link href="/register" class="font-semibold text-primary transition-colors duration-150 hover:text-primary-bright">
                 Creează cont firmă
             </Link>
         </p>

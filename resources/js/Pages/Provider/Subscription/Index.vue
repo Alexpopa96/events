@@ -32,9 +32,9 @@ const confirmChoose = () => {
 };
 
 const invoiceStatusMeta = {
-    paid: { label: 'Plătită', class: 'bg-emerald-100 text-emerald-700' },
-    pending: { label: 'În așteptare', class: 'bg-ivt-gold/20 text-ivt-gold' },
-    failed: { label: 'Eșuată', class: 'bg-rose-100 text-rose-700' },
+    paid: { label: 'Plătită', class: 'bg-success-100 text-success-700' },
+    pending: { label: 'În așteptare', class: 'bg-ivt-violet/20 text-ivt-violet' },
+    failed: { label: 'Eșuată', class: 'bg-danger-100 text-danger-700' },
     refunded: { label: 'Rambursată', class: 'bg-ivt-paper-2 text-ivt-ink-soft' },
 };
 </script>
@@ -56,15 +56,15 @@ const invoiceStatusMeta = {
                     ? 'border-primary ring-1 ring-primary/30 shadow-glow-primary'
                     : 'border-ivt-line shadow-sm shadow-ivt-ink/5 hover:shadow-glow-primary hover:-translate-y-1'"
             >
-                <span v-if="plan.id === currentPlanId" class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary-bright via-ivt-gold to-primary"></span>
+                <span v-if="plan.id === currentPlanId" class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary-bright via-ivt-violet to-primary"></span>
 
                 <div class="flex items-center justify-between mb-1">
-                    <h3 class="font-serif text-lg text-ivt-ink">{{ plan.name }}</h3>
+                    <h3 class="font-display text-lg text-ivt-ink">{{ plan.name }}</h3>
                     <span v-if="plan.id === currentPlanId" class="text-[10px] font-semibold uppercase tracking-wide text-primary bg-ivt-paper-2 rounded-full px-2 py-0.5">
                         Curent
                     </span>
                 </div>
-                <p class="font-serif text-3xl text-ivt-ink tabular-nums mb-1">
+                <p class="font-display text-3xl text-ivt-ink tabular-nums mb-1">
                     {{ plan.price === 0 ? 'Gratuit' : `${plan.price} ${plan.currency}` }}
                     <span v-if="plan.price > 0" class="font-sans text-sm font-normal text-ivt-ink-soft">/lună</span>
                 </p>
@@ -95,7 +95,7 @@ const invoiceStatusMeta = {
         </div>
 
         <div class="bg-white border border-ivt-line rounded-2xl p-6 shadow-sm shadow-ivt-ink/5">
-            <h3 class="font-serif text-lg text-ivt-ink mb-4">Facturi</h3>
+            <h3 class="font-display text-lg text-ivt-ink mb-4">Facturi</h3>
             <div v-if="invoices.length" class="divide-y divide-ivt-line">
                 <div v-for="invoice in invoices" :key="invoice.id" class="py-3 flex items-center justify-between text-sm px-2 -mx-2 rounded-lg transition-colors duration-150 hover:bg-ivt-paper/60">
                     <div class="flex items-center gap-3">

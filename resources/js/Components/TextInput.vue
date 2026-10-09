@@ -4,7 +4,7 @@
         <input :id="id" ref="input" v-bind="{ ...$attrs, class: null }" :class="[fieldClass, error && fieldErrorClass]" :type="type" :placeholder="placeholder"
                :value="modelValue" @input="$emit('update:modelValue', $event.target.value)">
         <slot/>
-        <div v-if="error" class="mt-1.5 text-sm text-red-600" role="alert">{{ error }}</div>
+        <div v-if="error" class="mt-1.5 text-sm text-danger-600" role="alert">{{ error }}</div>
     </div>
 </template>
 

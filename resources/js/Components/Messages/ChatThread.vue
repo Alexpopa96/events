@@ -170,22 +170,22 @@ watch(() => allMessages.value.length, (now, before) => {
                 <span class="flex h-14 w-14 items-center justify-center rounded-full bg-white text-primary shadow-lg shadow-primary/10 ring-1 ring-primary/10">
                     <ChatBubbleLeftRightIcon class="h-7 w-7" />
                 </span>
-                <p class="mt-3 text-sm text-ink-soft">{{ emptyText }}</p>
+                <p class="mt-3 text-sm text-ivt-ink-soft">{{ emptyText }}</p>
             </div>
 
             <template v-for="group in groups" :key="group.day">
                 <div class="flex justify-center py-3">
-                    <span class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-ink-soft shadow-sm shadow-ink/5 ring-1 ring-line">{{ group.day }}</span>
+                    <span class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-ivt-ink-soft shadow-sm shadow-ivt-ink/5 ring-1 ring-ivt-line">{{ group.day }}</span>
                 </div>
                 <div v-for="message in group.items" :key="message.id" class="flex" :class="message.mine ? 'justify-end' : 'justify-start'">
                     <div
                         class="max-w-[85%] px-4 py-2.5 sm:max-w-[68%]"
                         :class="message.mine
                             ? 'rounded-3xl rounded-br-lg bg-gradient-to-br from-primary to-primary-bright text-white shadow-md shadow-primary/20'
-                            : 'rounded-3xl rounded-bl-lg bg-white text-ink shadow-sm shadow-ink/5 ring-1 ring-line'"
+                            : 'rounded-3xl rounded-bl-lg bg-white text-ivt-ink shadow-sm shadow-ivt-ink/5 ring-1 ring-ivt-line'"
                     >
                         <p class="whitespace-pre-line break-words text-sm leading-relaxed">{{ message.body }}</p>
-                        <p class="mt-1 flex items-center justify-end gap-1 text-right text-[10px]" :class="message.mine ? 'text-white/70' : 'text-ink-soft/70'">
+                        <p class="mt-1 flex items-center justify-end gap-1 text-right text-[10px]" :class="message.mine ? 'text-white/70' : 'text-ivt-ink-soft/70'">
                             {{ message.time }}<span v-if="isSeen(message)">· Văzut</span>
                         </p>
                     </div>
@@ -193,15 +193,15 @@ watch(() => allMessages.value.length, (now, before) => {
             </template>
 
             <div v-if="counterpartTyping" class="flex justify-start">
-                <div class="flex items-center gap-1 rounded-3xl rounded-bl-lg bg-white px-4 py-3 shadow-sm shadow-ink/5 ring-1 ring-line">
-                    <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft/50 [animation-delay:-0.2s]" />
-                    <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft/50 [animation-delay:-0.1s]" />
-                    <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft/50" />
+                <div class="flex items-center gap-1 rounded-3xl rounded-bl-lg bg-white px-4 py-3 shadow-sm shadow-ivt-ink/5 ring-1 ring-ivt-line">
+                    <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-ivt-ink-soft/50 [animation-delay:-0.2s]" />
+                    <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-ivt-ink-soft/50 [animation-delay:-0.1s]" />
+                    <span class="h-1.5 w-1.5 animate-bounce rounded-full bg-ivt-ink-soft/50" />
                 </div>
             </div>
         </div>
 
-        <form @submit.prevent="send" class="border-t border-line bg-white p-3 sm:p-4">
+        <form @submit.prevent="send" class="border-t border-ivt-line bg-white p-3 sm:p-4">
             <div v-if="quickReplies.length" class="mb-2.5 flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:thin]">
                 <button
                     v-for="reply in quickReplies"
@@ -225,18 +225,18 @@ watch(() => allMessages.value.length, (now, before) => {
                     :disabled="disabled"
                     @keydown="onKeydown"
                     @input="resize(); notifyTyping()"
-                    class="max-h-36 min-h-[2.5rem] flex-1 resize-none border-0 bg-transparent px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-soft/60 focus:ring-0"
+                    class="max-h-36 min-h-[2.5rem] flex-1 resize-none border-0 bg-transparent px-3.5 py-2.5 text-sm text-ivt-ink placeholder:text-ivt-ink-soft/60 focus:ring-0"
                 ></textarea>
                 <button
                     type="submit"
                     :disabled="disabled || form.processing || !form.body.trim()"
-                    class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-primary text-white shadow-md shadow-primary/25 transition-all duration-200 hover:bg-primary-bright active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                    class="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand text-white shadow-md shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet active:scale-95 disabled:pointer-events-none disabled:opacity-40"
                     aria-label="Trimite"
                 >
                     <PaperAirplaneIcon class="h-[18px] w-[18px]" />
                 </button>
             </div>
-            <p class="mt-1.5 hidden px-3 text-[11px] text-ink-soft/70 sm:block">Enter trimite · Shift+Enter rând nou</p>
+            <p class="mt-1.5 hidden px-3 text-[11px] text-ivt-ink-soft/70 sm:block">Enter trimite · Shift+Enter rând nou</p>
         </form>
     </div>
 </template>

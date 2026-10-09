@@ -9,7 +9,7 @@ const isClient = computed(() => !!page.props.auth.user && !page.props.auth.isPro
 
 <template>
     <footer class="border-t border-ivt-line bg-ivt-paper-2 font-invita">
-        <div class="mx-auto max-w-7xl px-6 pb-10 pt-14 lg:px-8">
+        <div class="mx-auto max-w-[1600px] px-6 pb-10 pt-14 lg:px-8">
             <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
                 <div>
                     <Logo variant="invita" />
@@ -19,17 +19,17 @@ const isClient = computed(() => !!page.props.auth.user && !page.props.auth.isPro
                 </div>
 
                 <div>
-                    <h5 class="text-[13px] font-semibold uppercase tracking-wider text-ivt-wine">Platformă</h5>
+                    <h5 class="text-[13px] font-semibold uppercase tracking-wider text-primary">Platformă</h5>
                     <ul class="mt-4 space-y-2.5">
                         <li><Link :href="route('categories.index')" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Categorii</Link></li>
                         <li><Link :href="route('listings.index')" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Furnizori</Link></li>
-                        <li><a href="/#cereri" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Cereri de ofertă</a></li>
-                        <li v-if="!isClient"><a href="/#abonamente" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Abonamente</a></li>
+                        <li><Link :href="route('quote-requests.browse')" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Cereri de ofertă</Link></li>
+                        <li v-if="!isClient"><Link :href="route('subscriptions.index')" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Abonamente</Link></li>
                     </ul>
                 </div>
 
                 <div>
-                    <h5 class="text-[13px] font-semibold uppercase tracking-wider text-ivt-wine">Furnizori</h5>
+                    <h5 class="text-[13px] font-semibold uppercase tracking-wider text-primary">Furnizori</h5>
                     <ul class="mt-4 space-y-2.5">
                         <li><Link href="/register" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Creează cont</Link></li>
                         <li><a href="/#cum-functioneaza" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Ghid de publicare</a></li>
@@ -38,7 +38,7 @@ const isClient = computed(() => !!page.props.auth.user && !page.props.auth.isPro
                 </div>
 
                 <div>
-                    <h5 class="text-[13px] font-semibold uppercase tracking-wider text-ivt-wine">Companie</h5>
+                    <h5 class="text-[13px] font-semibold uppercase tracking-wider text-primary">Companie</h5>
                     <ul class="mt-4 space-y-2.5">
                         <li><a href="/#despre" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Despre noi</a></li>
                         <li><a href="mailto:contact@eventhub.ro" class="text-sm text-ivt-ink-soft transition-colors hover:text-ivt-ink">Contact</a></li>

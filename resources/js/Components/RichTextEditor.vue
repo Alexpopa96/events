@@ -85,7 +85,7 @@ const buttons = [
     float: left;
     height: 0;
     pointer-events: none;
-    color: rgba(107, 99, 115, 0.6);
+    color: rgba(75, 92, 79, 0.6);
 }
 
 .tiptap ul {

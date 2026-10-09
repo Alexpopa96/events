@@ -11,7 +11,7 @@
                     Înapoi
                 </button>
                 <button v-if="save" type="submit" :disabled="loading"
-                        class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright hover:shadow-glow-primary active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60">
+                        class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet hover:shadow-glow-primary active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60">
                     <Loader2 v-if="loading" class="h-4 w-4 animate-spin" />
                     <Check v-else class="h-4 w-4" />
                     Salvează

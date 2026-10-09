@@ -11,7 +11,7 @@
                             v-if="forms.length > 1"
                             type="button"
                             @click.prevent="deleteForm(index)"
-                            class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-rose-600 bg-rose-50 transition-colors hover:bg-rose-100"
+                            class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-danger-600 bg-danger-50 transition-colors hover:bg-danger-100"
                         >
                             <Trash2 class="h-3.5 w-3.5" /> Elimină
                         </button>
@@ -24,9 +24,9 @@
                     </div>
                 </div>
 
-                <div v-if="counter > 0 && alert" class="flex items-start justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700" role="alert">
+                <div v-if="counter > 0 && alert" class="flex items-start justify-between gap-3 rounded-2xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-700" role="alert">
                     <p class="font-medium">Au apărut erori în formularele {{ arr.toString() }}. Verificați ca toate datele necesare să fie introduse.</p>
-                    <button type="button" @click.prevent="alert = false" class="flex-none text-rose-500 hover:text-rose-700" aria-label="Închide">
+                    <button type="button" @click.prevent="alert = false" class="flex-none text-danger-500 hover:text-danger-700" aria-label="Închide">
                         <X class="h-4 w-4" />
                     </button>
                 </div>
@@ -35,13 +35,13 @@
                     <button
                         type="button"
                         @click.prevent="addForm"
-                        class="inline-flex items-center gap-2 rounded-xl border border-ivt-line bg-white px-4 py-2 text-sm font-semibold text-ivt-ink-soft transition-colors hover:border-ivt-gold hover:text-primary"
+                        class="inline-flex items-center gap-2 rounded-xl border border-ivt-line bg-white px-4 py-2 text-sm font-semibold text-ivt-ink-soft transition-colors hover:border-ivt-violet hover:text-primary"
                     >
                         <Plus class="h-4 w-4" /> Adaugă încă una
                     </button>
                     <button
                         type="submit"
-                        class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:bg-primary-bright"
+                        class="inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:brightness-110 hover:shadow-glow-violet"
                     >
                         <Check class="h-4 w-4" /> Salvează
                     </button>

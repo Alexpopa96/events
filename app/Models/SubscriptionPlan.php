@@ -43,4 +43,23 @@ class SubscriptionPlan extends Model
     {
         return (float) $this->price === 0.0;
     }
+
+    /**
+     * Shape exposed on public pages (homepage teaser, pricing page).
+     */
+    public function toPublicArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'price' => (float) $this->price,
+            'currency' => $this->currency,
+            'features' => $this->features ?? [],
+            'max_listings' => $this->max_listings,
+            'max_photos_per_listing' => $this->max_photos_per_listing,
+            'max_videos_per_listing' => $this->max_videos_per_listing,
+            'allows_featured_placement' => $this->allows_featured_placement,
+        ];
+    }
 }

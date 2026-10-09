@@ -7,7 +7,7 @@ const props = defineProps({
     title: { type: String, required: true },
     description: { type: String, default: '' },
     confirmLabel: { type: String, default: 'Confirmă' },
-    confirmClass: { type: String, default: 'bg-rose-600 hover:bg-rose-700' },
+    confirmClass: { type: String, default: 'bg-danger-600 hover:bg-danger-700' },
     processing: { type: Boolean, default: false },
 });
 
@@ -33,7 +33,7 @@ const submit = () => {
 <template>
     <Modal :show="show" max-width="lg" @close="$emit('close')">
         <div class="p-6">
-            <h3 class="font-serif text-lg text-ivt-ink">{{ title }}</h3>
+            <h3 class="font-display text-lg text-ivt-ink">{{ title }}</h3>
             <p v-if="description" class="mt-1.5 text-sm text-ivt-ink-soft">{{ description }}</p>
 
             <textarea

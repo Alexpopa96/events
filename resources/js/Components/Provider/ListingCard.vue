@@ -14,9 +14,9 @@ defineEmits(['delete']);
 
 const statusMeta = {
     draft: { label: 'Ciornă', class: 'bg-white/90 text-ivt-ink-soft' },
-    pending_review: { label: 'În verificare', class: 'bg-ivt-gold/90 text-white' },
-    published: { label: 'Publicat', class: 'bg-emerald-500/90 text-white' },
-    rejected: { label: 'Respins', class: 'bg-rose-500/90 text-white' },
+    pending_review: { label: 'În verificare', class: 'bg-ivt-violet/90 text-white' },
+    published: { label: 'Publicat', class: 'bg-success-500/90 text-white' },
+    rejected: { label: 'Respins', class: 'bg-danger-500/90 text-white' },
     archived: { label: 'Arhivat', class: 'bg-ivt-ink/70 text-white' },
 };
 
@@ -28,7 +28,7 @@ const location = computed(() => [props.listing.locality?.name, props.listing.cou
 
 <template>
     <div class="group relative flex flex-col rounded-2xl border border-ivt-line bg-white shadow-sm shadow-ivt-ink/5 overflow-hidden transition-all duration-200" :class="preview ? '' : 'hover:shadow-glow-primary hover:-translate-y-1'">
-        <div class="relative aspect-[4/3] bg-gradient-to-br from-ivt-paper-2 to-paper overflow-hidden">
+        <div class="relative aspect-[4/3] bg-gradient-to-br from-ivt-paper-2 to-ivt-paper overflow-hidden">
             <img v-if="listing.cover_url" :src="listing.cover_url" :alt="listing.title" class="w-full h-full object-cover transition-transform duration-300" :class="!preview && 'group-hover:scale-105'" />
             <div v-else class="w-full h-full flex items-center justify-center">
                 <component :is="icon" class="w-10 h-10 text-primary/30" />
@@ -46,7 +46,7 @@ const location = computed(() => [props.listing.locality?.name, props.listing.cou
                 <Link :href="route('provider.listings.edit', listing.id)" class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft shadow-sm transition-colors duration-150 hover:text-primary" title="Editează">
                     <PencilSquareIcon class="w-4 h-4" />
                 </Link>
-                <button @click="$emit('delete', listing)" class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft shadow-sm transition-colors duration-150 hover:text-rose-600" title="Șterge">
+                <button @click="$emit('delete', listing)" class="p-2 rounded-lg bg-white/95 text-ivt-ink-soft shadow-sm transition-colors duration-150 hover:text-danger-600" title="Șterge">
                     <TrashIcon class="w-4 h-4" />
                 </button>
             </div>

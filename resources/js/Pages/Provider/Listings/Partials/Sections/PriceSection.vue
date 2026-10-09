@@ -109,7 +109,7 @@ const iconWrapClass = 'w-7 h-7 rounded-full bg-ivt-paper-2 text-primary flex ite
                         <button
                             type="button"
                             @click.stop="removeBenefit(index)"
-                            class="flex h-5 w-5 flex-none items-center justify-center rounded-full text-ivt-ink-soft transition-colors duration-150 hover:bg-rose-100 hover:text-rose-600"
+                            class="flex h-5 w-5 flex-none items-center justify-center rounded-full text-ivt-ink-soft transition-colors duration-150 hover:bg-danger-100 hover:text-danger-600"
                             :aria-label="`Elimină „${benefit}”`"
                         >
                             <XMarkIcon class="h-3.5 w-3.5" />

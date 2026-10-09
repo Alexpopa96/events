@@ -79,7 +79,7 @@ const sections = computed(() => [
                     <span
                         class="flex items-center justify-center w-8 h-8 rounded-xl flex-none transition-all duration-200 ease-out"
                         :class="item.active
-                            ? 'bg-white/15 ring-1 ring-ivt-gold-bright/40'
+                            ? 'bg-white/15 ring-1 ring-ivt-accent-bright/40'
                             : 'bg-ivt-paper-2 text-ivt-ink-soft group-hover:text-primary group-hover:bg-white group-hover:shadow-sm'"
                     >
                         <component :is="item.icon" class="w-4 h-4" />
@@ -88,7 +88,7 @@ const sections = computed(() => [
                     <span
                         v-if="item.badge"
                         class="flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-[11px] font-semibold rounded-full"
-                        :class="item.active ? 'bg-white/20 text-white' : 'bg-ivt-gold/15 text-ivt-gold'"
+                        :class="item.active ? 'bg-white/20 text-white' : 'bg-ivt-violet/15 text-ivt-violet'"
                     >
                         {{ item.badge }}
                     </span>

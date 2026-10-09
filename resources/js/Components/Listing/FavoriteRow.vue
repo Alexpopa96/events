@@ -36,13 +36,13 @@ const imageLoaded = ref(false);
                 @error="imageLoaded = true"
             />
             <div v-else class="flex h-full w-full items-center justify-center">
-                <component :is="categoryIcon(listing.category_slug)" class="h-9 w-9 text-ivt-wine/25" />
+                <component :is="categoryIcon(listing.category_slug)" class="h-9 w-9 text-primary/25" />
             </div>
         </Link>
 
         <div class="flex flex-1 flex-col p-[18px]">
-            <p class="text-[10.5px] font-bold uppercase tracking-[0.08em] text-ivt-wine">{{ listing.category }}</p>
-            <Link :href="route('listings.show', listing.slug)" class="mt-1.5 font-serif text-[17px] font-medium leading-snug text-ivt-ink transition-colors hover:text-ivt-wine">
+            <p class="text-[10.5px] font-bold uppercase tracking-[0.08em] text-primary">{{ listing.category }}</p>
+            <Link :href="route('listings.show', listing.slug)" class="mt-1.5 font-display text-[17px] font-medium leading-snug text-ivt-ink transition-colors hover:text-primary">
                 {{ listing.title }}
             </Link>
             <p v-if="listing.provider?.company_name" class="mt-1 text-xs text-ivt-ink-faint">{{ listing.provider.company_name }}</p>
@@ -52,7 +52,7 @@ const imageLoaded = ref(false);
                 <button
                     type="button"
                     @click="toggleFavorite"
-                    class="text-ivt-wine transition-colors duration-150 hover:text-ivt-wine-bright"
+                    class="text-primary transition-colors duration-150 hover:text-primary-bright"
                     aria-label="Elimină de la favorite"
                 >
                     <HeartIconSolid class="h-4 w-4" />

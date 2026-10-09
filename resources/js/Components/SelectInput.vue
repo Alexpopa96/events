@@ -4,7 +4,7 @@
         <select :id="id" ref="input" v-model="selected" v-bind="{ ...$attrs, class: null }" class="cursor-pointer pr-10" :class="[fieldClass, error && fieldErrorClass]">
             <slot/>
         </select>
-        <div v-if="error" class="mt-1.5 text-sm text-red-600" role="alert">{{ error }}</div>
+        <div v-if="error" class="mt-1.5 text-sm text-danger-600" role="alert">{{ error }}</div>
     </div>
 </template>
 

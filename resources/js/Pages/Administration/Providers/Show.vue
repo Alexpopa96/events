@@ -103,24 +103,24 @@ const history = computed(() => {
     ];
 
     if (props.provider.approved_at) {
-        items.push({ label: 'Aprobat', date: props.provider.approved_at, icon: CheckCircle2, tone: 'text-emerald-600 bg-emerald-50' });
+        items.push({ label: 'Aprobat', date: props.provider.approved_at, icon: CheckCircle2, tone: 'text-success-600 bg-success-50' });
     }
     if (props.provider.rejected_at) {
-        items.push({ label: 'Respins', date: props.provider.rejected_at, reason: props.provider.rejection_reason, icon: XCircle, tone: 'text-rose-600 bg-rose-50' });
+        items.push({ label: 'Respins', date: props.provider.rejected_at, reason: props.provider.rejection_reason, icon: XCircle, tone: 'text-danger-600 bg-danger-50' });
     }
     if (props.provider.suspended_at) {
-        items.push({ label: 'Suspendat', date: props.provider.suspended_at, reason: props.provider.suspension_reason, icon: AlertTriangle, tone: 'text-slate-600 bg-slate-100' });
+        items.push({ label: 'Suspendat', date: props.provider.suspended_at, reason: props.provider.suspension_reason, icon: AlertTriangle, tone: 'text-ivt-ink-soft bg-ivt-paper-2' });
     }
 
     return items;
 });
 
 const listingStatus = {
-    draft: { label: 'Ciornă', classes: 'bg-slate-100 text-slate-600' },
-    pending_review: { label: 'În verificare', classes: 'bg-amber-50 text-amber-600' },
-    published: { label: 'Publicat', classes: 'bg-emerald-50 text-emerald-600' },
-    rejected: { label: 'Respins', classes: 'bg-rose-50 text-rose-600' },
-    archived: { label: 'Arhivat', classes: 'bg-slate-100 text-slate-600' },
+    draft: { label: 'Ciornă', classes: 'bg-ivt-paper-2 text-ivt-ink-soft' },
+    pending_review: { label: 'În verificare', classes: 'bg-warning-50 text-warning-600' },
+    published: { label: 'Publicat', classes: 'bg-success-50 text-success-600' },
+    rejected: { label: 'Respins', classes: 'bg-danger-50 text-danger-600' },
+    archived: { label: 'Arhivat', classes: 'bg-ivt-paper-2 text-ivt-ink-soft' },
 };
 
 const formatPrice = (listing) => {
@@ -149,7 +149,7 @@ const formatPrice = (listing) => {
                     </span>
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <h2 class="font-serif text-xl text-ivt-ink">{{ provider.company_name }}</h2>
+                            <h2 class="font-display text-xl text-ivt-ink">{{ provider.company_name }}</h2>
                             <StatusBadge :status="provider.status" />
                         </div>
                         <p class="text-sm text-ivt-ink-soft mt-1">
@@ -164,7 +164,7 @@ const formatPrice = (listing) => {
                         type="button"
                         :disabled="processing"
                         @click="approve"
-                        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-primary hover:bg-primary-bright shadow-sm shadow-primary/25 transition-colors disabled:opacity-50"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand hover:brightness-110 hover:shadow-glow-violet shadow-sm shadow-primary/25 transition-colors disabled:opacity-50"
                     >
                         Aprobă
                     </button>
@@ -173,7 +173,7 @@ const formatPrice = (listing) => {
                         type="button"
                         :disabled="processing"
                         @click="showRejectModal = true"
-                        class="px-4 py-2 rounded-xl text-sm font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors disabled:opacity-50"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-danger-600 bg-danger-50 hover:bg-danger-100 transition-colors disabled:opacity-50"
                     >
                         Respinge
                     </button>
@@ -182,7 +182,7 @@ const formatPrice = (listing) => {
                         type="button"
                         :disabled="processing"
                         @click="showSuspendModal = true"
-                        class="px-4 py-2 rounded-xl text-sm font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors disabled:opacity-50"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-danger-600 bg-danger-50 hover:bg-danger-100 transition-colors disabled:opacity-50"
                     >
                         Suspendă
                     </button>
@@ -191,7 +191,7 @@ const formatPrice = (listing) => {
                         type="button"
                         :disabled="processing"
                         @click="reactivate"
-                        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-primary hover:bg-primary-bright shadow-sm shadow-primary/25 transition-colors disabled:opacity-50"
+                        class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-brand hover:brightness-110 hover:shadow-glow-violet shadow-sm shadow-primary/25 transition-colors disabled:opacity-50"
                     >
                         Reactivează
                     </button>
@@ -248,23 +248,23 @@ const formatPrice = (listing) => {
                         </div>
                         <p class="text-xs text-ivt-ink-soft/70 mb-3">Compară datele introduse de furnizor cu cele oficiale de la ANAF.</p>
 
-                        <p v-if="provider.anaf_verified_at" class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
+                        <p v-if="provider.anaf_verified_at" class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-success-50 px-3 py-1.5 text-xs font-semibold text-success-700">
                             <CheckCircle2 class="w-3.5 h-3.5" /> Verificat la ANAF pe {{ provider.anaf_verified_at }}
-                            <span v-if="provider.anaf_status" class="font-normal text-emerald-700/80">· {{ provider.anaf_status }}</span>
+                            <span v-if="provider.anaf_status" class="font-normal text-success-700/80">· {{ provider.anaf_status }}</span>
                         </p>
                         <p v-else class="mb-3 inline-flex items-center gap-1.5 rounded-full bg-ivt-paper-2 px-3 py-1.5 text-xs font-semibold text-ivt-ink-soft">
                             <AlertTriangle class="w-3.5 h-3.5" /> Nu a fost verificat încă — badge-ul „Verificat” nu apare public
                         </p>
 
-                        <p v-if="anafError" class="text-sm text-rose-600">{{ anafError }}</p>
+                        <p v-if="anafError" class="text-sm text-danger-600">{{ anafError }}</p>
 
                         <div v-if="anafResult" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm mt-2">
                             <div class="rounded-xl bg-ivt-paper px-3 py-2.5">
                                 <p class="text-[11px] uppercase tracking-wider text-ivt-ink-soft/60 mb-1">Denumire (ANAF)</p>
                                 <p class="flex items-center gap-1.5 text-ivt-ink">
                                     {{ anafResult.denumire ?? '—' }}
-                                    <CheckCircle2 v-if="matches(anafResult.denumire, provider.company_name)" class="w-3.5 h-3.5 text-emerald-500" />
-                                    <AlertTriangle v-else class="w-3.5 h-3.5 text-amber-500" />
+                                    <CheckCircle2 v-if="matches(anafResult.denumire, provider.company_name)" class="w-3.5 h-3.5 text-success-500" />
+                                    <AlertTriangle v-else class="w-3.5 h-3.5 text-warning-500" />
                                 </p>
                             </div>
                             <div class="rounded-xl bg-ivt-paper px-3 py-2.5">
@@ -291,7 +291,7 @@ const formatPrice = (listing) => {
                                     v-for="(count, status) in listingCounts"
                                     :key="status"
                                     class="px-2 py-0.5 rounded-full text-[11px] font-semibold"
-                                    :class="(listingStatus[status] ?? {}).classes ?? 'bg-slate-100 text-slate-600'"
+                                    :class="(listingStatus[status] ?? {}).classes ?? 'bg-ivt-paper-2 text-ivt-ink-soft'"
                                 >
                                     {{ (listingStatus[status] ?? {}).label ?? status }}: {{ count }}
                                 </span>
@@ -307,7 +307,7 @@ const formatPrice = (listing) => {
                                 </div>
                                 <span
                                     class="px-2 py-0.5 rounded-full text-[11px] font-semibold flex-none"
-                                    :class="(listingStatus[listing.status] ?? {}).classes ?? 'bg-slate-100 text-slate-600'"
+                                    :class="(listingStatus[listing.status] ?? {}).classes ?? 'bg-ivt-paper-2 text-ivt-ink-soft'"
                                 >
                                     {{ (listingStatus[listing.status] ?? {}).label ?? listing.status }}
                                 </span>
@@ -320,7 +320,7 @@ const formatPrice = (listing) => {
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-sm font-semibold text-ivt-ink">Recenzii</h3>
                             <div class="flex items-center gap-1.5 text-sm text-ivt-ink-soft">
-                                <Star class="w-4 h-4 text-ivt-gold fill-ivt-gold" />
+                                <Star class="w-4 h-4 text-ivt-accent-bright fill-ivt-violet" />
                                 <span class="font-semibold text-ivt-ink">{{ provider.average_rating || '—' }}</span>
                                 <span>({{ provider.reviews_count }})</span>
                             </div>
@@ -335,7 +335,7 @@ const formatPrice = (listing) => {
                                         <Star
                                             v-for="i in 5" :key="i"
                                             class="w-3.5 h-3.5"
-                                            :class="i <= review.rating ? 'text-ivt-gold fill-ivt-gold' : 'text-line'"
+                                            :class="i <= review.rating ? 'text-ivt-violet fill-ivt-violet' : 'text-ivt-line'"
                                         />
                                     </div>
                                 </div>
@@ -414,7 +414,7 @@ const formatPrice = (listing) => {
             title="Respinge furnizorul"
             description="Motivul va fi trimis furnizorului prin email."
             confirm-label="Respinge"
-            confirm-class="bg-rose-600 hover:bg-rose-700"
+            confirm-class="bg-danger-600 hover:bg-danger-700"
             :processing="processing"
             @close="showRejectModal = false"
             @confirm="reject"
@@ -425,7 +425,7 @@ const formatPrice = (listing) => {
             title="Suspendă furnizorul"
             description="Motivul va fi trimis furnizorului prin email. Anunțurile sale nu vor mai fi vizibile public."
             confirm-label="Suspendă"
-            confirm-class="bg-rose-600 hover:bg-rose-700"
+            confirm-class="bg-danger-600 hover:bg-danger-700"
             :processing="processing"
             @close="showSuspendModal = false"
             @confirm="suspend"

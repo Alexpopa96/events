@@ -44,7 +44,7 @@
                         <button
                             type="button"
                             @click.prevent="exportExcel"
-                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-ivt-line bg-white text-sm font-semibold text-ivt-ink-soft transition-colors hover:border-ivt-gold hover:text-primary"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-ivt-line bg-white text-sm font-semibold text-ivt-ink-soft transition-colors hover:border-ivt-violet hover:text-primary"
                         >
                             <Loader2 v-if="exporting" class="w-4 h-4 animate-spin" />
                             <Download v-else class="w-4 h-4" />
@@ -52,7 +52,7 @@
                         </button>
                         <Link
                             href="/administration/users/create"
-                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:bg-primary-bright whitespace-nowrap"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:brightness-110 hover:shadow-glow-violet whitespace-nowrap"
                         >
                             <Plus class="w-4 h-4" />
                             Adaugă utilizator
@@ -93,7 +93,7 @@
                                     <div class="flex items-center gap-3">
                                         <span
                                             class="w-2 h-2 rounded-full flex-none"
-                                            :class="cacheUsers.includes(user.id) ? 'bg-emerald-500' : 'bg-ivt-ink-soft/25'"
+                                            :class="cacheUsers.includes(user.id) ? 'bg-success-500' : 'bg-ivt-ink-soft/25'"
                                             :title="cacheUsers.includes(user.id) ? 'Online' : 'Offline'"
                                         ></span>
                                         <button
@@ -109,7 +109,7 @@
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <span
                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-                                        :class="user.status == 1 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'"
+                                        :class="user.status == 1 ? 'bg-success-50 text-success-600' : 'bg-danger-50 text-danger-600'"
                                     >
                                         <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
                                         {{ user.status == 1 ? 'Activ' : 'Inactiv' }}

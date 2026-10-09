@@ -51,20 +51,20 @@ const previewListing = computed(() => ({
     <ProviderLayout title="Anunț nou">
         <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div>
-                <h2 class="font-serif text-2xl text-ivt-ink">Creează un anunț nou</h2>
+                <h2 class="font-display text-2xl text-ivt-ink">Creează un anunț nou</h2>
                 <p class="text-sm text-ivt-ink-soft mt-1">Completează detaliile de bază acum — poți adăuga fotografii și rafina descrierea imediat după salvare.</p>
             </div>
             <div v-if="quota.max !== null" class="flex-none text-right">
                 <p class="text-xs text-ivt-ink-soft">Plan {{ quota.plan_name }}</p>
-                <p class="text-sm font-semibold" :class="quotaReached ? 'text-rose-600' : 'text-ivt-ink'">{{ quota.used }} / {{ quota.max }} anunțuri</p>
+                <p class="text-sm font-semibold" :class="quotaReached ? 'text-danger-600' : 'text-ivt-ink'">{{ quota.used }} / {{ quota.max }} anunțuri</p>
             </div>
         </div>
 
-        <div v-if="quotaReached" class="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 mb-6">
-            <ExclamationTriangleIcon class="w-5 h-5 text-amber-500 flex-none mt-0.5" />
+        <div v-if="quotaReached" class="flex items-start gap-3 rounded-2xl border border-warning-200 bg-warning-50 px-5 py-4 mb-6">
+            <ExclamationTriangleIcon class="w-5 h-5 text-warning-500 flex-none mt-0.5" />
             <div>
-                <p class="text-sm font-semibold text-amber-700">Ai atins limita planului {{ quota.plan_name }}</p>
-                <p class="text-sm text-amber-700/80 mt-0.5">Arhivează un anunț existent sau treci la un plan superior pentru a mai publica anunțuri noi.</p>
+                <p class="text-sm font-semibold text-warning-700">Ai atins limita planului {{ quota.plan_name }}</p>
+                <p class="text-sm text-warning-700/80 mt-0.5">Arhivează un anunț existent sau treci la un plan superior pentru a mai publica anunțuri noi.</p>
             </div>
         </div>
 
@@ -73,11 +73,11 @@ const previewListing = computed(() => ({
                 <ListingFields :form="form" :categories="categories" :event-types="eventTypes" :counties="counties" />
 
                 <!-- Sticky action bar -->
-                <div class="sticky bottom-[4.5rem] lg:bottom-3 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-ivt-line bg-white/90 px-5 py-3.5 shadow-[0_8px_30px_-10px_rgba(33,28,39,0.2)] backdrop-blur-xl">
+                <div class="sticky bottom-[4.5rem] lg:bottom-3 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-ivt-line bg-white/90 px-5 py-3.5 shadow-[0_8px_30px_-10px_rgba(26,20,51,0.2)] backdrop-blur-xl">
                     <button
                         type="submit"
                         :disabled="form.processing || quotaReached"
-                        class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:bg-primary-bright hover:shadow-glow-primary active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
+                        class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-all duration-200 hover:brightness-110 hover:shadow-glow-violet hover:shadow-glow-primary active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none"
                     >
                         <svg v-if="form.processing" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />

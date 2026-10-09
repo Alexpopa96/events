@@ -12,7 +12,6 @@ defineProps({
     favoriteListingIds: { type: Array, default: () => [] },
     stats: { type: Object, default: () => ({ providers: 0, categories: 0, quoteRequests: 0 }) },
     quoteRequests: { type: Array, default: () => [] },
-    subscriptionPlans: { type: Array, default: () => [] },
 });
 
 const searchCategory = ref('');
@@ -29,7 +28,7 @@ const submitSearch = () => {
 <template>
     <Head title="EventHub — găsește furnizorii perfecți pentru evenimentul tău" />
 
-    <div class="bg-paper text-ink antialiased">
+    <div class="bg-ivt-paper text-ivt-ink antialiased">
         <SiteHeader />
 
         <HomeBody
@@ -41,7 +40,6 @@ const submitSearch = () => {
             :favorite-listing-ids="favoriteListingIds"
             :stats="stats"
             :quote-requests="quoteRequests"
-            :subscription-plans="subscriptionPlans"
             @search="submitSearch"
         />
 

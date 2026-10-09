@@ -16,13 +16,13 @@ const quotaReached = computed(() => props.quota?.max != null && props.quota.used
         <!-- Quota -->
         <section v-if="quota && quota.max !== null" class="rounded-2xl border border-ivt-line bg-white p-4 shadow-sm shadow-ivt-ink/5">
             <p class="text-sm font-semibold text-ivt-ink">Anunțuri folosite</p>
-            <p class="mt-0.5 text-xs" :class="quotaReached ? 'font-medium text-rose-600' : 'text-ivt-ink-soft'">
+            <p class="mt-0.5 text-xs" :class="quotaReached ? 'font-medium text-danger-600' : 'text-ivt-ink-soft'">
                 {{ quota.used }} / {{ quota.max }} din planul {{ quota.plan_name }}
             </p>
             <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-ivt-paper-2">
                 <div
                     class="h-full rounded-full transition-all duration-500"
-                    :class="quotaReached ? 'bg-rose-500' : 'bg-gradient-to-r from-primary-bright to-ivt-gold-bright'"
+                    :class="quotaReached ? 'bg-danger-500' : 'bg-gradient-to-r from-primary-bright to-ivt-accent-bright'"
                     :style="`width: ${Math.min(100, (quota.used / quota.max) * 100)}%`"
                 ></div>
             </div>

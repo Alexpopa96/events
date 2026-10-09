@@ -25,7 +25,7 @@ const imageLoaded = ref(false);
 </script>
 
 <template>
-    <div class="group relative flex overflow-hidden rounded-[18px] border border-ivt-line bg-white shadow-[0_18px_36px_-30px_rgba(22,40,31,0.25)] transition-all duration-300 hover:-translate-y-1 hover:shadow-ivt-soft">
+    <div class="group relative flex overflow-hidden rounded-[18px] border border-ivt-line bg-white shadow-[0_18px_36px_-30px_rgba(26,20,51,0.25)] transition-all duration-300 hover:-translate-y-1 hover:shadow-ivt-soft">
         <Link :href="route('listings.show', listing.slug)" class="relative block w-[150px] flex-none overflow-hidden bg-gradient-to-br from-ivt-paper-2 to-ivt-paper-3">
             <div v-if="listing.cover_url && !imageLoaded" class="absolute inset-0 animate-pulse bg-ivt-line/60" />
             <img
@@ -38,12 +38,12 @@ const imageLoaded = ref(false);
                 @error="imageLoaded = true"
             />
             <div v-else class="flex h-full w-full items-center justify-center">
-                <component :is="categoryIcon(categorySlug)" class="h-9 w-9 text-ivt-wine/25" />
+                <component :is="categoryIcon(categorySlug)" class="h-9 w-9 text-primary/25" />
             </div>
 
             <span
                 v-if="listing.is_featured"
-                class="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full border border-white/15 bg-ivt-ink px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.07em] text-ivt-gold-bright"
+                class="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full border border-white/15 bg-ivt-ink px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.07em] text-ivt-accent-bright"
             >
                 Premium
             </span>
@@ -52,15 +52,15 @@ const imageLoaded = ref(false);
         <button
             type="button"
             @click="toggleFavorite"
-            class="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-ivt-wine shadow-sm backdrop-blur transition-colors duration-150 hover:text-ivt-wine-bright"
+            class="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-primary shadow-sm backdrop-blur transition-colors duration-150 hover:text-primary-bright"
             :aria-label="isFavorited ? 'Elimină de la favorite' : 'Adaugă la favorite'"
         >
-            <HeartIconSolid v-if="isFavorited" class="h-3.5 w-3.5 text-ivt-wine" />
+            <HeartIconSolid v-if="isFavorited" class="h-3.5 w-3.5 text-primary" />
             <HeartIcon v-else class="h-3.5 w-3.5" />
         </button>
 
         <div class="flex flex-1 flex-col p-[18px]">
-            <Link :href="route('listings.show', listing.slug)" class="font-serif text-lg font-medium leading-snug text-ivt-ink transition-colors hover:text-ivt-wine">
+            <Link :href="route('listings.show', listing.slug)" class="font-display text-lg font-medium leading-snug text-ivt-ink transition-colors hover:text-primary">
                 {{ listing.title }}
             </Link>
             <p v-if="location(listing)" class="mt-1 flex items-center gap-1 text-xs text-ivt-ink-faint">
@@ -68,7 +68,7 @@ const imageLoaded = ref(false);
             </p>
 
             <div v-if="listing.rating" class="mt-2 flex items-center gap-1.5 text-[12.5px]">
-                <span class="flex items-center gap-0.5 text-ivt-gold"><StarIcon class="h-3.5 w-3.5" /></span>
+                <span class="flex items-center gap-0.5 text-ivt-accent-bright"><StarIcon class="h-3.5 w-3.5" /></span>
                 <span class="text-ivt-ink-faint">{{ listing.rating }} · {{ listing.reviews_count }} recenzii</span>
             </div>
 
@@ -82,7 +82,7 @@ const imageLoaded = ref(false);
                         :href="`tel:${listing.provider.phone}`"
                         @click="trackClick('phone_click')"
                         title="Sună"
-                        class="flex h-[29px] w-[29px] items-center justify-center rounded-full bg-ivt-ink text-ivt-paper transition-colors duration-150 hover:bg-ivt-wine"
+                        class="flex h-[29px] w-[29px] items-center justify-center rounded-full bg-ivt-ink text-ivt-paper transition-colors duration-150 hover:bg-primary"
                     >
                         <PhoneIcon class="h-3.5 w-3.5" />
                     </a>
@@ -93,7 +93,7 @@ const imageLoaded = ref(false);
                         rel="noopener"
                         @click="trackClick('whatsapp_click')"
                         title="WhatsApp"
-                        class="flex h-[29px] w-[29px] items-center justify-center rounded-full bg-ivt-ink text-ivt-paper transition-colors duration-150 hover:bg-ivt-wine"
+                        class="flex h-[29px] w-[29px] items-center justify-center rounded-full bg-ivt-ink text-ivt-paper transition-colors duration-150 hover:bg-primary"
                     >
                         <ChatBubbleLeftEllipsisIcon class="h-3.5 w-3.5" />
                     </a>
@@ -102,7 +102,7 @@ const imageLoaded = ref(false);
                         :href="`mailto:${listing.provider.email}`"
                         @click="trackClick('email_click')"
                         title="Email"
-                        class="flex h-[29px] w-[29px] items-center justify-center rounded-full bg-ivt-ink text-ivt-paper transition-colors duration-150 hover:bg-ivt-wine"
+                        class="flex h-[29px] w-[29px] items-center justify-center rounded-full bg-ivt-ink text-ivt-paper transition-colors duration-150 hover:bg-primary"
                     >
                         <EnvelopeIcon class="h-3.5 w-3.5" />
                     </a>

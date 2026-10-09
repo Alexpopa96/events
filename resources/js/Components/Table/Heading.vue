@@ -13,7 +13,7 @@
                 <ArrowUpDown v-else class="h-3.5 w-3.5 opacity-50 group-hover:opacity-100" />
             </button>
             <button v-if="selected" type="button" @click="$emit('removeSort')"
-                    class="text-ivt-ink-soft/50 transition-colors hover:text-rose-600" title="Elimină sortarea">
+                    class="text-ivt-ink-soft/50 transition-colors hover:text-danger-600" title="Elimină sortarea">
                 <X class="h-3.5 w-3.5" />
             </button>
         </div>

@@ -13,17 +13,134 @@ html {
     scrollbar-gutter: stable;
 }
 
+@layer base {
+    body {
+        @apply bg-ivt-paper text-ivt-ink;
+    }
+
+    ::selection {
+        background: theme(colors.primary.DEFAULT / 18%);
+        color: theme(colors.ivt.ink);
+    }
+
+    /* Headings set in the display face get its optical sizing and tighter tracking. */
+    .font-display {
+        font-optical-sizing: auto;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: theme(colors.ivt.paper-3) transparent;
+    }
+}
+
+@layer components {
+    /* Signature raspberry → violet gradient, as text. */
+    .text-gradient {
+        background-image: linear-gradient(110deg, theme(colors.primary.DEFAULT), theme(colors.ivt.violet), theme(colors.primary.bright), theme(colors.ivt.violet));
+        background-size: 250% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradient-x 8s ease infinite;
+    }
+
+    /* Lighter variant for dark surfaces. */
+    .text-gradient-light {
+        background-image: linear-gradient(110deg, theme(colors.primary.bright), theme(colors.ivt.violet-bright), theme(colors.ivt.accent-light), theme(colors.ivt.violet-bright));
+        background-size: 250% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: gradient-x 8s ease infinite;
+    }
+
+    /* Primary call-to-action: gradient fill with a light sweep on hover. */
+    .btn-brand {
+        @apply relative isolate inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-brand font-semibold text-white shadow-glow-primary transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow-violet focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 disabled:shadow-none;
+    }
+
+    .btn-brand::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.35) 50%, transparent 65%);
+        transform: translateX(-120%);
+        transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-brand:hover::after {
+        transform: translateX(120%);
+    }
+
+    /* Cursor-following glow, driven by the v-spotlight directive. */
+    .spotlight {
+        position: relative;
+    }
+
+    .spotlight::before {
+        content: '';
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        border-radius: inherit;
+        background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), theme(colors.ivt.violet / 10%), theme(colors.primary.DEFAULT / 6%) 35%, transparent 65%);
+        opacity: 0;
+        transition: opacity 0.35s ease;
+    }
+
+    .spotlight:hover::before {
+        opacity: 1;
+    }
+
+    /* Smooth return when the cursor leaves a v-tilt element. */
+    .tilt {
+        transform-style: preserve-3d;
+        transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform;
+    }
+
+    /* Gradient hairline border that lights up on hover. */
+    .ring-gradient {
+        position: relative;
+    }
+
+    .ring-gradient::after {
+        content: '';
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1.5px;
+        background: linear-gradient(135deg, theme(colors.primary.DEFAULT), theme(colors.ivt.violet), theme(colors.ivt.accent-bright));
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .ring-gradient:hover::after,
+    .ring-gradient:focus-within::after {
+        opacity: 1;
+    }
+}
+
 /* Scroll-reveal (used with the v-reveal directive) */
 .reveal {
     opacity: 0;
-    transform: translateY(28px);
-    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(28px) scale(0.98);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: opacity, transform;
 }
 
 .reveal-visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
 }
 
 @keyframes float-slow {
@@ -42,8 +159,8 @@ html {
 }
 
 @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(31, 92, 78, 0.35), 0 10px 40px -10px rgba(31, 92, 78, 0.35); }
-    50% { box-shadow: 0 0 0 10px rgba(31, 92, 78, 0), 0 10px 40px -5px rgba(31, 92, 78, 0.45); }
+    0%, 100% { box-shadow: 0 0 0 0 theme(colors.primary.DEFAULT / 35%), 0 10px 40px -10px theme(colors.primary.DEFAULT / 35%); }
+    50% { box-shadow: 0 0 0 10px theme(colors.primary.DEFAULT / 0%), 0 10px 40px -5px theme(colors.ivt.violet / 45%); }
 }
 
 @keyframes gradient-x {
@@ -83,8 +200,15 @@ html {
     .animate-float-slower,
     .animate-spin-slow,
     .animate-pulse-glow,
-    .animate-gradient-x {
+    .animate-gradient-x,
+    .animate-marquee,
+    .text-gradient,
+    .text-gradient-light {
         animation: none;
+    }
+
+    .btn-brand::after {
+        display: none;
     }
 
     html {

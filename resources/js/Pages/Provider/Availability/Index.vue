@@ -123,7 +123,7 @@ const dialogMessage = computed(() => blockToRemove.value?.source === 'offer'
         <div class="grid gap-5 lg:grid-cols-[1fr_20rem]">
             <div class="rounded-2xl border border-ivt-line bg-white p-5 shadow-sm shadow-ivt-ink/5">
                 <div class="mb-4 flex items-center justify-between">
-                    <p class="font-serif text-lg capitalize text-ivt-ink">{{ MONTHS[viewMonth] }} {{ viewYear }}</p>
+                    <p class="font-display text-lg capitalize text-ivt-ink">{{ MONTHS[viewMonth] }} {{ viewYear }}</p>
                     <div class="flex gap-1">
                         <button
                             type="button"
@@ -156,8 +156,8 @@ const dialogMessage = computed(() => blockToRemove.value?.source === 'offer'
                                 :class="[
                                     cell.past ? 'cursor-not-allowed text-ivt-ink-soft/30' :
                                     cell.block?.source === 'offer' ? 'bg-primary text-white' :
-                                    cell.block ? 'bg-rose-100 text-rose-700 hover:bg-rose-200' :
-                                    selected.has(cell.iso) ? 'bg-ivt-gold/20 text-ivt-ink ring-2 ring-ivt-gold' :
+                                    cell.block ? 'bg-danger-100 text-danger-700 hover:bg-danger-200' :
+                                    selected.has(cell.iso) ? 'bg-ivt-violet/20 text-ivt-ink ring-2 ring-ivt-violet' :
                                     'text-ivt-ink hover:bg-ivt-paper-2',
                                     cell.iso === todayIso ? 'font-bold' : '',
                                 ]"
@@ -172,8 +172,8 @@ const dialogMessage = computed(() => blockToRemove.value?.source === 'offer'
 
                 <div class="mt-5 flex flex-wrap items-center gap-4 text-xs text-ivt-ink-soft">
                     <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-full bg-primary" /> Rezervare confirmată</span>
-                    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-full bg-rose-200" /> Blocată manual</span>
-                    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-full bg-ivt-gold/30 ring-1 ring-ivt-gold" /> Selectată</span>
+                    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-full bg-danger-200" /> Blocată manual</span>
+                    <span class="flex items-center gap-1.5"><span class="h-3 w-3 rounded-full bg-ivt-violet/30 ring-1 ring-ivt-violet" /> Selectată</span>
                 </div>
 
                 <div v-if="selected.size" class="mt-5 rounded-xl bg-ivt-paper-2/60 p-4">
@@ -190,7 +190,7 @@ const dialogMessage = computed(() => blockToRemove.value?.source === 'offer'
                             type="button"
                             :disabled="busy"
                             @click="blockSelected"
-                            class="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:bg-primary-bright disabled:cursor-not-allowed disabled:opacity-50"
+                            class="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-primary/25 transition-colors hover:brightness-110 hover:shadow-glow-violet disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             Blochează
                         </button>
