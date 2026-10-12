@@ -16,3 +16,4 @@ Schedule::command('weather:sync')->dailyAt('07:00')
 // Until then, a weekly long-range trend from Open-Meteo (free, no key).
 Schedule::command('weather:outlook')->weeklyOn(1, '07:00')
     ->when(fn () => now()->lt('2026-10-29 00:00'));
+Schedule::command('weather:send')->everySixHours()->timezone('Europe/Bucharest');
